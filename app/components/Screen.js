@@ -1,8 +1,12 @@
 import React from "react";
 import Constants from "expo-constants";
 import { StyleSheet, SafeAreaView, View } from "react-native";
+import { useTheme } from '../contexts/ThemeContext';
 
 function Screen({ children, style }) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme)
+
   return (
     <SafeAreaView style={[styles.screen, style]}>
       <View style={[styles.view, style]}>{children}</View>
@@ -10,8 +14,9 @@ function Screen({ children, style }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme) => StyleSheet.create({
   screen: {
+    backgroundColor: theme.background,
     paddingTop: Constants.statusBarHeight,
     flex: 1,
   },

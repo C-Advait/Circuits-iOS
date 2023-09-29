@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import Screen from '../components/Screen';
+import Header from '../components/Header';
 
 function SettingsScreen(props) {
   return (
     <Screen>
-      <Text>SettingsScreen</Text>
+      <Header>Settings</Header>
     </Screen>
   );
 }

@@ -9,10 +9,14 @@ const Tab = createBottomTabNavigator();
 
 function AppNavigator() {
   return (
-        <Tab.Navigator>
-          <Tab.Screen name={routes.ROUTINES} component={RoutineNavigator} />
-          <Tab.Screen name={routes.SETTINGS_SCREEN} component={SettingsScreen} />
-        </Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+    <Tab.Screen name={routes.ROUTINES} component={RoutineNavigator} />
+    <Tab.Screen name={routes.SETTINGS_SCREEN} component={SettingsScreen} />
+    </Tab.Navigator>
   );
 }
 

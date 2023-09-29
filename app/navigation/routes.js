@@ -1,7 +1,7 @@
 export default Object.freeze({
-  ROUTINES: "RoutinesNavigator",
+  ROUTINES: "Routines",
   ROUTINES_SCREEN: "RoutinesScreen",
   ROUTINE_EDIT_SCREEN: "RoutineEditScreen",
   TIMER_SCREEN: "TimerScreen",
-  SETTINGS_SCREEN: "SettingsScreen",
+  SETTINGS_SCREEN: "Settings",
 });
