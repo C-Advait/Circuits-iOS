@@ -4,7 +4,6 @@ import { useTheme } from '../contexts/ThemeContext';
 
 function Header({ children, style }) {
   const { theme } = useTheme();
-  console.log("Theme in header: ", theme);
   const styles = getStyles(theme);
 
   return (

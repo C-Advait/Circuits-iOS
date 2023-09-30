@@ -11,7 +11,7 @@ function RoutineEditScreen(props) {
   return (
     <Screen>
       <Header>RoutineEditScreen</Header>
-      <Button title={"routines"} onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}/>
+      <Button title={"Back to routines"} onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}/>
     </Screen>
   );
 }
