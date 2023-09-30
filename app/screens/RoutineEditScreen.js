@@ -1,12 +1,14 @@
 import React from "react";
-import { StyleSheet, Button } from "react-native";
-import Screen from "../components/Screen";
+import { View, StyleSheet, Button } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import Header from "../components/Header";
-import routes from "../navigation/routes";
+import { Feather } from "@expo/vector-icons";
+
 import AuxiliaryCard from "../components/AuxiliaryCard";
-import { useTheme } from "../contexts/ThemeContext";
 import DummyInputComponent from "../components/DummyInputComponent";
+import Header from "../components/Header";
+import Screen from "../components/Screen";
+import routes from "../navigation/routes";
+import { useTheme } from "../contexts/ThemeContext";
 
 function RoutineEditScreen() {
   const navigation = useNavigation();
@@ -19,11 +21,30 @@ function RoutineEditScreen() {
         title="Back to routines"
         onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
       />
-      <AuxiliaryCard
-        title="Warmup"
-        accentColour={theme.accentGreen}
-        InputComponent={DummyInputComponent}
-      />
+      <View style={{ gap: 10 }}>
+        <AuxiliaryCard
+          title="Warm-up"
+          accentColour={theme.accentGreen}
+          InputComponent={DummyInputComponent}
+        />
+        <AuxiliaryCard
+          title="Cool down"
+          accentColour={theme.accentDarkBlue}
+          InputComponent={DummyInputComponent}
+        />
+        <AuxiliaryCard
+          title="Loop Exercise"
+          bold={true}
+          editable={false}
+          Icon={() => <Feather name="repeat" color={theme.primary} size={24} />}
+          InputComponent={() => <DummyInputComponent text="Once" />}
+        />
+        <AuxiliaryCard
+          title="Sounds"
+          editable={false}
+          InputComponent={() => <DummyInputComponent text="Chimes" />}
+        />
+      </View>
     </Screen>
   );
 }
