@@ -1,11 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { useTheme } from "../contexts/ThemeContext";
 import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/constants";
 
-function AuxiliaryCard({ accentColour, title }) {
+function AuxiliaryCard({ accentColour, title, InputComponent }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
@@ -16,7 +16,7 @@ function AuxiliaryCard({ accentColour, title }) {
         <EditableText placeholder="Warmup" style={styles.header}>
           {title}
         </EditableText>
-        <Text style={styles.body}>10 minutes</Text>
+        <InputComponent />
       </View>
     </View>
   );
@@ -52,10 +52,6 @@ const getStyles = (theme) =>
     subtitle: {
       fontSize: 18,
       marginTop: 5,
-    },
-    body: {
-      fontSize: PARAGRAPH_FONT_SIZE,
-      color: theme.text87,
     },
     buttonContainer: {
       flexDirection: "row",
