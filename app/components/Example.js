@@ -4,7 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 
 function Example() {
   const { theme } = useTheme();
-  const styles = getStyles(theme)
+  const styles = getStyles(theme);
 
   return (
     <View style={styles.container}>
