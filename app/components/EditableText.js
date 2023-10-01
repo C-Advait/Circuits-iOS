@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { PARAGRAPH_FONT_SIZE } from "../config/constants";
+import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import { useTheme } from "../contexts/ThemeContext";
 
 // TODO: Emit error when name is empty

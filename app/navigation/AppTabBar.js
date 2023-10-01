@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import navigationIcons from './navigationIcons';
-import { TAB_BAR_HEIGHT } from '../config/constants';
+import { TAB_BAR_HEIGHT } from '../config/appConstants';
 import { useTheme } from '../contexts/ThemeContext';
 
 const AppTabBar = ({ state, descriptors, navigation }) => {

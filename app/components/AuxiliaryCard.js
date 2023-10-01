@@ -3,7 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 
 import { useTheme } from "../contexts/ThemeContext";
 import EditableText from "./EditableText";
-import { PARAGRAPH_FONT_SIZE } from "../config/constants";
+import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 function AuxiliaryCard({
   accentColour,
