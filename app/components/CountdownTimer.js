@@ -1,11 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { Button, View, StyleSheet, Text } from 'react-native';
 
-
-function decrement() {
-
-}
-
 function CountdownTimer({length}) {
 
     const [seconds, setSeconds] = useState(length); //Start at the top, as we want a count-down timer
