@@ -8,12 +8,11 @@ import {
 } from "../config/appConstants";
 import { IconButton } from "./buttons";
 import RoutineActionButton from "./buttons/RoutineActionButton";
-
-// TODO: Convert minutes to xxh yym
+import formatDuration from "../utilities/formatDuration";
 
 const RoutineCard = ({
   accentColour,
-  duration, // Minutes; convert in this component
+  duration, // In seconds
   title,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -28,7 +27,7 @@ const RoutineCard = ({
       <View style={styles.permanentInfoContainer}>
         <View style={styles.headerTextContainer}>
           <Text style={styles.header}>{title}</Text>
-          <Text style={styles.duration}>{duration}m</Text>
+          <Text style={styles.duration}>{formatDuration(duration)}</Text>
         </View>
         <TouchableOpacity
           style={styles.chevron}

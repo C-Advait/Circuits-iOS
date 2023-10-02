@@ -29,7 +29,7 @@ function RoutinesScreen() {
         <RoutineCard
           accentColour={theme.accentGreen}
           title="Arms"
-          duration={40}
+          duration={1634}
         />
       </View>
     </Screen>
