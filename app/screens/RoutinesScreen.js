@@ -1,49 +1,65 @@
 import React from "react";
-import { StyleSheet, Button } from "react-native";
+import { StyleSheet, FlatList } from "react-native";
 import Screen from "../components/Screen";
-import { useNavigation } from "@react-navigation/core";
 
 import Header from "../components/Header";
-import routes from "../navigation/routes";
 import RoutineCard from "../components/RoutineCard";
 import { useTheme } from "../contexts/ThemeContext";
 
 import { View } from "react-native";
 
 function RoutinesScreen() {
-  const navigation = useNavigation();
   const { theme } = useTheme();
+
+  const data = [
+    {
+      id: 1,
+      title: "Arms",
+      duration: 3600,
+      accentColour: theme.accentOrange,
+    },
+    {
+      id: 2,
+      title: "Leg Workout A",
+      duration: 5100,
+      accentColour: theme.accentLightBlue,
+    },
+    {
+      id: 3,
+      title: "Climbing Circuit",
+      duration: 7200,
+      accentColour: theme.accentDarkBlue,
+    },
+    {
+      id: 4,
+      title: "Morning Meditation",
+      duration: 300,
+      accentColour: theme.accentPurple,
+    },
+    {
+      id: 5,
+      title: "Morning Meditation",
+      duration: 300,
+      accentColour: theme.accentGreen,
+    },
+  ];
 
   return (
     <Screen>
       <Header>Routines</Header>
-      <View style={{ padding: "5%", gap: 12 }}>
-        <RoutineCard
-          accentColour={theme.accentGreen}
-          title="Arms"
-          duration={3600}
-        />
-        <RoutineCard
-          accentColour={theme.accentPurple}
-          title="Leg Workout A"
-          duration={5100}
-        />
-        <RoutineCard
-          accentColour={theme.accentDarkBlue}
-          title="Climbing Circuit"
-          duration={7200}
-        />
-        <RoutineCard
-          accentColour={theme.accentLightBlue}
-          title="Morning Meditation"
-          duration={300}
-        />
-        <RoutineCard
-          accentColour={theme.accentOrange}
-          title="Morning Meditation"
-          duration={300}
-        />
-      </View>
+      <FlatList
+        data={data}
+        renderItem={({ item }) => (
+          <RoutineCard
+            title={item.title}
+            duration={item.duration}
+            accentColour={item.accentColour}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        style={{ marginHorizontal: 10 }}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+      />
     </Screen>
   );
 }

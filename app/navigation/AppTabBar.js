@@ -1,20 +1,21 @@
-import React from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import React from "react";
+import { StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 
-import navigationIcons from './navigationIcons';
-import { TAB_BAR_HEIGHT } from '../config/appConstants';
-import { useTheme } from '../contexts/ThemeContext';
+import navigationIcons from "./navigationIcons";
+import { TAB_BAR_HEIGHT } from "../config/appConstants";
+import { useTheme } from "../contexts/ThemeContext";
 
 const AppTabBar = ({ state, descriptors, navigation }) => {
   const { theme } = useTheme();
 
   return (
-    // Currently hard-coded for dark-mode. 
+    // Currently hard-coded for dark-mode.
     <LinearGradient
       colors={[
-        'rgba(30, 30, 30, 0)',      // #1e1e1e at 0% opacity
-        'rgba(18, 18, 18, 0.75)'   // #121212 at 75% opacity
+        "rgba(30, 30, 30, 0)", // #1e1e1e at 0% opacity
+        "rgba(18, 18, 18, 0.75)", // #121212 at 75% opacity
       ]}
       style={styles.bar}
       start={[0, 0]}
@@ -27,17 +28,18 @@ const AppTabBar = ({ state, descriptors, navigation }) => {
             options.tabBarLabel !== undefined
               ? options.tabBarLabel
               : options.title !== undefined
-                ? options.title
-                : route.name;
+              ? options.title
+              : route.name;
           const Icon = navigationIcons[route.name];
 
           const isFocused = state.index === index;
-          const color = isFocused ? 
-             theme.tabBarActiveTintColor : theme.tabBarInactiveTintColor;
+          const color = isFocused
+            ? theme.tabBarActiveTintColor
+            : theme.tabBarInactiveTintColor;
 
           const onPress = () => {
             const event = navigation.emit({
-              type: 'tabPress',
+              type: "tabPress",
               target: route.key,
               canPreventDefault: true,
             });
@@ -50,7 +52,7 @@ const AppTabBar = ({ state, descriptors, navigation }) => {
 
           const onLongPress = () => {
             navigation.emit({
-              type: 'tabLongPress',
+              type: "tabLongPress",
               target: route.key,
             });
           };
@@ -66,26 +68,34 @@ const AppTabBar = ({ state, descriptors, navigation }) => {
               onLongPress={onLongPress}
               style={styles.touchable}
             >
-              <View style={styles.tabGroupContainer}>
-                <Icon size={24} color={color} />
-                <Text style={[styles.label, { color: color }]}>
-                  {label}
-                </Text>
-              </View>
+              <>
+                <View style={styles.tabGroupContainer}>
+                  <Icon size={24} color={color} />
+                  <Text style={[styles.label, { color: color }]}>{label}</Text>
+                </View>
+                <View
+                  style={{
+                    zIndex: 3,
+                    backgroundColor: "dodgerblue",
+                    position: "absolute",
+                    height: 100,
+                  }}
+                />
+              </>
             </TouchableWithoutFeedback>
           );
         })}
       </View>
     </LinearGradient>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   bar: {
-    backgroundColor: "transparent",
+    backgroundColor: "#1212120c",
     bottom: 0,
     position: "absolute",
-    width: "100%"
+    width: "100%",
   },
   label: {
     fontSize: 10,
@@ -106,7 +116,7 @@ const styles = StyleSheet.create({
   },
   touchable: {
     backgroundColor: "transparent",
-  }
+  },
 });
 
 export default AppTabBar;
