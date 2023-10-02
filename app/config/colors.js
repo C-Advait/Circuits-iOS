@@ -15,6 +15,7 @@ export const darkTheme = {
   accentOrange: "#ffae35",
   tabBarActiveTintColor: "#eee",
   tabBarInactiveTintColor: "#909090",
+  dullIcon: '#FFFFFF'
 };
 
 export const lightTheme = {
