@@ -27,22 +27,25 @@ function RoutineCard({
       {accentColour ? (
         <View style={[styles.accent, { backgroundColor: accentColour }]} />
       ) : null}
-      <View style={styles.permanentInfoContainer}>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.header}>{title}</Text>
-          <Text style={styles.duration}>{formatDuration(duration)}</Text>
+      <TouchableOpacity 
+        onPress={() => setIsExpanded(!isExpanded)}
+        activeOpacity={0.8}>
+        <View style={styles.permanentInfoContainer}>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.header}>{title}</Text>
+            <Text style={styles.duration}>{formatDuration(duration)}</Text>
+          </View>
+          <View
+            style={styles.chevron}
+          >
+            <Feather
+              name={isExpanded ? "chevron-up" : "chevron-down"}
+              size={26}
+              color={theme.text60}
+            />
+          </View>
         </View>
-        <TouchableOpacity
-          style={styles.chevron}
-          onPress={() => setIsExpanded(!isExpanded)}
-        >
-          <Feather
-            name={isExpanded ? "chevron-up" : "chevron-down"}
-            size={26}
-            color={theme.text60}
-          />
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
 
       {isExpanded ? (
         <>
