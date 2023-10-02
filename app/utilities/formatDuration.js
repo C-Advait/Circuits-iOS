@@ -7,6 +7,9 @@ export default function formatDuration(seconds) {
   } else {
     let hours = Math.floor(seconds / 3600);
     let minutes = Math.round((seconds % 3600) / 60);
+    if (minutes === 0) {
+      return `${hours}h`;
+    }
     return `${hours}h ${minutes}m`;
   }
 }

@@ -16,20 +16,32 @@ function RoutinesScreen() {
 
   return (
     <Screen>
-      <Header>RoutinesScreen</Header>
-      <Button
-        title={"Edit"}
-        onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
-      />
-      <Button
-        title={"Go to timer"}
-        onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
-      />
-      <View style={{ padding: "5%" }}>
+      <Header>Routines</Header>
+      <View style={{ padding: "5%", gap: 12 }}>
         <RoutineCard
           accentColour={theme.accentGreen}
           title="Arms"
-          duration={1634}
+          duration={3600}
+        />
+        <RoutineCard
+          accentColour={theme.accentPurple}
+          title="Leg Workout A"
+          duration={5100}
+        />
+        <RoutineCard
+          accentColour={theme.accentDarkBlue}
+          title="Climbing Circuit"
+          duration={7200}
+        />
+        <RoutineCard
+          accentColour={theme.accentLightBlue}
+          title="Morning Meditation"
+          duration={300}
+        />
+        <RoutineCard
+          accentColour={theme.accentOrange}
+          title="Morning Meditation"
+          duration={300}
         />
       </View>
     </Screen>

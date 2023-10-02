@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
@@ -9,13 +9,16 @@ import {
 import { IconButton } from "./buttons";
 import RoutineActionButton from "./buttons/RoutineActionButton";
 import formatDuration from "../utilities/formatDuration";
+import { useNavigation } from "@react-navigation/native";
+import routes from "../navigation/routes";
 
-const RoutineCard = ({
+function RoutineCard({
   accentColour,
   duration, // In seconds
   title,
-}) => {
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
@@ -54,14 +57,14 @@ const RoutineCard = ({
           <View style={styles.buttonContainer}>
             <RoutineActionButton
               title="Start"
-              onPress={() => console.log("start")}
+              onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
               iconName="play-outline"
               IconFamily={Ionicons}
               foregroundColour={theme.text87}
             />
             <RoutineActionButton
               title="Edit"
-              onPress={() => console.log("edit")}
+              onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
               iconName="edit-2"
               IconFamily={Feather}
               foregroundColour={theme.text87}
@@ -70,14 +73,14 @@ const RoutineCard = ({
               iconName="trash-can-outline"
               IconFamily={MaterialCommunityIcons}
               foregroundColour={theme.danger}
-              onPress={() => console.log("delete")}
+              onPress={() => Alert.alert("Delete", "Delete")}
             />
           </View>
         </>
       ) : null}
     </View>
   );
-};
+}
 
 const getStyles = (theme) =>
   StyleSheet.create({
