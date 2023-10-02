@@ -7,6 +7,7 @@ import RoutineCard from "../components/RoutineCard";
 import { useTheme } from "../contexts/ThemeContext";
 
 import { View } from "react-native";
+import { TAB_BAR_HEIGHT } from "../config/appConstants";
 
 function RoutinesScreen() {
   const { theme } = useTheme();
@@ -46,20 +47,25 @@ function RoutinesScreen() {
 
   return (
     <Screen>
-      <Header>Routines</Header>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => (
-          <RoutineCard
-            title={item.title}
-            duration={item.duration}
-            accentColour={item.accentColour}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        style={{ marginHorizontal: 10 }}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-      />
+      <View style={{ height: "100%" }}>
+        <Header>Routines</Header>
+        <FlatList
+          data={data}
+          renderItem={({ item }) => (
+            <RoutineCard
+              title={item.title}
+              duration={item.duration}
+              accentColour={item.accentColour}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          style={{ marginHorizontal: 10 }}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          ListFooterComponent={() => (
+            <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
+          )}
+        />
+      </View>
     </Screen>
   );
 }

@@ -1,121 +1,85 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 
-import navigationIcons from "./navigationIcons";
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { useTheme } from "../contexts/ThemeContext";
+import navigationIcons from "./navigationIcons";
 
 const AppTabBar = ({ state, descriptors, navigation }) => {
   const { theme } = useTheme();
 
   return (
-    // Currently hard-coded for dark-mode.
-    <LinearGradient
-      colors={[
-        "rgba(30, 30, 30, 0)", // #1e1e1e at 0% opacity
-        "rgba(18, 18, 18, 0.75)", // #121212 at 75% opacity
-      ]}
-      style={styles.bar}
-      start={[0, 0]}
-      end={[0, 1]}
+    <BlurView
+      style={styles.tabBar}
+      blurType="extraDark"
+      blurAmount={50}
+      reducedTransparencyFallbackColor={theme.background}
     >
-      <View style={styles.tabContainer}>
-        {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name;
-          const Icon = navigationIcons[route.name];
+      <View style={styles.colorOverlay} />
+      {state.routes.map((route, index) => {
+        const { options } = descriptors[route.key];
+        const label =
+          options.tabBarLabel !== undefined
+            ? options.tabBarLabel
+            : options.title !== undefined
+            ? options.title
+            : route.name;
 
-          const isFocused = state.index === index;
-          const color = isFocused
-            ? theme.tabBarActiveTintColor
-            : theme.tabBarInactiveTintColor;
+        const isFocused = state.index === index;
 
-          const onPress = () => {
-            const event = navigation.emit({
-              type: "tabPress",
-              target: route.key,
-              canPreventDefault: true,
-            });
+        const onPress = () => {
+          const event = navigation.emit({
+            type: "tabPress",
+            target: route.key,
+          });
 
-            if (!isFocused && !event.defaultPrevented) {
-              // The `merge: true` option makes sure that the params inside the tab screen are preserved
-              navigation.navigate({ name: route.name, merge: true });
-            }
-          };
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
 
-          const onLongPress = () => {
-            navigation.emit({
-              type: "tabLongPress",
-              target: route.key,
-            });
-          };
+        const Icon = navigationIcons[route.name];
+        const color = isFocused
+          ? theme.tabBarActiveTintColor
+          : theme.tabBarInactiveTintColor;
 
-          return (
-            <TouchableWithoutFeedback
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              key={index}
-              testID={options.tabBarTestID}
-              onPress={onPress}
-              onLongPress={onLongPress}
-              style={styles.touchable}
-            >
-              <>
-                <View style={styles.tabGroupContainer}>
-                  <Icon size={24} color={color} />
-                  <Text style={[styles.label, { color: color }]}>{label}</Text>
-                </View>
-                <View
-                  style={{
-                    zIndex: 3,
-                    backgroundColor: "dodgerblue",
-                    position: "absolute",
-                    height: 100,
-                  }}
-                />
-              </>
-            </TouchableWithoutFeedback>
-          );
-        })}
-      </View>
-    </LinearGradient>
+        return (
+          <TouchableOpacity
+            key={index}
+            onPress={onPress}
+            style={styles.tabItem}
+          >
+            <View style={[styles.tabItem, { gap: 5 }]}>
+              <Icon size={24} color={color} />
+              <Text style={{ fontSize: 12, color: color }}>{label}</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </BlurView>
   );
 };
 
 const styles = StyleSheet.create({
-  bar: {
-    backgroundColor: "#1212120c",
-    bottom: 0,
-    position: "absolute",
-    width: "100%",
+  colorOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: "rgba(0,0,0,0.7)", // adjust opacity as needed
   },
-  label: {
-    fontSize: 10,
-  },
-  tabContainer: {
-    backgroundColor: "transparent",
+  tabBar: {
     flexDirection: "row",
     height: TAB_BAR_HEIGHT,
-    justifyContent: "space-around",
-    paddingBottom: 15,
-    zIndex: 2,
-  },
-  tabGroupContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: "transparent",
+    paddingBottom: 10,
+  },
+  tabItem: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
-  },
-  touchable: {
-    backgroundColor: "transparent",
   },
 });
 
