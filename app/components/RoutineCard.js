@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   ROUTINE_PARAGRAPH_FONT_SIZE,
   ROUTINE_TITLE_FONT_SIZE,
 } from "../config/appConstants";
+import { IconButton } from "./buttons";
+import RoutineActionButton from "./buttons/RoutineActionButton";
 
 // TODO: Convert minutes to xxh yym
 
@@ -42,11 +44,35 @@ const RoutineCard = ({
 
       {isExpanded ? (
         <>
-          <Text style={styles.body}>Body</Text>
+          <Text style={styles.body}>
+            Pushups (3x1min){"\n"}
+            Dips (5x60s){"\n"}
+            Hammer Curls (4x30s){"\n"}
+            Bicep Curls (4x30s){"\n"}
+            {"\n"}
+            Loops 2 times
+          </Text>
           <View style={styles.buttonContainer}>
-            <Button title="start" onPress={() => console.log("start")} />
-            <Button title="edit" onPress={() => console.log("edit")} />
-            <Button title="delete" onPress={() => console.log("delete")} />
+            <RoutineActionButton
+              title="Start"
+              onPress={() => console.log("start")}
+              iconName="play-outline"
+              IconFamily={Ionicons}
+              foregroundColour={theme.text87}
+            />
+            <RoutineActionButton
+              title="Edit"
+              onPress={() => console.log("edit")}
+              iconName="edit-2"
+              IconFamily={Feather}
+              foregroundColour={theme.text87}
+            />
+            <IconButton
+              iconName="trash-can-outline"
+              IconFamily={MaterialCommunityIcons}
+              foregroundColour={theme.danger}
+              onPress={() => console.log("delete")}
+            />
           </View>
         </>
       ) : null}
@@ -70,8 +96,11 @@ const getStyles = (theme) =>
       marginTop: 8,
     },
     buttonContainer: {
+      alignItems: "center",
       flexDirection: "row",
-      justifyContent: "space-between",
+      gap: 20,
+      justifyContent: "flex-start",
+      marginBottom: 12,
     },
     chevron: {
       alignSelf: "center",
@@ -81,7 +110,6 @@ const getStyles = (theme) =>
       borderRadius: 8,
       paddingLeft: 24,
       paddingRight: 16,
-      width: "90%",
     },
     duration: {
       color: theme.text60,
@@ -89,7 +117,7 @@ const getStyles = (theme) =>
       fontWeight: 600,
     },
     header: {
-      color: theme.primary,
+      color: theme.text87,
       fontSize: ROUTINE_TITLE_FONT_SIZE,
       marginBottom: 8,
     },

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, Button } from "react-native";
+import { StyleSheet, Button } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
 
@@ -8,7 +8,9 @@ import routes from "../navigation/routes";
 import RoutineCard from "../components/RoutineCard";
 import { useTheme } from "../contexts/ThemeContext";
 
-function RoutinesScreen(props) {
+import { View } from "react-native";
+
+function RoutinesScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
 
@@ -23,11 +25,13 @@ function RoutinesScreen(props) {
         title={"Go to timer"}
         onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
       />
-      <RoutineCard
-        accentColour={theme.accentGreen}
-        title="Arms"
-        duration={40}
-      />
+      <View style={{ padding: "5%" }}>
+        <RoutineCard
+          accentColour={theme.accentGreen}
+          title="Arms"
+          duration={40}
+        />
+      </View>
     </Screen>
   );
 }
