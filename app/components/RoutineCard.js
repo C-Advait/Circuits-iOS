@@ -85,8 +85,6 @@ function RoutineCard({
 const getStyles = (theme) =>
   StyleSheet.create({
     accent: {
-      borderBottomLeftRadius: 8,
-      borderTopLeftRadius: 8,
       height: "100%",
       position: "absolute",
       width: 3,
@@ -110,6 +108,7 @@ const getStyles = (theme) =>
     container: {
       backgroundColor: theme.tileBackground,
       borderRadius: 8,
+      overflow: "hidden",
       paddingLeft: 24,
       paddingRight: 16,
     },
