@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, FlatList, Alert } from "react-native";
 import Screen from "../components/Screen";
 
@@ -48,6 +48,40 @@ function RoutinesScreen() {
     },
   ];
 
+  // Initialize all items as not expanded.
+  const [expandedStates, setExpandedStates] = useState(
+    new Array(data.length).fill(false),
+  );
+
+  // State to track if all items are expanded or collapsed.
+  const [selectAllExpanded, setSelectAllExpanded] = useState(false);
+
+  const checkAllExpanded = (states) => {
+    // Check if all items in states are true
+    const allExpanded = states.every((state) => state);
+    setSelectAllExpanded(allExpanded);
+  };
+
+  const toggleExpand = (index) => {
+    const newStates = [...expandedStates];
+    newStates[index] = !newStates[index];
+    setExpandedStates(newStates);
+
+    // Check if all items are expanded after toggling
+    checkAllExpanded(newStates);
+  };
+
+  const expandCollapseAll = () => {
+    // If all are currently expanded, collapse all. Otherwise, expand all.
+    const newStates = selectAllExpanded
+      ? new Array(data.length).fill(false)
+      : new Array(data.length).fill(true);
+    setExpandedStates(newStates);
+
+    // Update the selectAllExpanded state
+    setSelectAllExpanded(!selectAllExpanded);
+  };
+
   return (
     <Screen>
       <View style={{ height: "100%" }}>
@@ -71,21 +105,21 @@ function RoutinesScreen() {
             onPress={() => Alert.alert("Sort", "Sort")}
           />
           <IconButton
-            iconName="maximize-2"
+            iconName={selectAllExpanded ? "minimize-2" : "maximize-2"}
             IconFamily={Feather}
             iconSize={40}
             foregroundColour={theme.text87}
             style={{ marginRight: 10 }}
-            onPress={() => Alert.alert("Expand all", "Expand")}
+            onPress={() => expandCollapseAll()}
           />
         </View>
         <FlatList
           data={data}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <RoutineCard
-              title={item.title}
-              duration={item.duration}
-              accentColour={item.accentColour}
+              item={item}
+              isExpanded={expandedStates[index]}
+              toggleExpand={() => toggleExpand(index)}
             />
           )}
           keyExtractor={(item) => item.id}

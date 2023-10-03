@@ -11,12 +11,10 @@ import formatDuration from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 
-function RoutineCard({
-  accentColour,
-  duration, // In seconds
-  title,
-}) {
-  const [isExpanded, setIsExpanded] = useState(false);
+function RoutineCard({ item, isExpanded, toggleExpand }) {
+  // Duration in seconds
+  const { accentColour, duration, title } = item;
+
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -26,10 +24,7 @@ function RoutineCard({
       {accentColour ? (
         <View style={[styles.accent, { backgroundColor: accentColour }]} />
       ) : null}
-      <TouchableOpacity
-        onPress={() => setIsExpanded(!isExpanded)}
-        activeOpacity={0.8}
-      >
+      <TouchableOpacity onPress={() => toggleExpand()} activeOpacity={0.8}>
         <View style={styles.permanentInfoContainer}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.header}>{title}</Text>
