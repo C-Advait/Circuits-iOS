@@ -6,8 +6,7 @@ import {
   ROUTINE_PARAGRAPH_FONT_SIZE,
   ROUTINE_TITLE_FONT_SIZE,
 } from "../config/appConstants";
-import { IconButton } from "./buttons";
-import RoutineActionButton from "./buttons/RoutineActionButton";
+import { IconButton, RoutineActionButton } from "./buttons";
 import formatDuration from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
@@ -27,17 +26,16 @@ function RoutineCard({
       {accentColour ? (
         <View style={[styles.accent, { backgroundColor: accentColour }]} />
       ) : null}
-      <TouchableOpacity 
+      <TouchableOpacity
         onPress={() => setIsExpanded(!isExpanded)}
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <View style={styles.permanentInfoContainer}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.header}>{title}</Text>
             <Text style={styles.duration}>{formatDuration(duration)}</Text>
           </View>
-          <View
-            style={styles.chevron}
-          >
+          <View style={styles.chevron}>
             <Feather
               name={isExpanded ? "chevron-up" : "chevron-down"}
               size={26}
