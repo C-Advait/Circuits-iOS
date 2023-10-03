@@ -45,9 +45,7 @@ const getStyles = (theme) =>
   StyleSheet.create({
     accent: {
       width: 3,
-      height: "98%",
-      borderTopLeftRadius: 8,
-      borderBottomLeftRadius: 8,
+      height: "100%",
     },
     buttonContainer: {
       flexDirection: "row",
@@ -60,6 +58,7 @@ const getStyles = (theme) =>
       borderRadius: 8,
       flexDirection: "row",
       height: 42,
+      overflow: "hidden",
       marginHorizontal: 16,
     },
     contentContainer: {

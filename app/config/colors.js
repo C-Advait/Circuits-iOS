@@ -5,6 +5,7 @@ export const darkTheme = {
   tileBackground: "#ffffff0c",
   foreground: "#eeeeee",
   primary: "#eeeeee",
+  danger: "#d93453",
   text: "#aaa",
   text87: "#ffffffde",
   text60: "#ffffff99",
