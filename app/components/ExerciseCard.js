@@ -2,6 +2,7 @@ import React, { useRef, useState} from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { EvilIcons, MaterialIcons } from '@expo/vector-icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Animated from 'react-native-reanimated';
 
 import { useTheme } from '../contexts/ThemeContext';
 import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE, PARAGRAPH_FONT_WEIGHT } from '../config/appConstants';
@@ -26,12 +27,12 @@ function ExerciseCard({
         <Swipeable 
           ref={swipeableRef}
           renderRightActions={() => (
-            <View style={styles.trashContainer}>
+            <Animated.View style={[styles.trashContainer, ]}>
               <EvilIcons name="trash" size={40} color="white" />
-            </View>
+            </Animated.View>
           )}
-          onSwipeableWillOpen={() => setIsSwipeableOpen(true)}
-          onSwipeableClose={() => setIsSwipeableOpen(false)}
+          // onSwipeableWillOpen={() => setIsSwipeableOpen(true)}
+          // onSwipeableClose={() => setIsSwipeableOpen(false)}
         >
             <View style={styles.container}>
                 {accentColor && (
