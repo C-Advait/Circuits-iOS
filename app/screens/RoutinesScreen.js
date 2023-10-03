@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, FlatList, Alert } from "react-native";
 import Screen from "../components/Screen";
 
@@ -46,6 +46,66 @@ function RoutinesScreen() {
       duration: 300,
       accentColour: theme.accentGreen,
     },
+    {
+      id: 6,
+      title: "Arms",
+      duration: 3600,
+      accentColour: theme.accentOrange,
+    },
+    {
+      id: 7,
+      title: "Leg Workout A",
+      duration: 5100,
+      accentColour: theme.accentLightBlue,
+    },
+    {
+      id: 8,
+      title: "Climbing Circuit",
+      duration: 7200,
+      accentColour: theme.accentDarkBlue,
+    },
+    {
+      id: 9,
+      title: "Morning Meditation",
+      duration: 300,
+      accentColour: theme.accentPurple,
+    },
+    {
+      id: 10,
+      title: "Morning Meditation",
+      duration: 300,
+      accentColour: theme.accentGreen,
+    },
+    {
+      id: 11,
+      title: "Arms",
+      duration: 3600,
+      accentColour: theme.accentOrange,
+    },
+    {
+      id: 12,
+      title: "Leg Workout A",
+      duration: 5100,
+      accentColour: theme.accentLightBlue,
+    },
+    {
+      id: 13,
+      title: "Climbing Circuit",
+      duration: 7200,
+      accentColour: theme.accentDarkBlue,
+    },
+    {
+      id: 14,
+      title: "Morning Meditation",
+      duration: 300,
+      accentColour: theme.accentPurple,
+    },
+    {
+      id: 15,
+      title: "Morning Meditation",
+      duration: 300,
+      accentColour: theme.accentGreen,
+    },
   ];
 
   // Initialize all items as not expanded.
@@ -54,33 +114,34 @@ function RoutinesScreen() {
   );
 
   // State to track if all items are expanded or collapsed.
-  const [selectAllExpanded, setSelectAllExpanded] = useState(false);
+  const [expandedCount, setExpandedCount] = useState(0);
 
-  const checkAllExpanded = (states) => {
-    // Check if all items in states are true
-    const allExpanded = states.every((state) => state);
-    setSelectAllExpanded(allExpanded);
-  };
+  const toggleExpand = useCallback(
+    (index) => {
+      // If the current item is expanded, decrement, else increment
+      if (expandedStates[index]) {
+        setExpandedCount((prevCount) => prevCount - 1);
+      } else {
+        setExpandedCount((prevCount) => prevCount + 1);
+      }
 
-  const toggleExpand = (index) => {
-    const newStates = [...expandedStates];
-    newStates[index] = !newStates[index];
-    setExpandedStates(newStates);
+      // Toggle the specific item's state
+      const newStates = [...expandedStates];
+      newStates[index] = !newStates[index];
+      setExpandedStates(newStates);
+    },
+    [expandedStates],
+  );
 
-    // Check if all items are expanded after toggling
-    checkAllExpanded(newStates);
-  };
-
-  const expandCollapseAll = () => {
-    // If all are currently expanded, collapse all. Otherwise, expand all.
-    const newStates = selectAllExpanded
-      ? new Array(data.length).fill(false)
-      : new Array(data.length).fill(true);
-    setExpandedStates(newStates);
-
-    // Update the selectAllExpanded state
-    setSelectAllExpanded(!selectAllExpanded);
-  };
+  const expandCollapseAll = useCallback(() => {
+    if (expandedCount === data.length) {
+      setExpandedStates(new Array(data.length).fill(false));
+      setExpandedCount(0);
+    } else {
+      setExpandedStates(new Array(data.length).fill(true));
+      setExpandedCount(data.length);
+    }
+  }, [expandedCount, data.length]);
 
   return (
     <Screen>
@@ -105,7 +166,9 @@ function RoutinesScreen() {
             onPress={() => Alert.alert("Sort", "Sort")}
           />
           <IconButton
-            iconName={selectAllExpanded ? "minimize-2" : "maximize-2"}
+            iconName={
+              expandedCount === data.length ? "minimize-2" : "maximize-2"
+            }
             IconFamily={Feather}
             iconSize={40}
             foregroundColour={theme.text87}
