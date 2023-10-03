@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, Alert } from "react-native";
 import Screen from "../components/Screen";
 
 import Header from "../components/Header";
@@ -8,6 +8,9 @@ import { useTheme } from "../contexts/ThemeContext";
 
 import { View } from "react-native";
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { IconButton } from "../components/buttons";
+import LabelledIconButton from "../components/buttons/LabelledIconButton";
 
 function RoutinesScreen() {
   const { theme } = useTheme();
@@ -48,7 +51,34 @@ function RoutinesScreen() {
   return (
     <Screen>
       <View style={{ height: "100%" }}>
-        <Header>Routines</Header>
+        <View style={styles.topPanel}>
+          <Header>Routines</Header>
+          <IconButton
+            iconName="plus"
+            IconFamily={Feather}
+            iconSize={55}
+            foregroundColour={theme.blue}
+            style={{ marginRight: 10 }}
+            onPress={() => Alert.alert("Add new routine", "Add")}
+          />
+        </View>
+        <View style={styles.middlePanel}>
+          <LabelledIconButton
+            iconName="sort-ascending"
+            IconFamily={MaterialCommunityIcons}
+            foregroundColour={theme.text87}
+            title="Recent"
+            onPress={() => Alert.alert("Sort", "Sort")}
+          />
+          <IconButton
+            iconName="maximize-2"
+            IconFamily={Feather}
+            iconSize={40}
+            foregroundColour={theme.text87}
+            style={{ marginRight: 10 }}
+            onPress={() => Alert.alert("Expand all", "Expand")}
+          />
+        </View>
         <FlatList
           data={data}
           renderItem={({ item }) => (
@@ -71,7 +101,23 @@ function RoutinesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {},
+  topPanel: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginLeft: 15,
+    marginBottom: 34,
+    marginHorizontal: 10,
+    marginTop: 25,
+  },
+  middlePanel: {
+    height: 25,
+    marginHorizontal: 10,
+    marginBottom: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 });
 
 export default RoutinesScreen;

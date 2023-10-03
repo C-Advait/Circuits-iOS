@@ -1,48 +1,49 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import Icon from "./Icon";
+import { PARAGRAPH_FONT_SIZE } from "../../config/appConstants";
 
-function IconButton({
+function LabelledIconButton({
   onPress,
   iconName,
-  iconSize = 60,
+  iconSize = 40,
   IconFamily,
   foregroundColour,
-  backgroundColour = "transparent",
+  textColour = foregroundColour,
+  title,
   style,
 }) {
-  console.log("foregroundColour", foregroundColour);
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
-      style={[
-        styles.touchable,
-        {
-          height: 0.4 * iconSize,
-          width: 0.4 * iconSize,
-        },
-        style,
-      ]}
+      style={[styles.touchable, style]}
     >
       <Icon
         size={iconSize}
         name={iconName}
         IconFamily={IconFamily}
         foregroundColour={foregroundColour}
-        backgroundColour={backgroundColour}
+        backgroundColour="transparent"
         hasBackground={true}
       />
+      <Text style={[styles.text, { color: textColour }]}>{title}</Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: PARAGRAPH_FONT_SIZE,
+  },
   touchable: {
     alignItems: "center",
+    borderRadius: 8,
+    flexDirection: "row",
+    gap: 5,
     justifyContent: "center",
   },
 });
 
-export default IconButton;
+export default LabelledIconButton;
