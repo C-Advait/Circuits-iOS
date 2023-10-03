@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     paddingVertical: 10,
-    width: "38%",
+    width: "39%",
   },
 });
 

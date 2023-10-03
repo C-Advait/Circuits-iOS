@@ -11,6 +11,7 @@ import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
+import { useFocusEffect } from "@react-navigation/native";
 
 function RoutinesScreen() {
   const { theme } = useTheme();
@@ -145,54 +146,49 @@ function RoutinesScreen() {
 
   return (
     <Screen>
-      <View style={{ height: "100%" }}>
-        <View style={styles.topPanel}>
-          <Header>Routines</Header>
-          <IconButton
-            iconName="plus"
-            IconFamily={Feather}
-            iconSize={55}
-            foregroundColour={theme.blue}
-            style={{ marginRight: 10 }}
-            onPress={() => Alert.alert("Add new routine", "Add")}
-          />
-        </View>
-        <View style={styles.middlePanel}>
-          <LabelledIconButton
-            iconName="sort-ascending"
-            IconFamily={MaterialCommunityIcons}
-            foregroundColour={theme.text87}
-            title="Recent"
-            onPress={() => Alert.alert("Sort", "Sort")}
-          />
-          <IconButton
-            iconName={
-              expandedCount === data.length ? "minimize-2" : "maximize-2"
-            }
-            IconFamily={Feather}
-            iconSize={40}
-            foregroundColour={theme.text87}
-            style={{ marginRight: 10 }}
-            onPress={() => expandCollapseAll()}
-          />
-        </View>
-        <FlatList
-          data={data}
-          renderItem={({ item, index }) => (
-            <RoutineCard
-              item={item}
-              isExpanded={expandedStates[index]}
-              toggleExpand={() => toggleExpand(index)}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          style={{ marginHorizontal: 10 }}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-          ListFooterComponent={() => (
-            <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
-          )}
+      <View style={styles.topPanel}>
+        <Header>Routines</Header>
+        <IconButton
+          iconName="plus"
+          IconFamily={Feather}
+          iconSize={55}
+          foregroundColour={theme.blue}
+          onPress={() => Alert.alert("Add new routine", "Add")}
         />
       </View>
+      <View style={styles.middlePanel}>
+        <LabelledIconButton
+          iconName="sort-ascending"
+          IconFamily={MaterialCommunityIcons}
+          foregroundColour={theme.text87}
+          title="Recent"
+          onPress={() => Alert.alert("Sort", "Sort")}
+        />
+        <IconButton
+          iconName={expandedCount === data.length ? "minimize-2" : "maximize-2"}
+          IconFamily={Feather}
+          iconSize={40}
+          foregroundColour={theme.text87}
+          onPress={() => expandCollapseAll()}
+          style={{ width: 77, height: 50 }}
+        />
+      </View>
+      <FlatList
+        data={data}
+        renderItem={({ item, index }) => (
+          <RoutineCard
+            item={item}
+            isExpanded={expandedStates[index]}
+            toggleExpand={() => toggleExpand(index)}
+          />
+        )}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ marginHorizontal: 16 }}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        ListFooterComponent={() => (
+          <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
+        )}
+      />
     </Screen>
   );
 }
@@ -209,7 +205,7 @@ const styles = StyleSheet.create({
   },
   middlePanel: {
     height: 25,
-    marginHorizontal: 10,
+    marginLeft: 16,
     marginBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",

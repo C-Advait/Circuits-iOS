@@ -11,6 +11,7 @@ function Icon({
   foregroundColour,
   backgroundColour,
   hasBackground = true,
+  iconStyle: style,
 }) {
   return (
     <View
@@ -26,6 +27,7 @@ function Icon({
               height: "auto",
               width: "auto",
             },
+        style,
       ]}
     >
       <IconFamily

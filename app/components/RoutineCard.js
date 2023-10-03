@@ -10,6 +10,7 @@ import { IconButton, RoutineActionButton } from "./buttons";
 import formatDuration from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
+import Collapsible from "react-native-collapsible";
 
 function RoutineCard({ item, isExpanded, toggleExpand }) {
   // Duration in seconds
@@ -30,50 +31,51 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
             <Text style={styles.header}>{title}</Text>
             <Text style={styles.duration}>{formatDuration(duration)}</Text>
           </View>
-          <View style={styles.chevron}>
-            <Feather
-              name={isExpanded ? "chevron-up" : "chevron-down"}
-              size={26}
-              color={theme.text60}
-            />
-          </View>
+          <IconButton
+            iconName={isExpanded ? "chevron-up" : "chevron-down"}
+            IconFamily={Feather}
+            iconSize={52}
+            foregroundColour={theme.text60}
+            onPress={() => toggleExpand()}
+          />
         </View>
-      </TouchableOpacity>
 
-      {isExpanded ? (
-        <>
-          <Text style={styles.body}>
-            Pushups (3x1min){"\n"}
-            Dips (5x60s){"\n"}
-            Hammer Curls (4x30s){"\n"}
-            Bicep Curls (4x30s){"\n"}
-            {"\n"}
-            Loops 2 times
-          </Text>
-          <View style={styles.buttonContainer}>
-            <RoutineActionButton
-              title="Start"
-              onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
-              iconName="play-outline"
-              IconFamily={Ionicons}
-              foregroundColour={theme.text87}
-            />
-            <RoutineActionButton
-              title="Edit"
-              onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
-              iconName="edit-2"
-              IconFamily={Feather}
-              foregroundColour={theme.text87}
-            />
-            <IconButton
-              iconName="trash-can-outline"
-              IconFamily={MaterialCommunityIcons}
-              foregroundColour={theme.danger}
-              onPress={() => Alert.alert("Delete", "Delete")}
-            />
-          </View>
-        </>
-      ) : null}
+        <Collapsible collapsed={!isExpanded} duration={350}>
+          <>
+            <Text style={styles.body}>
+              Pushups (3x1min){"\n"}
+              Dips (5x60s){"\n"}
+              Hammer Curls (4x30s){"\n"}
+              Bicep Curls (4x30s){"\n"}
+              {"\n"}
+              Loops 2 times
+            </Text>
+            <View style={styles.buttonContainer}>
+              <RoutineActionButton
+                title="Start"
+                onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
+                iconName="play-outline"
+                IconFamily={Ionicons}
+                foregroundColour={theme.text87}
+              />
+              <RoutineActionButton
+                title="Edit"
+                onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
+                iconName="edit-2"
+                IconFamily={Feather}
+                foregroundColour={theme.text87}
+              />
+              <IconButton
+                iconName="trash-can-outline"
+                IconFamily={MaterialCommunityIcons}
+                foregroundColour={theme.danger}
+                onPress={() => Alert.alert("Delete", "Delete")}
+                style={{ marginLeft: 0, alignItems: "flex-start" }}
+              />
+            </View>
+          </>
+        </Collapsible>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -94,7 +96,7 @@ const getStyles = (theme) =>
     buttonContainer: {
       alignItems: "center",
       flexDirection: "row",
-      gap: 20,
+      gap: 18,
       justifyContent: "flex-start",
       marginBottom: 12,
     },
