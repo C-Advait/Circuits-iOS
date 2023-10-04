@@ -54,7 +54,9 @@ export const createTables = async () => {
         title TEXT,
         duration INTEGER,
         color TEXT,
-        userCreated INTEGER
+        userCreated INTEGER,
+        timeCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        timeMostRecentlyCompleted TIMESTAMP,  
       );`,
       [],
       (_tx, _resultSet) => {

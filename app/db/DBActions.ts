@@ -3,6 +3,7 @@ import { getDBInstance } from "./DBSetup";
 import { Sound } from "../classes/Sound";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
+import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
 
 // CREATE
 const createExercise = (exercise: Exercise) => {
@@ -59,8 +60,9 @@ const createRoutine = async (routine: Routine) => {
          title, 
          duration, 
          color, 
-         userCreated
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+         userCreated,
+         timeMostRecentlyCompleted,
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
@@ -74,6 +76,7 @@ const createRoutine = async (routine: Routine) => {
           routine.duration,
           routine.color,
           routine.userCreated ? 1 : 0, // converting boolean to integer
+          null,
         ],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.insertId);
@@ -109,6 +112,8 @@ const createSound = (sound: Sound) => {
   });
 };
 
+// Writes to a table of RoutineCompletion rows,
+// contrast with updateMostRecentRoutineCompletion
 const logRoutineCompletion = async (routineID: number) => {
   const db = getDBInstance();
 
@@ -275,6 +280,27 @@ const updateRoutine = async (routine: Routine) => {
           routine.userCreated,
           routine.id,
         ],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const updateMostRecentRoutineCompletion = async (routineID: number) => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE Routine SET
+          timeMostRecentlyCompleted = ?
+        WHERE id = ?`;
+
+      tx.executeSql(
+        query,
+        [getCurrentTimestamp(), routineID],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);
         },

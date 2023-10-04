@@ -9,6 +9,8 @@ export class Routine {
   duration: number;
   color: string;
   userCreated: boolean;
+  timeCreated: string;
+  timeMostRecentlyCompleted: string;
 
   constructor(obj: any) {
     this.id = obj.id;
@@ -21,5 +23,7 @@ export class Routine {
     this.duration = obj.duration;
     this.color = obj.color;
     this.userCreated = obj.userCreated;
+    this.timeCreated = obj.timeCreated;
+    this.timeMostRecentlyCompleted = obj.timeMostRecentlyCompleted;
   }
 }
