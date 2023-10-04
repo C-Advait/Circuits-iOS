@@ -59,7 +59,6 @@ const getStyles = (theme) =>
       flexDirection: "row",
       height: 42,
       overflow: "hidden",
-      marginHorizontal: 16,
     },
     contentContainer: {
       alignContent: "center",
