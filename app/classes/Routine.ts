@@ -1,45 +1,25 @@
-import { Exercise } from "./Exercise";
-import { Sound } from "./Sound";
-
 export class Routine {
   id: number;
-  warmup: Exercise[];
-  working: Exercise[];
-  cooldown: Exercise[];
   numberOfLoops: number;
-  exerciseSound: Sound;
-  restSound: Sound;
-  breakSound: Sound;
-  endSound: Sound;
+  exerciseSoundID: number;
+  restSoundID: number;
+  breakSoundID: number;
+  endSoundID: number;
   title: string;
   duration: number;
+  color: string;
   userCreated: boolean;
 
-  constructor(
-    id: number,
-    warmup: Exercise[],
-    working: Exercise[],
-    cooldown: Exercise[],
-    numberOfLoops: number,
-    exerciseSound: Sound,
-    restSound: Sound,
-    breakSound: Sound,
-    endSound: Sound,
-    title: string,
-    duration: number,
-    userCreated: boolean,
-  ) {
-    this.id = id;
-    this.warmup = warmup;
-    this.working = working;
-    this.cooldown = cooldown;
-    this.numberOfLoops = numberOfLoops;
-    this.exerciseSound = exerciseSound;
-    this.restSound = restSound;
-    this.breakSound = breakSound;
-    this.endSound = endSound;
-    this.title = title;
-    this.duration = duration;
-    this.userCreated = userCreated;
+  constructor(obj: any) {
+    this.id = obj.id;
+    this.numberOfLoops = obj.numberOfLoops;
+    this.exerciseSoundID = obj.exerciseSoundID;
+    this.restSoundID = obj.restSoundID;
+    this.breakSoundID = obj.breakSoundID;
+    this.endSoundID = obj.endSoundID;
+    this.title = obj.title;
+    this.duration = obj.duration;
+    this.color = obj.color;
+    this.userCreated = obj.userCreated;
   }
 }

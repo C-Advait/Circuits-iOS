@@ -14,15 +14,15 @@ export class Exercise {
   breakBeforeNext: number;
   category: string;
 
-  constructor(dbRow: any) {
-    this.id = dbRow.id;
-    this.routineID = dbRow.routineID;
-    this.title = dbRow.title;
-    this.tag = dbRow.tag;
-    this.workTime = dbRow.workTime;
-    this.numberOfRounds = dbRow.numberOfRounds;
-    this.restBetweenRounds = dbRow.restBetweenRounds;
-    this.breakBeforeNext = dbRow.breakBeforeNext;
-    this.category = dbRow.category;
+  constructor(obj: any) {
+    this.id = obj.id;
+    this.routineID = obj.routineID;
+    this.title = obj.title;
+    this.tag = obj.tag;
+    this.workTime = obj.workTime;
+    this.numberOfRounds = obj.numberOfRounds;
+    this.restBetweenRounds = obj.restBetweenRounds;
+    this.breakBeforeNext = obj.breakBeforeNext;
+    this.category = obj.category;
   }
 }
