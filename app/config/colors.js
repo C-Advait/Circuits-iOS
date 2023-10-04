@@ -6,6 +6,7 @@ export const darkTheme = {
   foreground: "#eeeeee",
   primary: "#eeeeee",
   danger: "#d93453",
+  blue: "#3397f3",
   text: "#aaa",
   text87: "#ffffffde",
   text60: "#ffffff99",

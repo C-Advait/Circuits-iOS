@@ -11,6 +11,7 @@ function IconButton({
   foregroundColour,
   backgroundColour = "transparent",
   style,
+  iconStyle,
 }) {
   return (
     <TouchableOpacity
@@ -19,8 +20,8 @@ function IconButton({
       style={[
         styles.touchable,
         {
-          height: 0.4 * iconSize,
-          width: 0.4 * iconSize,
+          height: iconSize,
+          width: iconSize,
         },
         style,
       ]}
@@ -32,6 +33,7 @@ function IconButton({
         foregroundColour={foregroundColour}
         backgroundColour={backgroundColour}
         hasBackground={true}
+        iconStyle={iconStyle}
       />
     </TouchableOpacity>
   );

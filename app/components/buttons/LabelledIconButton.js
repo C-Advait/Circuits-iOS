@@ -4,10 +4,10 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import Icon from "./Icon";
 import { PARAGRAPH_FONT_SIZE } from "../../config/appConstants";
 
-function RoutineActionButton({
+function LabelledIconButton({
   onPress,
   iconName,
-  iconSize = 50,
+  iconSize = 40,
   IconFamily,
   foregroundColour,
   textColour = foregroundColour,
@@ -39,14 +39,11 @@ const styles = StyleSheet.create({
   },
   touchable: {
     alignItems: "center",
-    backgroundColor: "#ffffff0c",
     borderRadius: 8,
     flexDirection: "row",
-    gap: 10,
+    gap: 5,
     justifyContent: "center",
-    paddingVertical: 10,
-    width: "39%",
   },
 });
 
-export default RoutineActionButton;
+export default LabelledIconButton;
