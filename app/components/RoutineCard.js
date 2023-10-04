@@ -14,7 +14,7 @@ import Collapsible from "react-native-collapsible";
 
 function RoutineCard({ item, isExpanded, toggleExpand }) {
   // Duration in seconds
-  const { accentColour, duration, title } = item;
+  const { accentcolor, duration, title } = item;
 
   const navigation = useNavigation();
   const { theme } = useTheme();
@@ -22,8 +22,8 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
 
   return (
     <View style={styles.container}>
-      {accentColour ? (
-        <View style={[styles.accent, { backgroundColor: accentColour }]} />
+      {accentcolor ? (
+        <View style={[styles.accent, { backgroundColor: accentcolor }]} />
       ) : null}
       <TouchableOpacity onPress={() => toggleExpand()} activeOpacity={0.8}>
         <View style={styles.permanentInfoContainer}>
@@ -35,7 +35,7 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
             iconName={isExpanded ? "chevron-up" : "chevron-down"}
             IconFamily={Feather}
             iconSize={52}
-            foregroundColour={theme.text60}
+            foregroundcolor={theme.text60}
             onPress={() => toggleExpand()}
           />
         </View>
@@ -56,19 +56,19 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
                 onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
                 iconName="play-outline"
                 IconFamily={Ionicons}
-                foregroundColour={theme.text87}
+                foregroundcolor={theme.text87}
               />
               <RoutineActionButton
                 title="Edit"
                 onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
                 iconName="edit-2"
                 IconFamily={Feather}
-                foregroundColour={theme.text87}
+                foregroundcolor={theme.text87}
               />
               <IconButton
                 iconName="trash-can-outline"
                 IconFamily={MaterialCommunityIcons}
-                foregroundColour={theme.danger}
+                foregroundcolor={theme.danger}
                 onPress={() => Alert.alert("Delete", "Delete")}
                 style={{ marginLeft: 0, alignItems: "flex-start" }}
               />

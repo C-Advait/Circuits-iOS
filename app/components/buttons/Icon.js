@@ -8,8 +8,8 @@ function Icon({
   size,
   name,
   IconFamily = MaterialCommunityIcons,
-  foregroundColour,
-  backgroundColour,
+  foregroundcolor,
+  backgroundcolor,
   hasBackground = true,
   iconStyle: style,
 }) {
@@ -32,8 +32,8 @@ function Icon({
     >
       <IconFamily
         name={name}
-        backgroundColor={backgroundColour}
-        color={foregroundColour}
+        backgroundColor={backgroundcolor}
+        color={foregroundcolor}
         size={size / 2}
       />
     </View>
