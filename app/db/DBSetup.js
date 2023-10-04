@@ -68,15 +68,17 @@ export const createTables = async () => {
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS Exercise (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        routineID INTEGER ,
+        routineID INTEGER,
         title TEXT,
+        exerciseOrder INTEGER, 
         tag TEXT,
         workTime INTEGER,
         numberOfRounds INTEGER,
         restBetweenRounds INTEGER,
         breakBeforeNext INTEGER,
         category TEXT,
-        FOREIGN KEY (routineID) REFERENCES Routine(id) ON DELETE CASCADE
+        FOREIGN KEY (routineID) REFERENCES Routine(id) ON DELETE CASCADE,
+        UNIQUE(routineID, exerciseOrder)
       );`,
       [],
       (_tx, _resultSet) => {

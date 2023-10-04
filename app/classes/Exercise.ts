@@ -7,6 +7,7 @@ export class Exercise {
   id: number;
   routineID: number; // FK
   title: string;
+  exerciseOrder: number;
   tag: Tag;
   workTime: number;
   numberOfRounds: number;
@@ -18,6 +19,7 @@ export class Exercise {
     this.id = obj.id;
     this.routineID = obj.routineID;
     this.title = obj.title;
+    this.exerciseOrder = obj.exerciseOrder;
     this.tag = obj.tag;
     this.workTime = obj.workTime;
     this.numberOfRounds = obj.numberOfRounds;

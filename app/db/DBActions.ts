@@ -13,19 +13,21 @@ const createExercise = (exercise: Exercise) => {
       const query = `INSERT INTO Exercise (
          routineID, 
          title, 
+         exerciseOrder,
          tag, 
          workTime, 
          numberOfRounds, 
          restBetweenRounds, 
          breakBeforeNext, 
          category
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
         [
           exercise.routineID,
           exercise.title,
+          exercise.exerciseOrder,
           exercise.tag,
           exercise.workTime,
           exercise.numberOfRounds,
@@ -191,7 +193,7 @@ const getExercisesForRoutine = async (routineID: number) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx: any) => {
       tx.executeSql(
-        "SELECT * FROM Exercise WHERE routineID = ?",
+        "SELECT * FROM Exercise WHERE routineID = ? ORDER BY exerciseOrder ASC",
         [routineID],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Exercise(row)));
@@ -210,6 +212,7 @@ const updateExercise = async (exercise: Exercise) => {
       const query = `UPDATE Exercise SET
           routineID = ?,
           title = ?,
+          exerciseOrder = ?,
           tag = ?,
           workTime = ?,
           numberOfRounds = ?,
@@ -223,6 +226,7 @@ const updateExercise = async (exercise: Exercise) => {
         [
           exercise.routineID,
           exercise.title,
+          exercise.exerciseOrder,
           exercise.tag,
           exercise.workTime,
           exercise.numberOfRounds,

@@ -73,10 +73,11 @@ const getNames = async () => {
   console.log("All routine names: ", JSON.stringify(names, null, 2));
 };
 
-const createDummyExercise = async () => {
+const createDummyExercises = async () => {
   const myExercise = new Exercise({
     routineID: 1,
     title: "Jumping Jacks",
+    exerciseOrder: 1,
     tag: Tag.GENERIC,
     workTime: 30,
     numberOfRounds: 5,
@@ -85,11 +86,19 @@ const createDummyExercise = async () => {
     category: "Cardio",
   });
 
-  console.log(
-    "About to create exercise: ",
-    JSON.stringify(myExercise, null, 2),
-  );
+  const myExercise2 = new Exercise({
+    routineID: 1,
+    title: "Pushups",
+    exerciseOrder: 2,
+    tag: Tag.GENERIC,
+    workTime: 40,
+    numberOfRounds: 5,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
   createExercise(myExercise);
+  createExercise(myExercise2);
 };
 
 const getDummyExercises = async () => {
@@ -143,7 +152,7 @@ function SettingsScreen() {
       />
       <Button
         title="Create dummy exercise"
-        onPress={() => createDummyExercise()}
+        onPress={() => createDummyExercises()}
       />
       <Button title="Reset DB" onPress={() => resetDB()} />
       <Button title="Get RoutineNames" onPress={() => getNames()} />
