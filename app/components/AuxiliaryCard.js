@@ -6,7 +6,7 @@ import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 function AuxiliaryCard({
-  accentColour,
+  accentcolor,
   bold = false,
   editable = true,
   title,
@@ -26,8 +26,8 @@ function AuxiliaryCard({
           <Icon />
         </View>
       ) : null}
-      {accentColour ? (
-        <View style={[styles.accent, { backgroundColor: accentColour }]} />
+      {accentcolor ? (
+        <View style={[styles.accent, { backgroundColor: accentcolor }]} />
       ) : null}
       <View style={styles.contentContainer}>
         {editable ? (
@@ -59,7 +59,6 @@ const getStyles = (theme) =>
       flexDirection: "row",
       height: 42,
       overflow: "hidden",
-      marginHorizontal: 16,
     },
     contentContainer: {
       alignContent: "center",
