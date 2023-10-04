@@ -4,7 +4,8 @@ export enum Tag {
 }
 
 export class Exercise {
-  id: string; // UUID
+  id: number;
+  routineID: number; // FK
   title: string;
   tag: Tag;
   workTime: number;
@@ -13,23 +14,15 @@ export class Exercise {
   breakBeforeNext: number;
   category: string;
 
-  constructor(
-    id: string,
-    title: string,
-    tag: Tag,
-    workTime: number,
-    numberOfRounds: number,
-    restBetweenRounds: number,
-    breakBeforeNext: number,
-    category: string,
-  ) {
-    this.id = id;
-    this.title = title;
-    this.tag = tag;
-    this.workTime = workTime;
-    this.numberOfRounds = numberOfRounds;
-    this.restBetweenRounds = restBetweenRounds;
-    this.breakBeforeNext = breakBeforeNext;
-    this.category = category;
+  constructor(dbRow: any) {
+    this.id = dbRow.id;
+    this.routineID = dbRow.routineID;
+    this.title = dbRow.title;
+    this.tag = dbRow.tag;
+    this.workTime = dbRow.workTime;
+    this.numberOfRounds = dbRow.numberOfRounds;
+    this.restBetweenRounds = dbRow.restBetweenRounds;
+    this.breakBeforeNext = dbRow.breakBeforeNext;
+    this.category = dbRow.category;
   }
 }

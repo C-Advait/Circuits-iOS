@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, FlatList, Alert } from "react-native";
+import { StyleSheet, FlatList, Alert, Button } from "react-native";
 import Screen from "../components/Screen";
 
 import Header from "../components/Header";
@@ -11,27 +11,6 @@ import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
-
-import { getAllExercises, insertExercise } from "../db/DBService";
-
-const dumpDB = async () => {
-  const exercises = await getAllExercises();
-  console.log(exercises);
-};
-
-const addDummyExercise = async () => {
-  const dummyExercise = {
-    title: "Pushups",
-    tag: "generic",
-    workTime: 60,
-    numberOfRounds: 3,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "upper body",
-  };
-
-  insertExercise(dummyExercise, () => {});
-};
 
 function RoutinesScreen() {
   const { theme } = useTheme();
@@ -173,10 +152,7 @@ function RoutinesScreen() {
           IconFamily={Feather}
           iconSize={55}
           foregroundColour={theme.blue}
-          onPress={() => {
-            Alert.alert("Add new routine", "Add");
-            addDummyExercise();
-          }}
+          onPress={() => Alert.alert("Add new routine", "Add")}
         />
       </View>
       <View style={styles.middlePanel}>
@@ -185,10 +161,7 @@ function RoutinesScreen() {
           IconFamily={MaterialCommunityIcons}
           foregroundColour={theme.text87}
           title="Recent"
-          onPress={() => {
-            Alert.alert("Sort", "Sort");
-            dumpDB();
-          }}
+          onPress={() => Alert.alert("Sort", "Sort")}
         />
         <IconButton
           iconName={expandedCount === data.length ? "minimize-2" : "maximize-2"}
