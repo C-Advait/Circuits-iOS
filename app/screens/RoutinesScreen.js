@@ -159,7 +159,7 @@ function RoutinesScreen() {
         <LabelledIconButton
           iconName="sort-ascending"
           IconFamily={MaterialCommunityIcons}
-          foregroundcolor={theme.text87}
+          foregroundColor={theme.text87}
           title="Recent"
           onPress={() => Alert.alert("Sort", "Sort")}
         />

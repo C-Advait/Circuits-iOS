@@ -9,10 +9,11 @@ function LabelledIconButton({
   iconName,
   iconSize = 40,
   IconFamily,
-  foregroundcolor,
-  textcolor = foregroundcolor,
+  foregroundColor,
+  textColor = foregroundColor,
   title,
   style,
+  textStyle,
 }) {
   return (
     <TouchableOpacity
@@ -20,15 +21,19 @@ function LabelledIconButton({
       onPress={onPress}
       style={[styles.touchable, style]}
     >
-      <Icon
-        size={iconSize}
-        name={iconName}
-        IconFamily={IconFamily}
-        foregroundcolor={foregroundcolor}
-        backgroundcolor="transparent"
-        hasBackground={true}
-      />
-      <Text style={[styles.text, { color: textcolor }]}>{title}</Text>
+      {iconName ? (
+        <Icon
+          size={iconSize}
+          name={iconName}
+          IconFamily={IconFamily}
+          foregroundcolor={foregroundColor}
+          backgroundcolor="transparent"
+          hasBackground={true}
+        />
+      ) : null}
+      <Text style={[styles.text, { color: textColor }, textStyle]}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 }

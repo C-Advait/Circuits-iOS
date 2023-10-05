@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, Button } from "react-native";
+import { View, StyleSheet, Dimensions, Button, Text } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -8,17 +8,20 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import { Circle, G, Svg, Defs, LinearGradient, Stop } from "react-native-svg";
+import NumericalTimer from "./NumericalTimer";
 
 const { width } = Dimensions.get("window");
-const CIRCLE_SIZE = width - 40;
-const STROKE_WIDTH = 10;
+const CIRCLE_SIZE = width - 60;
+const STROKE_WIDTH = 11;
 const CIRCUMFERENCE = CIRCLE_SIZE * Math.PI;
+const STARTING_OFFSET = 0.06;
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const Timer = ({ duration }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const progress = useSharedValue(0.97);
+const Timer = ({ title, duration }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState(duration);
+  const progress = useSharedValue(1);
 
   useEffect(() => {
     if (isPlaying) {
@@ -32,7 +35,8 @@ const Timer = ({ duration }) => {
   }, [isPlaying]);
 
   const animatedProps = useAnimatedProps(() => {
-    const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
+    const strokeDashoffset =
+      (1 - progress.value + STARTING_OFFSET) * CIRCUMFERENCE;
     return {
       strokeDashoffset,
     };
@@ -68,6 +72,22 @@ const Timer = ({ duration }) => {
           />
         </G>
       </Svg>
+      <View style={styles.overlay}>
+        <Text style={styles.title}>{title}</Text>
+        <NumericalTimer
+          isPlaying={isPlaying}
+          secondsRemaining={secondsRemaining}
+          setSecondsRemaining={setSecondsRemaining}
+        />
+        <Button
+          title="Reset"
+          onPress={() => {
+            setSecondsRemaining(duration);
+            setIsPlaying(false);
+            progress.value = 1;
+          }}
+        />
+      </View>
       <Button
         title={isPlaying ? "Pause" : "Play"}
         onPress={() => setIsPlaying((prev) => !prev)}
@@ -79,9 +99,25 @@ const Timer = ({ duration }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
     padding: 20,
+  },
+  overlay: {
+    position: "absolute",
+    top: CIRCLE_SIZE / 3 - 10,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 27,
+    fontWeight: 500,
+    color: "white",
+    marginBottom: 10,
+  },
+  timer: {
+    fontSize: 20,
+    color: "white",
+    marginBottom: 10,
   },
 });
 

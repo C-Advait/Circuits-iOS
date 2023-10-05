@@ -53,7 +53,9 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
             <View style={styles.buttonContainer}>
               <RoutineActionButton
                 title="Start"
-                onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
+                onPress={() =>
+                  navigation.navigate(routes.TIMER_SCREEN, { title: title })
+                }
                 iconName="play-outline"
                 IconFamily={Ionicons}
                 foregroundcolor={theme.text87}
