@@ -9,6 +9,7 @@ import Header from "../components/Header";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
 import { useTheme } from "../contexts/ThemeContext";
+import ExerciseCard from "../components/ExerciseCard";
 
 function RoutineEditScreen() {
   const navigation = useNavigation();
@@ -24,12 +25,12 @@ function RoutineEditScreen() {
       <View style={{ gap: 10 }}>
         <AuxiliaryCard
           title="Warm-up"
-          accentColour={theme.accentGreen}
+          accentcolor={theme.accentGreen}
           InputComponent={DummyInputComponent}
         />
         <AuxiliaryCard
           title="Cool down"
-          accentColour={theme.accentDarkBlue}
+          accentcolor={theme.accentDarkBlue}
           InputComponent={DummyInputComponent}
         />
         <AuxiliaryCard
@@ -43,6 +44,13 @@ function RoutineEditScreen() {
           title="Sounds"
           editable={false}
           InputComponent={() => <DummyInputComponent text="Chimes" />}
+        />
+        <ExerciseCard 
+          title="Planks" 
+          subTitle={"25 seconds"}
+          showDeleteIcon={true}
+          accentColor={'tomato'} 
+          clickDrag={true}
         />
       </View>
     </Screen>

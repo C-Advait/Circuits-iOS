@@ -20,91 +20,91 @@ function RoutinesScreen() {
       id: 1,
       title: "Arms",
       duration: 3600,
-      accentColour: theme.accentOrange,
+      accentcolor: theme.accentOrange,
     },
     {
       id: 2,
       title: "Leg Workout A",
       duration: 5100,
-      accentColour: theme.accentLightBlue,
+      accentcolor: theme.accentLightBlue,
     },
     {
       id: 3,
       title: "Climbing Circuit",
       duration: 7200,
-      accentColour: theme.accentDarkBlue,
+      accentcolor: theme.accentDarkBlue,
     },
     {
       id: 4,
       title: "Morning Meditation",
       duration: 300,
-      accentColour: theme.accentPurple,
+      accentcolor: theme.accentPurple,
     },
     {
       id: 5,
       title: "Morning Meditation",
       duration: 300,
-      accentColour: theme.accentGreen,
+      accentcolor: theme.accentGreen,
     },
     {
       id: 6,
       title: "Arms",
       duration: 3600,
-      accentColour: theme.accentOrange,
+      accentcolor: theme.accentOrange,
     },
     {
       id: 7,
       title: "Leg Workout A",
       duration: 5100,
-      accentColour: theme.accentLightBlue,
+      accentcolor: theme.accentLightBlue,
     },
     {
       id: 8,
       title: "Climbing Circuit",
       duration: 7200,
-      accentColour: theme.accentDarkBlue,
+      accentcolor: theme.accentDarkBlue,
     },
     {
       id: 9,
       title: "Morning Meditation",
       duration: 300,
-      accentColour: theme.accentPurple,
+      accentcolor: theme.accentPurple,
     },
     {
       id: 10,
       title: "Morning Meditation",
       duration: 300,
-      accentColour: theme.accentGreen,
+      accentcolor: theme.accentGreen,
     },
     {
       id: 11,
       title: "Arms",
       duration: 3600,
-      accentColour: theme.accentOrange,
+      accentcolor: theme.accentOrange,
     },
     {
       id: 12,
       title: "Leg Workout A",
       duration: 5100,
-      accentColour: theme.accentLightBlue,
+      accentcolor: theme.accentLightBlue,
     },
     {
       id: 13,
       title: "Climbing Circuit",
       duration: 7200,
-      accentColour: theme.accentDarkBlue,
+      accentcolor: theme.accentDarkBlue,
     },
     {
       id: 14,
       title: "Morning Meditation",
       duration: 300,
-      accentColour: theme.accentPurple,
+      accentcolor: theme.accentPurple,
     },
     {
       id: 15,
       title: "Morning Meditation",
       duration: 300,
-      accentColour: theme.accentGreen,
+      accentcolor: theme.accentGreen,
     },
   ];
 
@@ -151,7 +151,7 @@ function RoutinesScreen() {
           iconName="plus"
           IconFamily={Feather}
           iconSize={55}
-          foregroundColour={theme.blue}
+          foregroundcolor={theme.blue}
           onPress={() => Alert.alert("Add new routine", "Add")}
         />
       </View>
@@ -159,7 +159,7 @@ function RoutinesScreen() {
         <LabelledIconButton
           iconName="sort-ascending"
           IconFamily={MaterialCommunityIcons}
-          foregroundColour={theme.text87}
+          foregroundcolor={theme.text87}
           title="Recent"
           onPress={() => Alert.alert("Sort", "Sort")}
         />
@@ -167,7 +167,7 @@ function RoutinesScreen() {
           iconName={expandedCount === data.length ? "minimize-2" : "maximize-2"}
           IconFamily={Feather}
           iconSize={40}
-          foregroundColour={theme.text87}
+          foregroundcolor={theme.text87}
           onPress={() => expandCollapseAll()}
           style={{ width: 77, height: 50 }}
         />

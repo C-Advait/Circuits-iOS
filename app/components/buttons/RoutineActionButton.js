@@ -9,8 +9,8 @@ function RoutineActionButton({
   iconName,
   iconSize = 50,
   IconFamily,
-  foregroundColour,
-  textColour = foregroundColour,
+  foregroundcolor,
+  textcolor = foregroundcolor,
   title,
   style,
 }) {
@@ -24,11 +24,11 @@ function RoutineActionButton({
         size={iconSize}
         name={iconName}
         IconFamily={IconFamily}
-        foregroundColour={foregroundColour}
-        backgroundColour="transparent"
+        foregroundcolor={foregroundcolor}
+        backgroundcolor="transparent"
         hasBackground={true}
       />
-      <Text style={[styles.text, { color: textColour }]}>{title}</Text>
+      <Text style={[styles.text, { color: textcolor }]}>{title}</Text>
     </TouchableOpacity>
   );
 }
