@@ -11,6 +11,7 @@ export class Routine {
   userCreated: boolean;
   timeCreated: string;
   timeMostRecentlyCompleted: string;
+  emoji: string;
 
   constructor(obj: any) {
     this.id = obj.id;
@@ -25,5 +26,6 @@ export class Routine {
     this.userCreated = obj.userCreated;
     this.timeCreated = obj.timeCreated;
     this.timeMostRecentlyCompleted = obj.timeMostRecentlyCompleted;
+    this.emoji = obj.emoji;
   }
 }
