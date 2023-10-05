@@ -1,6 +1,7 @@
 export enum Tag {
-  GENERIC = "generic",
-  SIMPLIFIED = "simplified",
+  PREROUTINE = "preroutine",
+  POSTROUTINE = "postroutine",
+  WORKING = "working",
 }
 
 export class Exercise {
