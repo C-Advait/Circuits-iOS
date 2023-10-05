@@ -22,12 +22,12 @@ function AuxiliaryCard({
 
   return (
     <View style={styles.container}>
+      <View style={[styles.accent, { backgroundColor: accentcolor }]} />
       {Icon ? (
         <View style={styles.iconContainer}>
           <Icon />
         </View>
       ) : null}
-      <View style={[styles.accent, { backgroundColor: accentcolor }]} />
       <View style={styles.contentContainer}>
         {editable ? (
           <EditableText placeholder={title} style={textStyle} />

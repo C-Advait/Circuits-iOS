@@ -1,7 +1,8 @@
 import React from "react";
 import { View, StyleSheet, Button, SectionList, Text } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
@@ -11,6 +12,9 @@ import routes from "../navigation/routes";
 import { useTheme } from "../contexts/ThemeContext";
 import ExerciseCard from "../components/ExerciseCard";
 import {Tag} from "../classes/Exercise"
+import { TAB_BAR_HEIGHT } from '../config/appConstants'
+import AppTextButton from "../components/buttons/AppTextButton";
+import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -86,7 +90,7 @@ const DATA = formatDataForSectionList([
     id: 4,
     routineID: 1,
     title: "Plank",
-    exerciseOrder: 4,
+    exerciseOrder: 3,
     tag: Tag.WORKING,
     workTime: 150,
     numberOfRounds: 1,
@@ -96,6 +100,126 @@ const DATA = formatDataForSectionList([
   },
   {
     id: 5,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 6,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 7,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 8,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 9,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 10,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 11,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 12,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 13,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 14,
+    routineID: 1,
+    title: "Plank",
+    exerciseOrder: 4,
+    tag: Tag.WORKING,
+    workTime: 150,
+    numberOfRounds: 1,
+    restBetweenRounds: 50,
+    breakBeforeNext: 0,
+    category: null
+  },
+  {
+    id: 15,
     routineID: 1,
     title: "Cooldown",
     exerciseOrder: 5,
@@ -108,35 +232,88 @@ const DATA = formatDataForSectionList([
   },
 ]);
 
-
+const getNumExercises = () => {
+  for (let i = 0; i < DATA.length; i++) {
+    if (DATA[i]['title'] === "Exercises") {
+      return DATA[i]["data"].length - 1;
+    }
+  }
+  throw new Error(" `Exercises` section array not found in DATA object");
+};
+const paddingBottomValue = TAB_BAR_HEIGHT / 2;
 
 function RoutineEditScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  console.log(DATA);
+  const numExercises = getNumExercises();
+  console.log(numExercises);
+
+
 
   return (
-    <Screen style={styles.container}>
-      <Header>RoutineEditScreen</Header>
-      <Button
-          title="Back to routines"
+    <Screen>
+      <View style={styles.navPanel}>
+        <AppTextButton
           onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-        />
+          textStyle={{fontSize: 18, fontWeight: '400', color: theme.foreground}}>
+            Cancel
+        </AppTextButton>
+        <Header style={styles.text}>New Routine</Header>
+        <AppTextButton
+          onPress={() => null}
+          textStyle={{fontSize: 18, fontWeight: '500'}}>
+          Create
+        </AppTextButton>
+      </View>
+
       <SectionList 
-        sections={DATA}
-        // keyExtractor={(item, index) => item.id + '-' + index}
-        renderItem={({item}) => (
+        contentContainerStyle ={styles.container}
+        ListHeaderComponent={
           <>
-            {((item.tag === Tag.PREROUTINE) || (item.tag === Tag.POSTROUTINE)) && 
+          <View style={styles.headingPanel}>
+            <LinearGradient
+              colors={['#ffffff', '#3397f3', ]} //to be adjusted
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 0.25 }}
+              style={styles.emojiBox}
+            />
+            <Header style={styles.title}>My Routine #11</Header>
+          </View>          
+          <View style={styles.templatePanel}>
             <AuxiliaryCard 
-              accentcolor={'dodgerblue'}
+              title={"Template"}
               editable={false}
-              bold={false}
-              title={item.title}
-              InputComponent={DummyInputComponent}
-            />} 
-            {
-              (item.tag === Tag.WORKING) && 
+              InputComponent={() => <DummyInputComponent text="Custom" />}
+            />
+          </View>
+          </>
+        }
+        sections={DATA}
+        keyExtractor={(item) => item.id}
+        // keyExtractor={(item, index) => item.id + '-' + index}
+        renderItem={({item, index}) => (
+          <>
+            {(item.tag === Tag.PREROUTINE) && 
+              <AuxiliaryCard 
+                accentcolor={theme.accentGreen}
+                editable={false}
+                bold={false}
+                title={item.title}
+                InputComponent={DummyInputComponent}
+              />
+            } 
+            {(item.tag === Tag.POSTROUTINE) &&
+              <AuxiliaryCard 
+                accentcolor={theme.accentDarkBlue}
+                editable={false}
+                bold={false}
+                title={item.title}
+                InputComponent={DummyInputComponent}
+              />
+            }
+            {(item.tag === Tag.WORKING) && 
               <ExerciseCard 
                 title={item.title}
                 subTitle={item.workTime}
@@ -145,43 +322,28 @@ function RoutineEditScreen() {
                 clickDrag={true}
               />
             }
+            {index === (numExercises) && // THIS WILL BREAK in the future as it hard-coded accounts for the # of items in the "PREROUTINE" section as 1
+              <View style={{marginTop: 12}}>
+                <AuxiliaryCard 
+                // accentcolor={'dodgerblue'}
+                editable={false}
+                bold={false}
+                title={"Loops"}
+                InputComponent={() => <DummyInputComponent text="Once"/>}
+                Icon={() => <Feather name="repeat" size={24} color={theme.foreground} />}
+                />
+              </View>
+            }
           </>
         )}
         renderSectionHeader={({section}) => (
-          <Text style={{fontWeight: 'bold', fontSize: 18, color: 'white'}}>{section.title}</Text>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
         )}
+        stickySectionHeadersEnabled={false}
+        renderSectionFooter={() => <View style={{height: 22}} />}
+        ItemSeparatorComponent={() => <View style={{height:StyleSheet.hairlineWidth, backgroundColor:theme.text60}}/>}
       />
-      <View style={{ gap: 10 }}>
-        <AuxiliaryCard
-          title="Warm-up"
-          accentcolor={theme.accentGreen}
-          InputComponent={DummyInputComponent}
-        />
-        <AuxiliaryCard
-          title="Cool down"
-          accentcolor={theme.accentDarkBlue}
-          InputComponent={DummyInputComponent}
-        />
-        <AuxiliaryCard
-          title="Loop Exercise"
-          bold={true}
-          editable={false}
-          Icon={() => <Feather name="repeat" color={theme.primary} size={24} />}
-          InputComponent={() => <DummyInputComponent text="Once" />}
-        />
-        <AuxiliaryCard
-          title="Sounds"
-          editable={false}
-          InputComponent={() => <DummyInputComponent text="Chimes" />}
-        />
-        <ExerciseCard 
-          title="Planks" 
-          subTitle={"25 seconds"}
-          accentColor={'tomato'} 
-          clickDrag={true}
-          style={{borderTopLeftRadius: 0, borderTopRightRadius: 0}}
-        />
-      </View>
+
     </Screen>
   );
 }
@@ -189,11 +351,45 @@ function RoutineEditScreen() {
 const getStyles = (theme) => StyleSheet.create({
   container: {
     backgroundColor: theme.background,
-    padding: 10, //consistency between screens importants
+    paddingHorizontal: 15, //consistency between screens important
+    paddingBottom: paddingBottomValue
   },
-  message: {
-    color: theme.foreground,
-  }
+  emojiBox: {
+    backgroundColor: theme.blue,
+    height: 30,
+    width: 30,
+    borderRadius: 7,
+    marginRight: 10
+  },
+  headingPanel: {
+    flexDirection: 'row',
+    height: 40,
+    alignItems: 'center',
+    marginBottom: 15
+  },
+  navPanel: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 30, 
+    marginTop: 5,
+    paddingHorizontal: 11
+  },
+  title: {
+    color: theme.foreground
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  templatePanel: {
+    marginBottom: 15
+  },
+  sectionTitle: {
+    color: theme.text60,
+    fontSize: INFO_FONT_SIZE,
+    marginBottom: 8
+  },
 });
 
 export default RoutineEditScreen;
