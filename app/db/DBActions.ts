@@ -20,8 +20,9 @@ const createExercise = (exercise: Exercise) => {
          numberOfRounds, 
          restBetweenRounds, 
          breakBeforeNext, 
-         category
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+         category,
+         color
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
@@ -35,6 +36,7 @@ const createExercise = (exercise: Exercise) => {
           exercise.restBetweenRounds,
           exercise.breakBeforeNext,
           exercise.category,
+          exercise.color,
         ],
         (_txObj: any, resultSet: any) => {
           // return the id of the newly inserted row
@@ -62,7 +64,8 @@ const createRoutine = async (routine: Routine) => {
          color, 
          userCreated,
          timeMostRecentlyCompleted,
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+         emoji
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
@@ -223,7 +226,8 @@ const updateExercise = async (exercise: Exercise) => {
           numberOfRounds = ?,
           restBetweenRounds = ?,
           breakBeforeNext = ?,
-          category = ?
+          category = ?,
+          color = ?
         WHERE id = ?`;
 
       tx.executeSql(
@@ -238,6 +242,7 @@ const updateExercise = async (exercise: Exercise) => {
           exercise.restBetweenRounds,
           exercise.breakBeforeNext,
           exercise.category,
+          exercise.color,
           exercise.id,
         ],
         (_txObj: any, resultSet: any) => {
@@ -263,7 +268,8 @@ const updateRoutine = async (routine: Routine) => {
           title = ?,
           duration = ?,
           color = ?,
-          userCreated = ?
+          userCreated = ?,
+          emoji = ?
         WHERE id = ?`;
 
       tx.executeSql(
@@ -278,6 +284,7 @@ const updateRoutine = async (routine: Routine) => {
           routine.duration,
           routine.color,
           routine.userCreated,
+          routine.emoji,
           routine.id,
         ],
         (_txObj: any, resultSet: any) => {

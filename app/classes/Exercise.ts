@@ -14,6 +14,7 @@ export class Exercise {
   restBetweenRounds: number;
   breakBeforeNext: number;
   category: string;
+  color: string;
 
   constructor(obj: any) {
     this.id = obj.id;
@@ -26,5 +27,6 @@ export class Exercise {
     this.restBetweenRounds = obj.restBetweenRounds;
     this.breakBeforeNext = obj.breakBeforeNext;
     this.category = obj.category;
+    this.color = obj.color;
   }
 }

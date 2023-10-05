@@ -57,6 +57,7 @@ export const createTables = async () => {
         userCreated INTEGER,
         timeCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         timeMostRecentlyCompleted TIMESTAMP,  
+        emoji TEXT
       );`,
       [],
       (_tx, _resultSet) => {
@@ -79,6 +80,7 @@ export const createTables = async () => {
         restBetweenRounds INTEGER,
         breakBeforeNext INTEGER,
         category TEXT,
+        color TEXT,
         FOREIGN KEY (routineID) REFERENCES Routine(id) ON DELETE CASCADE,
         UNIQUE(routineID, exerciseOrder)
       );`,
