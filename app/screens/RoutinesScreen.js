@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from "react";
-import { StyleSheet, FlatList, Alert } from "react-native";
+import React, { useState, useCallback, useEffect } from "react";
+import { StyleSheet, FlatList, Alert, Button } from "react-native";
 import Screen from "../components/Screen";
 
 import Header from "../components/Header";
@@ -11,7 +11,6 @@ import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
-import { useFocusEffect } from "@react-navigation/native";
 
 function RoutinesScreen() {
   const { theme } = useTheme();
