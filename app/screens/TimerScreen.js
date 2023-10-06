@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
@@ -8,12 +8,15 @@ import Timer from "../components/Timer";
 
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
 import { useTheme } from "../contexts/ThemeContext";
+import PlayPause from "../components/PlayPause";
+import SkipButton from "../components/SkipButton";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
 
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const confirmedNavigate = () => {
     Alert.alert(
@@ -44,11 +47,20 @@ function TimerScreen({ route }) {
             foregroundColor="white"
             onPress={confirmedNavigate}
             style={styles.backButton}
-            textStyle={{ fontSize: 17, fontWeight: "bold" }}
           />
         </View>
       </View>
-      <Timer duration={30} title="Rest" />
+      <Timer
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        duration={30}
+        title="Rest"
+      />
+      <View style={styles.controlRow}>
+        <SkipButton shouldSkipForward={false} />
+        <PlayPause isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+        <SkipButton shouldSkipForward={true} />
+      </View>
     </Screen>
   );
 }
@@ -60,6 +72,12 @@ const getStyles = (theme) =>
       width: 65,
       height: 35,
       borderRadius: 18,
+    },
+    controlRow: {
+      alignSelf: "center",
+      flexDirection: "row",
+      gap: 20,
+      margin: "auto",
     },
     routineTitle: {
       color: theme.foreground,

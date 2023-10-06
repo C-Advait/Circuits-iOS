@@ -18,8 +18,7 @@ const STARTING_OFFSET = 0.06;
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const Timer = ({ title, duration }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
   const [secondsRemaining, setSecondsRemaining] = useState(duration);
   const progress = useSharedValue(1);
 
@@ -88,17 +87,12 @@ const Timer = ({ title, duration }) => {
           }}
         />
       </View>
-      <Button
-        title={isPlaying ? "Pause" : "Play"}
-        onPress={() => setIsPlaying((prev) => !prev)}
-      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
     padding: 20,
