@@ -15,6 +15,7 @@ import {Tag} from "../classes/Exercise"
 import { TAB_BAR_HEIGHT } from '../config/appConstants'
 import AppTextButton from "../components/buttons/AppTextButton";
 import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
+import NavHeader from "../components/NavHeader";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -327,18 +328,29 @@ function RoutineEditScreen() {
 
   return (
     <Screen>
+
+      <NavHeader 
+        LeftComponent={
+          <AppTextButton
+            onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
+            textStyle={{fontSize: 18, fontWeight: '400', color: theme.foreground}}
+          > Cancel
+          </AppTextButton>
+        }
+        headerText="New Routine"
+        RightComponent={
+          <AppTextButton
+            onPress={() => null}
+            textStyle={{fontSize: 18, fontWeight: '500'}}
+          > Create
+          </AppTextButton>
+        }
+      />
+
       <View style={styles.navPanel}>
-        <AppTextButton
-          onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-          textStyle={{fontSize: 18, fontWeight: '400', color: theme.foreground}}>
-            Cancel
-        </AppTextButton>
+
         <Header style={styles.text}>New Routine</Header>
-        <AppTextButton
-          onPress={() => null}
-          textStyle={{fontSize: 18, fontWeight: '500'}}>
-          Create
-        </AppTextButton>
+
       </View>
 
       <SectionList 
@@ -407,10 +419,6 @@ const getStyles = (theme) => StyleSheet.create({
   },
   title: {
     color: theme.foreground
-  },
-  text: {
-    fontSize: 18,
-    fontWeight: 'bold'
   },
   templatePanel: {
     marginBottom: 15
