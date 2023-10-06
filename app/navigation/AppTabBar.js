@@ -6,10 +6,12 @@ import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { useTheme } from "../contexts/ThemeContext";
 import navigationIcons from "./navigationIcons";
 
+import shouldShowTabBar from "./shouldShowTabBar";
+
 const AppTabBar = ({ state, descriptors, navigation }) => {
   const { theme } = useTheme();
 
-  return (
+  return shouldShowTabBar(getCurrentRoute(state)) ? (
     <BlurView
       style={styles.tabBar}
       blurType="extraDark"
@@ -58,7 +60,17 @@ const AppTabBar = ({ state, descriptors, navigation }) => {
         );
       })}
     </BlurView>
-  );
+  ) : null;
+};
+
+const getCurrentRoute = (state) => {
+  const { routes, index } = state;
+  const currentTab = routes[index];
+  if (currentTab.state) {
+    const { index: innerIndex, routes } = currentTab.state;
+    return routes[innerIndex].name;
+  }
+  return currentTab.name;
 };
 
 const styles = StyleSheet.create({
