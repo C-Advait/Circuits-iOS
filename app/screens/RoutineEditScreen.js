@@ -50,6 +50,7 @@ function RoutineEditScreen() {
           subTitle={"25 seconds"}
           accentColor={'tomato'} 
           clickDrag={true}
+          style={{borderTopLeftRadius: 0, borderTopRightRadius: 0}}
         />
       </View>
     </Screen>

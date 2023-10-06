@@ -11,6 +11,7 @@ function ExerciseCard({
   subTitle,
   accentColor,
   clickDrag = false,
+  style
 }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -21,7 +22,7 @@ function ExerciseCard({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
       <TouchableOpacity style={styles.closeButton} onPress={handlePress}>
         <EvilIcons
