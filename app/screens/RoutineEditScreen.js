@@ -11,7 +11,7 @@ import Screen from "../components/Screen";
 import routes from "../navigation/routes";
 import { useTheme } from "../contexts/ThemeContext";
 import ExerciseCard from "../components/ExerciseCard";
-import {Tag} from "../classes/Exercise"
+import { Tag } from "../classes/Exercise"
 import { TAB_BAR_HEIGHT } from '../config/appConstants'
 import AppTextButton from "../components/buttons/AppTextButton";
 import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
@@ -42,7 +42,7 @@ const formatDataForSectionList = (data) => {
         break;
     }
   });
-  
+
   // Convert the sections object into an array of section objects for SectionList
   return Object.keys(sections).map((key) => ({
     title: key,
@@ -236,7 +236,7 @@ const DATA = formatDataForSectionList([
 const getNumExercises = () => {
   for (let i = 0; i < DATA.length; i++) {
     if (DATA[i]['title'] === "Exercises") {
-      return DATA[i]["data"].length-1;
+      return DATA[i]["data"].length - 1;
     }
   }
   throw new Error(" `Exercises` section array not found in DATA object");
@@ -253,22 +253,22 @@ function RoutineEditScreen() {
     switch (item.tag) {
       case Tag.PREROUTINE:
         return (
-            <AuxiliaryCard 
+          <AuxiliaryCard
             accentcolor={theme.accentGreen}
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes"/>}
+            InputComponent={() => <DummyInputComponent text="10 minutes" />}
           />
         );
       case Tag.POSTROUTINE:
         return (
-            <AuxiliaryCard 
+          <AuxiliaryCard
             accentcolor={theme.accentDarkBlue}
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes"/>}
+            InputComponent={() => <DummyInputComponent text="10 minutes" />}
           />
         );
       case Tag.WORKING: {
@@ -286,41 +286,41 @@ function RoutineEditScreen() {
     switch (index) {
       case 0:
         return (
-          <ExerciseCard 
-          title={item.title}
-          subTitle={item.workTime}
-          accentColor={theme.accentLightPurple}
-          clickDrag={true}
-          style={{borderBottomStartRadius: 0}}
+          <ExerciseCard
+            title={item.title}
+            subTitle={item.workTime}
+            accentColor={theme.accentLightPurple}
+            clickDrag={true}
+            style={{ borderBottomStartRadius: 0 }}
           />
         );
       case numExercises:
         return (
-          <View style={{gap: 12}}>
-            <ExerciseCard 
+          <View style={{ gap: 12 }}>
+            <ExerciseCard
               title={item.title}
               subTitle={item.workTime}
               accentColor={theme.accentLightPurple}
               clickDrag={true}
-              style={{borderTopStartRadius: 0}}
+              style={{ borderTopStartRadius: 0 }}
             />
-            <AuxiliaryCard 
+            <AuxiliaryCard
               editable={false}
               bold={false}
               title={"Loops"}
-              InputComponent={() => <DummyInputComponent text="Once"/>}
+              InputComponent={() => <DummyInputComponent text="Once" />}
               Icon={() => <Feather name="repeat" size={24} color={theme.foreground} />}
             />
           </View>
         );
       default:
         return (
-          <ExerciseCard 
-          title={item.title}
-          subTitle={item.workTime}
-          accentColor={theme.accentLightPurple}
-          clickDrag={true}
-          style={{borderRadius: 0}}
+          <ExerciseCard
+            title={item.title}
+            subTitle={item.workTime}
+            accentColor={theme.accentLightPurple}
+            clickDrag={true}
+            style={{ borderRadius: 0 }}
           />
         );
     }
@@ -328,11 +328,11 @@ function RoutineEditScreen() {
 
   return (
     <Screen>
-      <NavHeader 
+      <NavHeader
         LeftComponent={
           <AppTextButton
             onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-            textStyle={{fontWeight: '400', color: theme.foreground}}
+            textStyle={{ fontWeight: '400', color: theme.foreground }}
           > Cancel
           </AppTextButton>
         }
@@ -340,44 +340,43 @@ function RoutineEditScreen() {
         RightComponent={
           <AppTextButton
             onPress={() => console.log("Routine created")}
-            textStyle={{fontWeight: '500'}}
+            textStyle={{ fontWeight: '500' }}
           > Create
           </AppTextButton>
         }
       />
-      <SectionList 
-        contentContainerStyle ={styles.container}
+      <SectionList
+        contentContainerStyle={styles.container}
         ListHeaderComponent={
           <>
-          <View style={styles.headingPanel}>
-            <LinearGradient
-              colors={['#ffffff', '#3397f3', ]} //to be adjusted
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 0.25 }}
-              style={styles.emojiBox}
-            />
-            <Header style={styles.title}>My Routine #11</Header>
-          </View>          
-          <View style={styles.templatePanel}>
-            <AuxiliaryCard 
-              title={"Template"}
-              editable={false}
-              InputComponent={() => <DummyInputComponent text="Custom" />}
-            />
-          </View>
+            <View style={styles.headingPanel}>
+              <LinearGradient
+                colors={['#ffffff', '#3397f3',]} //to be adjusted
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 0.25 }}
+                style={styles.emojiBox}
+              />
+              <Header style={styles.title}>My Routine #11</Header>
+            </View>
+            <View style={styles.templatePanel}>
+              <AuxiliaryCard
+                title={"Template"}
+                editable={false}
+                InputComponent={() => <DummyInputComponent text="Custom" />}
+              />
+            </View>
           </>
         }
         sections={DATA}
         keyExtractor={(item) => item.id}
-        renderItem={({item, index}) => renderItem(item, index)}
-        renderSectionHeader={({section}) => (
+        renderItem={({ item, index }) => renderItem(item, index)}
+        renderSectionHeader={({ section }) => (
           <Text style={styles.sectionTitle}>{section.title}</Text>
         )}
         stickySectionHeadersEnabled={false}
-        renderSectionFooter={() => <View style={{height: 22}} />}
-        ItemSeparatorComponent={() => <View style={{height:StyleSheet.hairlineWidth, backgroundColor:theme.text60}}/>}
+        renderSectionFooter={() => <View style={{ height: 22 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: theme.text60 }} />}
       />
-
     </Screen>
   );
 }
@@ -405,7 +404,7 @@ const getStyles = (theme) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 30, 
+    marginBottom: 30,
     marginTop: 5,
     paddingHorizontal: 11
   },
