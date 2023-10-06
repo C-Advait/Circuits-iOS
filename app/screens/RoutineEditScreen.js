@@ -235,7 +235,7 @@ const DATA = formatDataForSectionList([
 const getNumExercises = () => {
   for (let i = 0; i < DATA.length; i++) {
     if (DATA[i]['title'] === "Exercises") {
-      return DATA[i]["data"].length - 1;
+      return DATA[i]["data"].length-1;
     }
   }
   throw new Error(" `Exercises` section array not found in DATA object");
@@ -246,11 +246,84 @@ function RoutineEditScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  console.log(DATA);
   const numExercises = getNumExercises();
-  console.log(numExercises);
 
+  const renderItem = (item, index) => {
+    switch (item.tag) {
+      case Tag.PREROUTINE:
+        return (
+            <AuxiliaryCard 
+            accentcolor={theme.accentGreen}
+            editable={false}
+            bold={false}
+            title={item.title}
+            InputComponent={() => <DummyInputComponent text="10 minutes"/>}
+          />
+        );
+      case Tag.POSTROUTINE:
+        return (
+            <AuxiliaryCard 
+            accentcolor={theme.accentDarkBlue}
+            editable={false}
+            bold={false}
+            title={item.title}
+            InputComponent={() => <DummyInputComponent text="10 minutes"/>}
+          />
+        );
+      case Tag.WORKING: {
+        return (renderExerciseItem(item, index));
+      }
+      default:
+        throw new Error(
+          `${item.tag} does not match any expected tags. ` +
+          `Expected one of ${Tag.PREROUTINE}, ${Tag.POSTROUTINE}, ${Tag.WORKING}`
+        );
+    }
+  }
 
+  const renderExerciseItem = (item, index) => {
+    switch (index) {
+      case 0:
+        return (
+          <ExerciseCard 
+          title={item.title}
+          subTitle={item.workTime}
+          accentColor={'red'}
+          clickDrag={true}
+          style={{borderBottomStartRadius: 0}}
+          />
+        );
+      case numExercises:
+        return (
+          <View style={{gap: 12}}>
+            <ExerciseCard 
+              title={item.title}
+              subTitle={item.workTime}
+              accentColor={'red'}
+              clickDrag={true}
+              style={{borderTopStartRadius: 0}}
+            />
+            <AuxiliaryCard 
+              editable={false}
+              bold={false}
+              title={"Loops"}
+              InputComponent={() => <DummyInputComponent text="Once"/>}
+              Icon={() => <Feather name="repeat" size={24} color={theme.foreground} />}
+            />
+          </View>
+        );
+      default:
+        return (
+          <ExerciseCard 
+          title={item.title}
+          subTitle={item.workTime}
+          accentColor={'red'}
+          clickDrag={true}
+          style={{borderRadius: 0}}
+          />
+        );
+    }
+  };
 
   return (
     <Screen>
@@ -292,50 +365,7 @@ function RoutineEditScreen() {
         }
         sections={DATA}
         keyExtractor={(item) => item.id}
-        // keyExtractor={(item, index) => item.id + '-' + index}
-        renderItem={({item, index}) => (
-          <>
-            {(item.tag === Tag.PREROUTINE) && 
-              <AuxiliaryCard 
-                accentcolor={theme.accentGreen}
-                editable={false}
-                bold={false}
-                title={item.title}
-                InputComponent={DummyInputComponent}
-              />
-            } 
-            {(item.tag === Tag.POSTROUTINE) &&
-              <AuxiliaryCard 
-                accentcolor={theme.accentDarkBlue}
-                editable={false}
-                bold={false}
-                title={item.title}
-                InputComponent={DummyInputComponent}
-              />
-            }
-            {(item.tag === Tag.WORKING) && 
-              <ExerciseCard 
-                title={item.title}
-                subTitle={item.workTime}
-                showDeleteIcon={true}
-                accentColor={'red'}
-                clickDrag={true}
-              />
-            }
-            {index === (numExercises) && // THIS WILL BREAK in the future as it hard-coded accounts for the # of items in the "PREROUTINE" section as 1
-              <View style={{marginTop: 12}}>
-                <AuxiliaryCard 
-                // accentcolor={'dodgerblue'}
-                editable={false}
-                bold={false}
-                title={"Loops"}
-                InputComponent={() => <DummyInputComponent text="Once"/>}
-                Icon={() => <Feather name="repeat" size={24} color={theme.foreground} />}
-                />
-              </View>
-            }
-          </>
-        )}
+        renderItem={({item, index}) => renderItem(item, index)}
         renderSectionHeader={({section}) => (
           <Text style={styles.sectionTitle}>{section.title}</Text>
         )}
