@@ -48,7 +48,6 @@ function RoutineEditScreen() {
         <ExerciseCard 
           title="Planks" 
           subTitle={"25 seconds"}
-          showDeleteIcon={true}
           accentColor={'tomato'} 
           clickDrag={true}
         />
