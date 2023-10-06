@@ -73,11 +73,13 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
       </Svg>
       <View style={styles.overlay}>
         <Text style={styles.title}>{title}</Text>
-        <NumericalTimer
-          isPlaying={isPlaying}
-          secondsRemaining={secondsRemaining}
-          setSecondsRemaining={setSecondsRemaining}
-        />
+        <View style={{ backgroundColor: "red" }}>
+          <NumericalTimer
+            isPlaying={isPlaying}
+            secondsRemaining={secondsRemaining}
+            setSecondsRemaining={setSecondsRemaining}
+          />
+        </View>
         <Button
           title="Reset"
           onPress={() => {
@@ -98,6 +100,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   overlay: {
+    width: 0.5 * CIRCLE_SIZE,
+    height: 0.5 * CIRCLE_SIZE,
     position: "absolute",
     top: CIRCLE_SIZE / 3 - 10,
     alignItems: "center",
