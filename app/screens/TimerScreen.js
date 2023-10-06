@@ -51,9 +51,13 @@ function TimerScreen({ route }) {
       <Timer
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
-        duration={30}
+        duration={20}
         title="Rest"
       />
+      <View style={styles.nextContainer}>
+        <Text style={styles.upNext}>UP NEXT:</Text>
+        <Text style={styles.nextExercise}>Squats</Text>
+      </View>
       <View style={styles.controlRow}>
         <SkipButton shouldSkipForward={false} />
         <PlayPause isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
@@ -71,11 +75,28 @@ const getStyles = (theme) =>
       height: 35,
       borderRadius: 18,
     },
+    backButtonContainer: {
+      alignItems: "center",
+      flexDirection: "row",
+      height: "100%",
+      position: "absolute",
+      right: 22,
+    },
     controlRow: {
       alignSelf: "center",
       flexDirection: "row",
       gap: 20,
       margin: "auto",
+    },
+    nextContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    nextExercise: {
+      color: theme.secondary,
+      fontWeight: 500,
+      fontSize: 27,
+      marginBottom: 25,
     },
     routineTitle: {
       color: theme.foreground,
@@ -85,14 +106,11 @@ const getStyles = (theme) =>
     topContainer: {
       alignItems: "center",
       justifyContent: "center",
-      marginVertical: 25,
+      marginTop: 25,
     },
-    backButtonContainer: {
-      alignItems: "center",
-      flexDirection: "row",
-      height: "100%",
-      position: "absolute",
-      right: 22,
+    upNext: {
+      color: theme.primary,
+      fontSize: 17,
     },
   });
 

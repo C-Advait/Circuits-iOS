@@ -34,8 +34,7 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
   }, [isPlaying]);
 
   const animatedProps = useAnimatedProps(() => {
-    const strokeDashoffset =
-      (1 - progress.value + RING_STARTING_OFFSET) * CIRCUMFERENCE;
+    const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
     return {
       strokeDashoffset,
     };
@@ -73,7 +72,7 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
       </Svg>
       <View style={styles.overlay}>
         <Text style={styles.title}>{title}</Text>
-        <View style={{ backgroundColor: "red" }}>
+        <View>
           <NumericalTimer
             isPlaying={isPlaying}
             secondsRemaining={secondsRemaining}

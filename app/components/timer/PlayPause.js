@@ -5,7 +5,9 @@ function PlayPause({ isPlaying, setIsPlaying }) {
   return (
     <Button
       title={isPlaying ? "Pause" : "Play"}
-      onPress={() => setIsPlaying((prev) => !prev)}
+      onPress={() => {
+        setIsPlaying((prev) => !prev);
+      }}
     />
   );
 }
