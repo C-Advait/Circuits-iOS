@@ -4,12 +4,10 @@ import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
 
 import routes from "../navigation/routes";
-import Timer from "../components/Timer";
 
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
 import { useTheme } from "../contexts/ThemeContext";
-import PlayPause from "../components/PlayPause";
-import SkipButton from "../components/SkipButton";
+import { PlayPause, SkipButton, Timer } from "../components/timer";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();

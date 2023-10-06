@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions, Button, Text } from "react-native";
+import { View, StyleSheet, Button, Text } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -9,12 +9,12 @@ import Animated, {
 } from "react-native-reanimated";
 import { Circle, G, Svg, Defs, LinearGradient, Stop } from "react-native-svg";
 import NumericalTimer from "./NumericalTimer";
-
-const { width } = Dimensions.get("window");
-const CIRCLE_SIZE = width - 60;
-const STROKE_WIDTH = 11;
-const CIRCUMFERENCE = CIRCLE_SIZE * Math.PI;
-const STARTING_OFFSET = 0.06;
+import {
+  CIRCLE_SIZE,
+  CIRCUMFERENCE,
+  RING_STARTING_OFFSET,
+  STROKE_WIDTH,
+} from "./timerContants";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -35,7 +35,7 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset =
-      (1 - progress.value + STARTING_OFFSET) * CIRCUMFERENCE;
+      (1 - progress.value + RING_STARTING_OFFSET) * CIRCUMFERENCE;
     return {
       strokeDashoffset,
     };
