@@ -328,12 +328,11 @@ function RoutineEditScreen() {
 
   return (
     <Screen>
-
       <NavHeader 
         LeftComponent={
           <AppTextButton
             onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-            textStyle={{fontSize: 18, fontWeight: '400', color: theme.foreground}}
+            textStyle={{fontWeight: '400', color: theme.foreground}}
           > Cancel
           </AppTextButton>
         }
@@ -341,18 +340,11 @@ function RoutineEditScreen() {
         RightComponent={
           <AppTextButton
             onPress={() => null}
-            textStyle={{fontSize: 18, fontWeight: '500'}}
+            textStyle={{fontWeight: '500'}}
           > Create
           </AppTextButton>
         }
       />
-
-      <View style={styles.navPanel}>
-
-        <Header style={styles.text}>New Routine</Header>
-
-      </View>
-
       <SectionList 
         contentContainerStyle ={styles.container}
         ListHeaderComponent={

@@ -7,6 +7,7 @@ function AppTextButton({ children, onPress, buttonStyle, textStyle}) {
 
     const { theme } = useTheme();
     const styles = getStyles(theme);
+    onPress = onPress ? onPress : () => null;
 
     return (
         <TouchableOpacity onPress={onPress} style={[styles.button, buttonStyle]}>
@@ -20,6 +21,8 @@ const getStyles = (theme) => StyleSheet.create({
         color: theme.blue
     },
     text: {
+        fontSize: 18,
+        fontWeight: '400',
         color: theme.blue
     }
 })

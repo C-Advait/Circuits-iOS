@@ -3,6 +3,8 @@ import {View, StyleSheet}  from 'react-native'
 
 import routes from "../navigation/routes";
 import { useTheme } from "../contexts/ThemeContext";
+import Header from './Header';
+import AppTextButton from './buttons/AppTextButton';
 
 function NavHeader({
     LeftComponent,
@@ -10,19 +12,24 @@ function NavHeader({
     RightComponent
 }) {
 
+    LeftComponent = LeftComponent ? LeftComponent : <AppTextButton>Replace me</AppTextButton>
+    RightComponent = RightComponent ? RightComponent : <AppTextButton>Replace me</AppTextButton>
     const { theme } = useTheme();
     const styles = getStyles(theme);
 
     return (
     <View style={styles.navPanel}>
-        <LeftComponent />
+        {LeftComponent}
         <Header style={[styles.text]}>{headerText}</Header>
-        <RightComponent />
+        {RightComponent}
       </View>
     );
 }
 
 const getStyles = (theme) => StyleSheet.create({
+    defaultLeftComponent: {
+
+    },
     navPanel: {
         flexDirection: 'row',
         justifyContent: 'space-between',
