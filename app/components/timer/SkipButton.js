@@ -1,10 +1,17 @@
 import React from "react";
-import { Button } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+import { IconButton } from "../buttons";
 
 function SkipButton({ shouldSkipForward }) {
   return (
-    <Button
-      title={shouldSkipForward ? "Next" : "Previous"}
+    <IconButton
+      iconName={
+        shouldSkipForward ? "md-play-skip-forward" : "md-play-skip-back"
+      }
+      iconSize={70}
+      foregroundColor="white"
+      IconFamily={Ionicons}
       onPress={() => {
         if (shouldSkipForward) {
           console.log("Skipping next");

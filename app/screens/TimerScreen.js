@@ -83,9 +83,11 @@ const getStyles = (theme) =>
       right: 22,
     },
     controlRow: {
-      alignSelf: "center",
       flexDirection: "row",
-      gap: 20,
+      justifyContent: "center",
+      alignItems: "center",
+      alignSelf: "center",
+      gap: 46,
       margin: "auto",
     },
     nextContainer: {

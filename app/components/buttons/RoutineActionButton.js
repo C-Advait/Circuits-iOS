@@ -24,8 +24,8 @@ function RoutineActionButton({
         size={iconSize}
         name={iconName}
         IconFamily={IconFamily}
-        foregroundcolor={foregroundcolor}
-        backgroundcolor="transparent"
+        foregroundColor={foregroundcolor}
+        backgroundColor="transparent"
         hasBackground={true}
       />
       <Text style={[styles.text, { color: textcolor }]}>{title}</Text>

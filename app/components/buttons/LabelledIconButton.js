@@ -26,8 +26,8 @@ function LabelledIconButton({
           size={iconSize}
           name={iconName}
           IconFamily={IconFamily}
-          foregroundcolor={foregroundColor}
-          backgroundcolor="transparent"
+          foregroundColor={foregroundColor}
+          backgroundColor="transparent"
           hasBackground={true}
         />
       ) : null}

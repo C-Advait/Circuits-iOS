@@ -8,8 +8,8 @@ function IconButton({
   iconName,
   iconSize = 60,
   IconFamily,
-  foregroundcolor,
-  backgroundcolor = "transparent",
+  foregroundColor,
+  backgroundColor = "transparent",
   style,
   iconStyle,
 }) {
@@ -30,8 +30,8 @@ function IconButton({
         size={iconSize}
         name={iconName}
         IconFamily={IconFamily}
-        foregroundcolor={foregroundcolor}
-        backgroundcolor={backgroundcolor}
+        foregroundColor={foregroundColor}
+        backgroundColor={backgroundColor}
         hasBackground={true}
         iconStyle={iconStyle}
       />
