@@ -7,6 +7,8 @@ import {
   StyleSheet,
 } from "react-native";
 import Screen from "../components/Screen";
+import { useTheme } from "../contexts/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 
 const data = [
   {
@@ -54,24 +56,58 @@ const data = [
     title: "Cardio",
     userCreated: true,
   },
+  {
+    id: 10,
+    title: "Arms",
+    userCreated: true,
+  },
+  {
+    id: 11,
+    title: "Leg Workout A",
+    userCreated: true,
+  },
+  {
+    id: 12,
+    title: "Climbing Circuit",
+    userCreated: true,
+  },
+  {
+    id: 13,
+    title: "Morning Meditation",
+    userCreated: true,
+  },
+  {
+    id: 14,
+    title: "Cardio",
+    userCreated: true,
+  },
 ];
 
 const TemplateSelectionScreen = () => {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
+
   const userCreatedData = data.filter((item) => item.userCreated);
   const systemCreatedData = data.filter((item) => !item.userCreated);
 
   // Default selectedId to 1
   const [selectedId, setSelectedId] = useState(1);
 
-  const renderItem = (item) => (
-    <TouchableOpacity
-      key={item.id}
-      style={styles.item}
-      onPress={() => setSelectedId(item.id)}
-    >
-      <Text>{item.title}</Text>
-      {selectedId === item.id && <Text style={styles.checkmark}>✓</Text>}
-    </TouchableOpacity>
+  const renderItem = (item, isLast) => (
+    <>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        key={item.id}
+        style={styles.item}
+        onPress={() => setSelectedId(item.id)}
+      >
+        <Text style={styles.choiceText}>{item.title}</Text>
+        {selectedId === item.id && (
+          <Ionicons name="checkmark" color={theme.blue} size={25} />
+        )}
+      </TouchableOpacity>
+      {!isLast ? <View style={styles.separator} /> : null}
+    </>
   );
 
   return (
@@ -79,45 +115,59 @@ const TemplateSelectionScreen = () => {
       <ScrollView style={styles.container}>
         <Text style={styles.sectionTitle}>System Created Templates</Text>
         <View style={styles.group}>
-          {systemCreatedData.map((item) => renderItem(item))}
+          {systemCreatedData.map((item, index) =>
+            renderItem(item, index === systemCreatedData.length - 1),
+          )}
         </View>
-        <View style={styles.separator} />
         <Text style={styles.sectionTitle}>User Created Templates</Text>
         <View style={styles.group}>
-          {userCreatedData.map((item) => renderItem(item))}
+          {userCreatedData.map((item, index) =>
+            renderItem(item, index === userCreatedData.length - 1),
+          )}
         </View>
       </ScrollView>
     </Screen>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "darkgrey",
-  },
-  group: {},
-  item: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: "grey",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  checkmark: {
-    color: "blue",
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginLeft: 10,
-  },
-});
+const getStyles = (theme) =>
+  StyleSheet.create({
+    choiceText: {
+      color: theme.primary,
+      fontSize: 17,
+    },
+    container: {
+      flex: 1,
+    },
+    group: {
+      borderRadius: 8,
+      marginBottom: 23,
+      marginHorizontal: 15,
+      overflow: "hidden",
+    },
+    item: {
+      alignItems: "center",
+      backgroundColor: theme.secondaryBackground,
+      flexDirection: "row",
+      height: 50,
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingVertical: 5,
+    },
+    checkmark: {
+      color: theme.blue,
+    },
+    separator: {
+      backgroundColor: "#ebebf540",
+      height: 1,
+    },
+    sectionTitle: {
+      color: theme.secondary,
+      fontSize: 14,
+      fontWeight: 500,
+      marginLeft: 16,
+      marginBottom: 8,
+    },
+  });
 
 export default TemplateSelectionScreen;

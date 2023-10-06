@@ -1,6 +1,6 @@
 // Some use 'argb' to specify 'alpha' or 'transparency'
 export const darkTheme = {
-  background: "#121212",
+  background: "#000000",
   backgroundFaded: "#1e1e1e",
   tileBackground: "#ffffff0c",
   secondaryBackground: "#1c1c1e",
