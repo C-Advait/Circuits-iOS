@@ -8,12 +8,15 @@ import routes from "../navigation/routes";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
 import { useTheme } from "../contexts/ThemeContext";
 import { PlayPause, SkipButton, Timer } from "../components/timer";
+import InfoWidget from "../components/timer/InfoWidget";
+import ProgressSlider from "../components/timer/ProgressSlider";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
 
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const [totalElapsed, setTotalElapsed] = useState(563);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const confirmedNavigate = () => {
@@ -63,6 +66,14 @@ function TimerScreen({ route }) {
         <PlayPause isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
         <SkipButton shouldSkipForward={true} />
       </View>
+      <View style={styles.progressRow}>
+        <InfoWidget title="Round" current={2} total={3} />
+        <InfoWidget title="Exercise" current={10} total={10} />
+        <InfoWidget title="Loop" current={2} total={3} />
+      </View>
+      <View style={styles.sliderContainer}>
+        <ProgressSlider elapsed={totalElapsed} total={1774} />
+      </View>
     </Screen>
   );
 }
@@ -88,7 +99,7 @@ const getStyles = (theme) =>
       alignItems: "center",
       alignSelf: "center",
       gap: 46,
-      margin: "auto",
+      marginBottom: 55,
     },
     nextContainer: {
       justifyContent: "center",
@@ -100,10 +111,19 @@ const getStyles = (theme) =>
       fontSize: 27,
       marginBottom: 25,
     },
+    progressRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginHorizontal: 15,
+      marginBottom: 22,
+    },
     routineTitle: {
       color: theme.foreground,
       fontWeight: "bold",
       fontSize: 17,
+    },
+    sliderContainer: {
+      marginHorizontal: 15,
     },
     topContainer: {
       alignItems: "center",

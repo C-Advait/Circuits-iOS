@@ -3,6 +3,7 @@ export const darkTheme = {
   background: "#121212",
   backgroundFaded: "#1e1e1e",
   tileBackground: "#ffffff0c",
+  secondaryBackground: "#1c1c1e",
   foreground: "#eeeeee",
   primary: "#eeeeee",
   secondary: "#ebebf599",

@@ -8,7 +8,10 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import { Circle, G, Svg, Defs, LinearGradient, Stop } from "react-native-svg";
+
 import NumericalTimer from "./NumericalTimer";
+import ResetButton from "./ResetButton";
+
 import {
   CIRCLE_SIZE,
   CIRCUMFERENCE,
@@ -79,8 +82,7 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
             setSecondsRemaining={setSecondsRemaining}
           />
         </View>
-        <Button
-          title="Reset"
+        <ResetButton
           onPress={() => {
             setSecondsRemaining(duration);
             setIsPlaying(false);
