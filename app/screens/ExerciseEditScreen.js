@@ -68,9 +68,6 @@ function ExerciseEditScreen(props) {
 
 const getStyles = (theme) => 
     StyleSheet.create({
-        disabledCard: {
-            backgroundColor: 'grey',
-        },
     })
 
 export default ExerciseEditScreen;
