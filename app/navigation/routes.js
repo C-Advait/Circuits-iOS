@@ -3,6 +3,7 @@ export default Object.freeze({
   ROUTINES_SCREEN: "RoutinesScreen",
   ROUTINE_EDIT_SCREEN: "RoutineEditScreen",
   TIMER_SCREEN: "TimerScreen",
+  TEMPLATE_SELECTION_SCREEN: "TemplateSelectionScreen",
   SETTINGS_SCREEN: "Settings",
   EXERCISE_EDIT_SCREEN: "ExerciseEditScreen",
 });
