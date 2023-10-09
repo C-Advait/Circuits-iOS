@@ -289,7 +289,7 @@ function RoutineEditScreen() {
           <ExerciseCard 
           title={item.title}
           subTitle={item.workTime}
-          accentColor={'red'}
+          accentColor={theme.accentLightPurple}
           clickDrag={true}
           style={{borderBottomStartRadius: 0}}
           />
@@ -300,7 +300,7 @@ function RoutineEditScreen() {
             <ExerciseCard 
               title={item.title}
               subTitle={item.workTime}
-              accentColor={'red'}
+              accentColor={theme.accentLightPurple}
               clickDrag={true}
               style={{borderTopStartRadius: 0}}
             />
@@ -318,7 +318,7 @@ function RoutineEditScreen() {
           <ExerciseCard 
           title={item.title}
           subTitle={item.workTime}
-          accentColor={'red'}
+          accentColor={theme.accentLightPurple}
           clickDrag={true}
           style={{borderRadius: 0}}
           />
