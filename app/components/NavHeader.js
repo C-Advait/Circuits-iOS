@@ -1,60 +1,64 @@
-import React from 'react';
-import {View, StyleSheet}  from 'react-native'
+import React from "react";
+import { View, StyleSheet } from "react-native";
 
 import routes from "../navigation/routes";
 import { useTheme } from "../contexts/ThemeContext";
-import Header from './Header';
-import AppTextButton from './buttons/AppTextButton';
+import Header from "./Header";
+import AppTextButton from "./buttons/AppTextButton";
 
 function NavHeader({
-    LeftComponent,
-    headerText = "Navigation Heading",
-    RightComponent
+  LeftComponent,
+  headerText = "Navigation Heading",
+  RightComponent,
 }) {
+  LeftComponent = LeftComponent ? (
+    LeftComponent
+  ) : (
+    <View style={{ width: 50, height: 50 }} />
+  );
+  RightComponent = RightComponent ? (
+    RightComponent
+  ) : (
+    <View style={{ width: 50, height: 50 }} />
+  );
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
 
-    LeftComponent = LeftComponent ? LeftComponent : <View style={{width: 50, height: 50, }} />
-    RightComponent = RightComponent ? RightComponent : <View style={{width: 50, height: 50, }} />
-    const { theme } = useTheme();
-    const styles = getStyles(theme);
-
-    return (
+  return (
     <View style={styles.navPanel}>
-        <View style={styles.leftView}>
-            {LeftComponent}
-        </View>
-        <View>
-            <Header style={[styles.text]}>{headerText}</Header>
-        </View>
-        <View style={styles.rightView}>
-            {RightComponent}
-        </View>
+      <View style={styles.leftView}>{LeftComponent}</View>
+      <View>
+        <Header style={[styles.text]}>{headerText}</Header>
+      </View>
+      <View style={styles.rightView}>{RightComponent}</View>
     </View>
-    );
+  );
 }
 
-const getStyles = (theme) => StyleSheet.create({
+const getStyles = (theme) =>
+  StyleSheet.create({
     leftView: {
-        position: 'absolute',
-        left: 0,
+      position: "absolute",
+      left: 0,
     },
     navPanel: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 30, 
-        marginTop: 5,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 30,
+      marginTop: 5,
     },
     rightView: {
-        position: 'absolute',
-        right: 16,
+      position: "absolute",
+      right: 16,
     },
     text: {
-        fontSize: 18,
-        fontWeight: 'bold'
+      fontSize: 17,
+      fontWeight: 500,
     },
     textView: {
-        position: 'center'
+      position: "center",
     },
-})
+  });
 
 export default NavHeader;

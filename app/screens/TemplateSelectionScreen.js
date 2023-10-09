@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,8 +8,12 @@ import {
 } from "react-native";
 import Screen from "../components/Screen";
 import { useTheme } from "../contexts/ThemeContext";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTemplate } from "../contexts/TemplateContext";
+import { useNavigation } from "@react-navigation/native";
+import NavHeader from "../components/NavHeader";
+import { IconButton } from "../components/buttons";
+import routes from "../navigation/routes";
 
 const data = [
   {
@@ -85,6 +89,7 @@ const data = [
 ];
 
 const TemplateSelectionScreen = () => {
+  const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
@@ -117,6 +122,17 @@ const TemplateSelectionScreen = () => {
 
   return (
     <Screen>
+      <NavHeader
+        LeftComponent={
+          <IconButton
+            iconName="chevron-left"
+            IconFamily={Feather}
+            foregroundColor={theme.blue}
+            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
+          />
+        }
+        headerText="Templates"
+      />
       <ScrollView style={styles.container}>
         <Text style={styles.sectionTitle}>System Created Templates</Text>
         <View style={styles.group}>

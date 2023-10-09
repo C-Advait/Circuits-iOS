@@ -247,14 +247,16 @@ const paddingBottomValue = TAB_BAR_HEIGHT / 2;
 
 function RoutineEditScreen() {
   const navigation = useNavigation();
-  const { selectedTemplate } = useTemplate();
+  const { selectedTemplate, selectedTemplateID } = useTemplate();
 
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const numExercises = getNumExercises();
 
   useEffect(() => {
-    console.log("New template selected: ", selectedTemplate);
+    console.log(
+      `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
+    );
   }, [selectedTemplate]);
 
   const renderItem = (item, index) => {
