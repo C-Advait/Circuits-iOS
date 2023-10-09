@@ -65,6 +65,7 @@ const getStyles = (theme) =>
       flex: 1,
       justifyContent: "space-between",
       padding: 10,
+      paddingHorizontal: 16
     },
     header: {
       color: theme.text87,
