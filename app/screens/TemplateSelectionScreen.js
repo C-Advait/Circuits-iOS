@@ -9,6 +9,7 @@ import {
 import Screen from "../components/Screen";
 import { useTheme } from "../contexts/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
+import { useTemplate } from "../contexts/TemplateContext";
 
 const data = [
   {
@@ -91,7 +92,8 @@ const TemplateSelectionScreen = () => {
   const systemCreatedData = data.filter((item) => !item.userCreated);
 
   // Default selectedId to 1
-  const [selectedId, setSelectedId] = useState(1);
+  const { selectedTemplateID, setSelectedTemplateID, setSelectedTemplate } =
+    useTemplate();
 
   const renderItem = (item, isLast) => (
     <>
@@ -99,10 +101,13 @@ const TemplateSelectionScreen = () => {
         activeOpacity={0.8}
         key={item.id}
         style={styles.item}
-        onPress={() => setSelectedId(item.id)}
+        onPress={() => {
+          setSelectedTemplateID(item.id);
+          setSelectedTemplate(item.title);
+        }}
       >
         <Text style={styles.choiceText}>{item.title}</Text>
-        {selectedId === item.id && (
+        {selectedTemplateID === item.id && (
           <Ionicons name="checkmark" color={theme.blue} size={25} />
         )}
       </TouchableOpacity>
