@@ -5,6 +5,7 @@ import RoutinesScreen from "../screens/RoutinesScreen";
 import TimerScreen from "../screens/TimerScreen";
 import RoutineEditScreen from "../screens/RoutineEditScreen";
 import routes from "./routes";
+import ExerciseEditScreen from "../screens/ExerciseEditScreen";
 
 const Stack = createStackNavigator();
 

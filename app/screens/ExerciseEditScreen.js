@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Button, SectionList, Text } from "react-native";
+import React, { useState } from 'react';
+import { View, StyleSheet} from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import {Feather} from '@expo/vector-icons'
 
@@ -10,12 +10,14 @@ import { useTheme } from '../contexts/ThemeContext';
 import routes from '../navigation/routes';
 import AuxilaryCard from "../components/AuxiliaryCard"
 import DummyInputComponent from "../components/DummyInputComponent";
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 function ExerciseEditScreen(props) {
 
     const navigation = useNavigation();
     const { theme } = useTheme();
     const styles = getStyles(theme);
+    const [restEnabled, setRestEnabled] = useState(false);
 
     return (
         <Screen style = {{flex: 1}}>
@@ -25,7 +27,7 @@ function ExerciseEditScreen(props) {
                     iconName={"chevron-left"}
                     IconFamily={Feather}
                     iconSize={52}
-                    foregroundcolor={theme.blue}
+                    foregroundColor={"#3397f3"}
                     onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
                   />
                 }
@@ -38,17 +40,20 @@ function ExerciseEditScreen(props) {
                 title={"Work time"}
                 InputComponent={() => <DummyInputComponent text="1 minute"/>}
                 />
+                <TouchableOpacity onPress={() => restEnabled ? setRestEnabled(false) : setRestEnabled(true)}>
+                    <AuxilaryCard 
+                    editable={false}
+                    bold={false}
+                    title={"Number of rounds"}
+                    InputComponent={() => <DummyInputComponent text="1"/>}
+                    />
+                </TouchableOpacity>
                 <AuxilaryCard 
                 editable={false}
                 bold={false}
-                title={"Number of rounds"}
-                InputComponent={() => <DummyInputComponent text="1"/>}
-                />
-                <AuxilaryCard 
-                editable={false}
-                bold={false}
+                disabled={restEnabled}
                 title={"Rest between rounds"}
-                InputComponent={() => <DummyInputComponent text="30 seconds"/>}
+                InputComponent={() => <DummyInputComponent text="30 seconds" disabled={restEnabled}/>}
                 />
                 <AuxilaryCard 
                 editable={false}
@@ -63,7 +68,9 @@ function ExerciseEditScreen(props) {
 
 const getStyles = (theme) => 
     StyleSheet.create({
-        
+        disabledCard: {
+            backgroundColor: 'grey',
+        },
     })
 
 export default ExerciseEditScreen;
