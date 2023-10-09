@@ -12,35 +12,48 @@ function NavHeader({
     RightComponent
 }) {
 
-    LeftComponent = LeftComponent ? LeftComponent : <AppTextButton>Replace me</AppTextButton>
-    RightComponent = RightComponent ? RightComponent : <AppTextButton>Replace me</AppTextButton>
+    LeftComponent = LeftComponent ? LeftComponent : <View style={{width: 50, height: 50, }} />
+    RightComponent = RightComponent ? RightComponent : <View style={{width: 50, height: 50, }} />
     const { theme } = useTheme();
     const styles = getStyles(theme);
 
     return (
     <View style={styles.navPanel}>
-        {LeftComponent}
-        <Header style={[styles.text]}>{headerText}</Header>
-        {RightComponent}
-      </View>
+        <View style={styles.leftView}>
+            {LeftComponent}
+        </View>
+        <View>
+            <Header style={[styles.text]}>{headerText}</Header>
+        </View>
+        <View style={styles.rightView}>
+            {RightComponent}
+        </View>
+    </View>
     );
 }
 
 const getStyles = (theme) => StyleSheet.create({
-    defaultLeftComponent: {
-
+    leftView: {
+        position: 'absolute',
+        left: 0,
     },
     navPanel: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'center',
         marginBottom: 30, 
         marginTop: 5,
-        paddingHorizontal: 11
-      },
+    },
+    rightView: {
+        position: 'absolute',
+        right: 16,
+    },
     text: {
         fontSize: 18,
         fontWeight: 'bold'
+    },
+    textView: {
+        position: 'center'
     },
 })
 
