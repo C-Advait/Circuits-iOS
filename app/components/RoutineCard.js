@@ -58,14 +58,14 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
                 }
                 iconName="play-outline"
                 IconFamily={Ionicons}
-                foregroundcolor={theme.text87}
+                foregroundColor={theme.text87}
               />
               <RoutineActionButton
                 title="Edit"
                 onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
                 iconName="edit-2"
                 IconFamily={Feather}
-                foregroundcolor={theme.text87}
+                foregroundColor={theme.text87}
               />
               <IconButton
                 iconName="trash-can-outline"
