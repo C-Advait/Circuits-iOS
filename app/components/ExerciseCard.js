@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { EvilIcons, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from "@react-navigation/native";
 
 import { useTheme } from '../contexts/ThemeContext';
 import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE, PARAGRAPH_FONT_WEIGHT } from '../config/appConstants';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import routes from '../navigation/routes';
 
 function ExerciseCard({
   title,
@@ -15,6 +17,8 @@ function ExerciseCard({
 }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const navigation = useNavigation();
+
   accentColor = accentColor ? accentColor : theme.tileBackground;
 
   const handlePress = () => {
@@ -32,7 +36,7 @@ function ExerciseCard({
         />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableWithoutFeedback style={styles.touchable} onPress={() => {console.log("touchable w/o feedback pressed")}}>
+        <TouchableWithoutFeedback style={styles.touchable} onPress={() => {navigation.navigate(routes.EXERCISE_EDIT_SCREEN)}}>
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subTitle}>{subTitle}</Text>

@@ -339,7 +339,7 @@ function RoutineEditScreen() {
         headerText="New Routine"
         RightComponent={
           <AppTextButton
-            onPress={() => null}
+            onPress={() => console.log("Routine created")}
             textStyle={{fontWeight: '500'}}
           > Create
           </AppTextButton>
