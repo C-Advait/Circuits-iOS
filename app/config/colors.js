@@ -12,6 +12,7 @@ export const darkTheme = {
   text60: "#ffffff99",
   accentGreen: "#bcdc49",
   accentPurple: "#c45fc6",
+  accentLightPurple: "#d893c3",
   accentDarkBlue: "#1b5cfd",
   accentLightBlue: "#9ed3ce",
   accentOrange: "#ffae35",
