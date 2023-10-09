@@ -9,16 +9,16 @@ function AuxiliaryCard({
   accentcolor,
   bold = false,
   editable = true,
+  disabled = false,
   title,
   Icon,
   InputComponent,
 }) {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
+  const styles =  getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
   accentcolor = accentcolor || theme.backgroundFaded;
 
   const fontWeight = bold ? 600 : 400;
-  const textStyle = [styles.header, { fontWeight: fontWeight }];
 
   return (
     <View style={styles.container}>
@@ -30,17 +30,17 @@ function AuxiliaryCard({
       ) : null}
       <View style={styles.contentContainer}>
         {editable ? (
-          <EditableText placeholder={title} style={textStyle} />
+          <EditableText placeholder={title} style={[styles.textStyle, {fontWeight: fontWeight}]} />
         ) : (
-          <Text style={textStyle}>{title}</Text>
+          <Text style={[styles.textStyle, {fontWeight: fontWeight}]}>{title}</Text>
         )}
-        <InputComponent />
+        <InputComponent disabled={true} />
       </View>
     </View>
   );
 }
 
-const getStyles = (theme) =>
+const getStylesActive = (theme) =>
   StyleSheet.create({
     accent: {
       width: 3,
@@ -65,6 +65,7 @@ const getStyles = (theme) =>
       flex: 1,
       justifyContent: "space-between",
       padding: 10,
+      paddingHorizontal: 16
     },
     header: {
       color: theme.text87,
@@ -78,6 +79,56 @@ const getStyles = (theme) =>
       fontSize: 18,
       marginTop: 5,
     },
-  });
+    textStyle: {
+      color: theme.text87,
+      fontSize: PARAGRAPH_FONT_SIZE,
+    }
+});
 
-export default AuxiliaryCard;
+const getStylesDisabled = (theme) =>
+  StyleSheet.create({
+    accent: {
+      width: 3,
+      height: "100%",
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: 10,
+    },
+    container: {
+      alignItems: "center",
+      backgroundColor: theme.tileBackground,
+      borderRadius: 8,
+      flexDirection: "row",
+      height: 42,
+      overflow: "hidden",
+    },
+    contentContainer: {
+      alignContent: "center",
+      flexDirection: "row",
+      flex: 1,
+      justifyContent: "space-between",
+      padding: 10,
+      paddingHorizontal: 16
+    },
+    header: {
+      color: theme.text87,
+      fontSize: PARAGRAPH_FONT_SIZE,
+    },
+    iconContainer: {
+      marginLeft: 16,
+      marginRight: 8,
+    },
+    subtitle: {
+      fontSize: 18,
+      marginTop: 5,
+    },
+    textStyle: {
+      color: theme.textDisabled,
+      fontSize: PARAGRAPH_FONT_SIZE,
+    }
+});
+
+
+export default AuxiliaryCard

@@ -9,8 +9,8 @@ function RoutineActionButton({
   iconName,
   iconSize = 50,
   IconFamily,
-  foregroundcolor,
-  textcolor = foregroundcolor,
+  foregroundColor,
+  textcolor = foregroundColor,
   title,
   style,
 }) {
@@ -24,7 +24,7 @@ function RoutineActionButton({
         size={iconSize}
         name={iconName}
         IconFamily={IconFamily}
-        foregroundColor={foregroundcolor}
+        foregroundColor={foregroundColor}
         backgroundColor="transparent"
         hasBackground={true}
       />

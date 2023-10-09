@@ -4,17 +4,26 @@ import { Text, StyleSheet } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
-function DummyInputComponent({ text = "10 minutes" }) {
+function DummyInputComponent({ text = "10 minutes", disabled= false}) {
   const { theme } = useTheme();
-  const styles = getStyles(theme);
-  return <Text style={styles.body}>{text}</Text>;
+  const styles = disabled? getStylesDisabled(theme) : getStylesActive(theme);
+  return <Text style={[styles.body]}>{text}</Text>;
 }
 
-const getStyles = (theme) =>
+const getStylesActive = (theme) =>
   StyleSheet.create({
     body: {
       fontSize: PARAGRAPH_FONT_SIZE,
       color: theme.text87,
     },
   });
+
+const getStylesDisabled = (theme) =>
+StyleSheet.create({
+  body: {
+    fontSize: PARAGRAPH_FONT_SIZE,
+    color: theme.textDisabled,
+  },
+});
+
 export default DummyInputComponent;

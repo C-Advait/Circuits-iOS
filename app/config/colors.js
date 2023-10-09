@@ -12,6 +12,7 @@ export const darkTheme = {
   text: "#aaa",
   text87: "#ffffffde",
   text60: "#ffffff99",
+  textDisabled: "#494949",
   accentGreen: "#bcdc49",
   accentPurple: "#c45fc6",
   accentLightPurple: "#d893c3",
