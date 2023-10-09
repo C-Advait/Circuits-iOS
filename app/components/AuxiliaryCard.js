@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, ActionSheetIOS } from "react-native";
 
 import { useTheme } from "../contexts/ThemeContext";
 import EditableText from "./EditableText";
@@ -15,19 +15,18 @@ function AuxiliaryCard({
 }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  accentcolor = accentcolor || theme.backgroundFaded;
 
   const fontWeight = bold ? 600 : 400;
   const textStyle = [styles.header, { fontWeight: fontWeight }];
 
   return (
     <View style={styles.container}>
+      <View style={[styles.accent, { backgroundColor: accentcolor }]} />
       {Icon ? (
         <View style={styles.iconContainer}>
           <Icon />
         </View>
-      ) : null}
-      {accentcolor ? (
-        <View style={[styles.accent, { backgroundColor: accentcolor }]} />
       ) : null}
       <View style={styles.contentContainer}>
         {editable ? (
