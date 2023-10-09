@@ -3,8 +3,10 @@ export const darkTheme = {
   background: "#121212",
   backgroundFaded: "#1e1e1e",
   tileBackground: "#ffffff0c",
+  secondaryBackground: "#1c1c1e",
   foreground: "#eeeeee",
   primary: "#eeeeee",
+  secondary: "#ebebf599",
   danger: "#d93453",
   blue: "#3397f3",
   text: "#aaa",
@@ -18,7 +20,7 @@ export const darkTheme = {
   accentOrange: "#ffae35",
   tabBarActiveTintColor: "#eee",
   tabBarInactiveTintColor: "#909090",
-  dullIcon: '#ffffff'
+  dullIcon: "#ffffff",
 };
 
 export const lightTheme = {

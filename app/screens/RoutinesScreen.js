@@ -151,7 +151,7 @@ function RoutinesScreen() {
           iconName="plus"
           IconFamily={Feather}
           iconSize={55}
-          foregroundcolor={theme.blue}
+          foregroundColor={theme.blue}
           onPress={() => Alert.alert("Add new routine", "Add")}
         />
       </View>
@@ -159,7 +159,7 @@ function RoutinesScreen() {
         <LabelledIconButton
           iconName="sort-ascending"
           IconFamily={MaterialCommunityIcons}
-          foregroundcolor={theme.text87}
+          foregroundColor={theme.text87}
           title="Recent"
           onPress={() => Alert.alert("Sort", "Sort")}
         />
@@ -167,7 +167,7 @@ function RoutinesScreen() {
           iconName={expandedCount === data.length ? "minimize-2" : "maximize-2"}
           IconFamily={Feather}
           iconSize={40}
-          foregroundcolor={theme.text87}
+          foregroundColor={theme.text87}
           onPress={() => expandCollapseAll()}
           style={{ width: 77, height: 50 }}
         />

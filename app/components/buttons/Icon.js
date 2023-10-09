@@ -2,14 +2,14 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const DEFAULT_CIRCLE_SIZE = 50;
+const DEFAULT_CIRCLE_SIZE = 80;
 
 function Icon({
   size,
   name,
   IconFamily = MaterialCommunityIcons,
-  foregroundcolor,
-  backgroundcolor,
+  foregroundColor,
+  backgroundColor,
   hasBackground = true,
   iconStyle: style,
 }) {
@@ -27,13 +27,12 @@ function Icon({
               height: "auto",
               width: "auto",
             },
-        style,
       ]}
     >
       <IconFamily
         name={name}
-        backgroundColor={backgroundcolor}
-        color={foregroundcolor}
+        backgroundColor={backgroundColor}
+        color={foregroundColor}
         size={size / 2}
       />
     </View>

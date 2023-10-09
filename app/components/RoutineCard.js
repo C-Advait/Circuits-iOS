@@ -35,7 +35,7 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
             iconName={isExpanded ? "chevron-up" : "chevron-down"}
             IconFamily={Feather}
             iconSize={52}
-            foregroundcolor={theme.text60}
+            foregroundColor={theme.text60}
             onPress={() => toggleExpand()}
           />
         </View>
@@ -53,7 +53,9 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
             <View style={styles.buttonContainer}>
               <RoutineActionButton
                 title="Start"
-                onPress={() => navigation.navigate(routes.TIMER_SCREEN)}
+                onPress={() =>
+                  navigation.navigate(routes.TIMER_SCREEN, { title: title })
+                }
                 iconName="play-outline"
                 IconFamily={Ionicons}
                 foregroundcolor={theme.text87}
@@ -68,7 +70,7 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
               <IconButton
                 iconName="trash-can-outline"
                 IconFamily={MaterialCommunityIcons}
-                foregroundcolor={theme.danger}
+                foregroundColor={theme.danger}
                 onPress={() => Alert.alert("Delete", "Delete")}
                 style={{ marginLeft: 0, alignItems: "flex-start" }}
               />
