@@ -12,7 +12,7 @@ PODS:
   - EXJSONUtils (0.7.1)
   - EXManifests (0.7.2):
     - ExpoModulesCore
-  - Expo (49.0.12):
+  - Expo (49.0.13):
     - ExpoModulesCore
   - expo-dev-client (2.4.11):
     - EXManifests
@@ -518,7 +518,7 @@ PODS:
     - React
   - RNGestureHandler (2.13.1):
     - React-Core
-  - RNReanimated (3.5.4):
+  - RNReanimated (3.3.0):
     - DoubleConversion
     - FBLazyVector
     - glog
@@ -766,7 +766,7 @@ SPEC CHECKSUMS:
   EXFont: 738c44c390953ebcbab075a4848bfbef025fd9ee
   EXJSONUtils: 6802be4282d42b97c51682468ddc1026a06f8276
   EXManifests: cf66451b11b2c2f6464917528d792759f7fd6ce0
-  Expo: 30f1f1af73d650fa5d158702faec70e5d26b5d97
+  Expo: e7d2116b947e2e6fdeb09ee4f2754f819426d1b6
   expo-dev-client: a97a68508a6104ad99f4b2613fd808cda7a4186c
   expo-dev-launcher: 7336e6dc8ed51b87225f8a96d787add81a99748c
   expo-dev-menu: 9542570483a647626570cb4333c80add4cea1254
@@ -819,7 +819,7 @@ SPEC CHECKSUMS:
   ReactCommon: 91ece8350ebb3dd2be9cef662abd78b6948233c0
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNGestureHandler: 38aa38413896620338948fbb5c90579a7b1c3fde
-  RNReanimated: ab2e96c6d5591c3dfbb38a464f54c8d17fb34a87
+  RNReanimated: 9f7068e43b9358a46a688d94a5a3adb258139457
   RNScreens: 50ffe2fa2342eabb2d0afbe19f7c1af286bc7fb3
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
@@ -827,4 +827,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 41c18fa79fff6b0f2d79d44c933ac14c58523b9e
 
-COCOAPODS: 1.13.0
+COCOAPODS: 1.11.3

@@ -101,10 +101,9 @@ const TemplateSelectionScreen = () => {
     useTemplate();
 
   const renderItem = (item, isLast) => (
-    <>
+    <React.Fragment key={item.id}>
       <TouchableOpacity
         activeOpacity={0.8}
-        key={item.id}
         style={styles.item}
         onPress={() => {
           setSelectedTemplateID(item.id);
@@ -117,7 +116,7 @@ const TemplateSelectionScreen = () => {
         )}
       </TouchableOpacity>
       {!isLast ? <View style={styles.separator} /> : null}
-    </>
+    </React.Fragment>
   );
 
   return (
