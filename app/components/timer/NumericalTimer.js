@@ -1,58 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Dimensions, View, Text, StyleSheet } from "react-native";
+import timerActions from "../../actions/timerActions";
 
 import playSound from "../../utilities/playSound"
 import { COUNTDOWN_BEEP_SOUND, END_EXERCISE_SOUND } from "../../config/appConstants";
 
-
-const NumericalTimer = ({
-  isPlaying,
-  secondsRemaining,
-  setSecondsRemaining,
-  onFinish,
-  routineComplete,
-}) => {
+const NumericalTimer = ({ state, dispatch }) => {
   useEffect(() => {
     let interval;
-    if (isPlaying) {
+
+    if (state.isPlaying) {
       interval = setInterval(() => {
-        setSecondsRemaining((prevSeconds) => {
-          if (prevSeconds < 1) {  // Modified condition here
-            clearInterval(interval); // Clear interval here
-            onFinish();
-            return 0;
-          }
-          if (prevSeconds === 1) {
-            playSound(END_EXERCISE_SOUND);
-          }
-          if (1 < prevSeconds && prevSeconds <= 4) {
-            playSound(COUNTDOWN_BEEP_SOUND);
-          }
-          return prevSeconds - 1;
-        });
+        if (state.exerciseSecondsRemaining < 1) {
+          dispatch({ type: timerActions.SKIP_FORWARD });
+          clearInterval(interval);
+        } else {
+          dispatch({ type: timerActions.DECREMENT_TIMER });
+        }
       }, 1000);
-    } else if (!isPlaying && secondsRemaining !== 0) {
+    } else if (state.exerciseSecondsRemaining !== 0) {
       clearInterval(interval);
     }
 
     return () => clearInterval(interval); // cleanup on component unmount
   }, [isPlaying, secondsRemaining]);
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""
-      }${seconds}`;
-  };
-
   return (
     <View style={styles.container}>
       <Text style={[styles.timerText, styles.placeholder]}>88:88</Text>
       <Text style={styles.timerText}>
-        {routineComplete ? "" : formatTime(secondsRemaining)}
+        {state.routineComplete
+          ? ""
+          : formatTime(state.exerciseSecondsRemaining)}
       </Text>
     </View>
   );
+};
+
+const formatTime = (time) => {
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""
+    }${seconds}`;
 };
 
 const { width } = Dimensions.get("window");

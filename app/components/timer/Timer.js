@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Button, Text } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Text } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -19,48 +19,69 @@ import {
   STROKE_WIDTH,
 } from "./timerContants";
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
+import timerActions from "../../actions/timerActions";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
+// const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
+const Timer = ({ state, dispatch }) => {
   const progress = useSharedValue(1);
-  const [secondsRemaining, setSecondsRemaining] = useState(duration);
-  const [hasFinished, setHasFinished] = useState(false);
+  // Consider moving into state directly.
+  const { title, tag } = state.intervals[state.currentIndex] || {};
 
-  const routineComplete = duration === undefined;
-
+  // Reload timer when flag set, then unset flag.
   useEffect(() => {
-    if (hasFinished) {
-      if (onFinish) {
-        onFinish();
-      }
-      setSecondsRemaining(duration);
+    if (state.shouldResetTimer) {
       progress.value = 1;
-      setHasFinished(false);
+      dispatch({ type: timerActions.MARK_TIMER_LOAD_COMPLETE });
+
+      const exerciseDuration = state.intervals[state.currentIndex]?.duration;
+
+      if (state.isPlaying) {
+        progress.value = withTiming(0, {
+          duration: exerciseDuration * 1000,
+          easing: Easing.linear,
+        });
+      }
     }
-  }, [hasFinished, onFinish]);
+  }, [state.shouldResetTimer]);
 
+  // Handle play / pause.
   useEffect(() => {
-    setSecondsRemaining(duration);
+    // Can use exerciseSecondsRemaining?
+    const exerciseDuration = state.intervals[state.currentIndex]?.duration;
 
-    if (isPlaying) {
+    if (exerciseDuration && state.isPlaying) {
       progress.value = withTiming(0, {
-        duration: duration * 1000,
-        easing: Easing.linear,
-      });
-    }
-  }, [duration]);
-
-  useEffect(() => {
-    if (isPlaying) {
-      progress.value = withTiming(0, {
-        duration: duration * 1000,
+        duration: exerciseDuration * 1000,
         easing: Easing.linear,
       });
     } else {
       cancelAnimation(progress);
     }
-  }, [isPlaying]);
+  }, [state.isPlaying]);
+
+  // useEffect(() => {
+  //   if (hasFinished) {
+  //     if (onFinish) {
+  //       onFinish();
+  //     }
+  //     setSecondsRemaining(duration);
+  //     progress.value = 1;
+  //     setHasFinished(false);
+  //   }
+  // }, [hasFinished, onFinish]);
+
+  // useEffect(() => {
+  //   setSecondsRemaining(duration);
+
+  //   if (isPlaying) {
+  //     progress.value = withTiming(0, {
+  //       duration: duration * 1000,
+  //       easing: Easing.linear,
+  //     });
+  //   }
+  // }, [duration]);
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
@@ -100,23 +121,13 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
         </G>
       </Svg>
       <View style={styles.overlay}>
-        <Text style={styles.title}>{routineComplete ? "" : title}</Text>
+        <Text style={styles.title}>{state.routineComplete ? "" : title}</Text>
         <View>
-          <NumericalTimer
-            isPlaying={isPlaying}
-            secondsRemaining={secondsRemaining}
-            setSecondsRemaining={setSecondsRemaining}
-            onFinish={() => setHasFinished(true)}
-            routineComplete={routineComplete}
-          />
+          <NumericalTimer state={state} dispatch={dispatch} />
         </View>
-        {routineComplete ? null : (
+        {state.routineComplete ? null : (
           <ResetButton
-            onPress={() => {
-              setSecondsRemaining(duration);
-              setIsPlaying(false);
-              progress.value = 1;
-            }}
+            onPress={() => dispatch({ type: timerActions.RESET_TIMER })}
           />
         )}
       </View>

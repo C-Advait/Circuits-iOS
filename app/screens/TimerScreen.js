@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useReducer } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
 
@@ -12,92 +12,47 @@ import InfoWidget from "../components/timer/InfoWidget";
 import ProgressSlider from "../components/timer/ProgressSlider";
 import { getExercisesForRoutine } from "../db/DBActions";
 import { processExerciseList } from "../utilities/processExerciseList";
+import { confirmedNavigate } from "../alerts/endRoutine";
+import timerActions from "../actions/timerActions";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
-
-  const { id: routineID, numberOfLoops, title } = route.params;
-
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const [totalElapsed, setTotalElapsed] = useState(563);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const [intervals, setIntervals] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [numberOfExercises, setNumberOfExercises] = useState();
-  const [currentLoop, setCurrentLoop] = useState(1);
-
-  const createTimerSequence = async () => {
-    const exercises = await getExercisesForRoutine(routineID);
-
-    // Decompress exercises
-    setNumberOfExercises(exercises.length); // Does this include warmup yet?
-    setIntervals(processExerciseList(exercises));
-    console.log(JSON.stringify(processExerciseList(exercises), null, 2));
-  };
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    createTimerSequence();
+    dispatch({ type: timerActions.INIT_FROM_PARAMS, params: route.params });
+    createTimerSequence(route.params.id, dispatch);
   }, []);
-
-  const handleTimerFinish = () => {
-    // If we've reached the end of 'intervals', then either
-    //   a) We need to restart from the beginning and
-    //      increment currentLoop, or
-    //   b) We are done the routine.
-    if (currentIndex === intervals.length - 1) {
-      setCurrentLoop((prev) => prev + 1);
-      if (currentLoop === numberOfLoops) {
-        console.log("Routine is complete.");
-        setCurrentIndex(intervals.length + 1);
-      } else {
-        setCurrentIndex(0);
-      }
-    } else {
-      setCurrentIndex((prev) => prev + 1);
-    }
-  };
-
-  const confirmedNavigate = () => {
-    Alert.alert(
-      "Confirm", // title
-      "Are you sure you want to end this routine?", // message
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => navigation.navigate(routes.ROUTINES_SCREEN),
-        },
-      ],
-      { cancelable: false },
-    );
-  };
 
   // Check header for length, and potentially truncate!
   return (
     <Screen>
       <View style={styles.topContainer}>
-        <Text style={styles.routineTitle}>{title}</Text>
+        <Text style={styles.routineTitle}>{state.title}</Text>
         <View style={styles.backButtonContainer}>
           <LabelledIconButton
             title={"End"}
             foregroundColor="white"
-            onPress={confirmedNavigate}
+            onPress={() =>
+              confirmedNavigate(() =>
+                navigation.navigate(routes.ROUTINES_SCREEN),
+              )
+            }
             style={styles.backButton}
           />
         </View>
       </View>
       <Timer
-        isPlaying={isPlaying}
-        setIsPlaying={setIsPlaying}
-        duration={intervals[currentIndex]?.duration}
-        onFinish={handleTimerFinish}
-        title={intervals[currentIndex]?.title}
-        tag={intervals[currentIndex]?.tag}
+        state={state}
+        dispatch={dispatch}
+      // isPlaying={isPlaying}
+      // setIsPlaying={setIsPlaying}
+      // duration={intervals[currentIndex]?.duration}
+      // onFinish={handleTimerFinish}
+      // title={intervals[currentIndex]?.title}
+      // tag={intervals[currentIndex]?.tag}
       />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
@@ -106,36 +61,166 @@ function TimerScreen({ route }) {
       <View style={styles.controlRow}>
         <SkipButton
           shouldSkipForward={false}
-          currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
+          dispatch={dispatch}
+          active={
+            (state.currentIndex !== 0 || state.currentLoop !== 1) &&
+            !state.routineComplete
+          }
         />
-        <PlayPause isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+        <PlayPause isPlaying={state.isPlaying} dispatch={dispatch} />
         <SkipButton
           shouldSkipForward={true}
-          maxIndex={intervals.length}
-          currentIndex={currentIndex}
-          setCurrentIndex={setCurrentIndex}
+          dispatch={dispatch}
+          active={
+            state.currentIndex !== state.intervals.length - 1 ||
+            state.currentLoop !== state.numberOfLoops
+          }
         />
       </View>
       <View style={styles.progressRow}>
         <InfoWidget
           title="Round"
-          current={intervals[currentIndex]?.currentRound}
-          total={intervals[currentIndex]?.numberOfRounds}
+          current={state.intervals[state.currentIndex]?.currentRound}
+          total={state.intervals[state.currentIndex]?.numberOfRounds}
         />
         <InfoWidget
           title="Exercise"
-          current={intervals[currentIndex]?.exerciseOrder}
-          total={numberOfExercises}
+          current={state.intervals[state.currentIndex]?.exerciseOrder}
+          total={state?.numberOfExercises}
         />
-        <InfoWidget title="Loop" current={currentLoop} total={numberOfLoops} />
+        <InfoWidget
+          title="Loop"
+          current={state?.currentLoop}
+          total={state?.numberOfLoops}
+        />
       </View>
       <View style={styles.sliderContainer}>
-        <ProgressSlider elapsed={totalElapsed} total={1774} />
+        <ProgressSlider
+          elapsed={state.totalElapsedTime}
+          total={state.totalDuration}
+        />
       </View>
     </Screen>
   );
 }
+
+function reducer(state, action) {
+  switch (action.type) {
+    case timerActions.INIT_FROM_PARAMS:
+      return {
+        ...state,
+        ...action.params,
+      };
+    case timerActions.SET_EXERCISE_DATA:
+      console.log(`Setting exercise data: ${JSON.stringify(action, null, 2)}`);
+      return {
+        ...state,
+        numberOfExercises: action.numberOfExercises,
+        intervals: action.intervals,
+        exerciseSecondsRemaining: action.initialDuration,
+      };
+    case timerActions.SKIP_FORWARD:
+      // If we've reached the end of 'intervals', then either
+      //   a) We need to restart from the beginning and
+      //      increment currentLoop, or
+      //   b) We are done the routine.
+      if (state.routineComplete) return state;
+
+      if (state.currentIndex === state.intervals.length - 1) {
+        if (state.currentLoop === state.numberOfLoops) {
+          console.log("Routine is complete.");
+          return {
+            ...state,
+            // currentLoop: state.currentLoop + 1,
+            // currentIndex: state.currentIndex + 1,
+            routineComplete: true,
+          };
+        } else {
+          return {
+            ...state,
+            shouldResetTimer: true,
+            currentLoop: state.currentLoop + 1,
+            currentIndex: 0,
+            exerciseSecondsRemaining: state.intervals[0]?.duration,
+          };
+        }
+      } else {
+        return {
+          ...state,
+          shouldResetTimer: true,
+          currentIndex: state.currentIndex + 1,
+          exerciseSecondsRemaining:
+            state.intervals[state.currentIndex + 1]?.duration,
+        };
+      }
+    case timerActions.SKIP_BACKWARD:
+      if (state.routineComplete) return state;
+
+      if (state.currentIndex !== 0) {
+        return {
+          ...state,
+          shouldResetTimer: true,
+          currentIndex: state.currentIndex - 1,
+          exerciseSecondsRemaining:
+            state.intervals[state.currentIndex - 1]?.duration,
+        };
+      } else {
+        return state;
+      }
+    case timerActions.DECREMENT_TIMER:
+      return {
+        ...state,
+        exerciseSecondsRemaining: state.exerciseSecondsRemaining - 1,
+      };
+    case timerActions.TOGGLE_IS_PLAYING:
+      return {
+        ...state,
+        isPlaying: !state.isPlaying,
+      };
+    case timerActions.RESET_TIMER:
+      return {
+        ...state,
+        shouldResetTimer: true,
+        exerciseSecondsRemaining: state.intervals[state.currentIndex]?.duration,
+      };
+    case timerActions.MARK_TIMER_LOAD_COMPLETE:
+      return {
+        ...state,
+        shouldResetTimer: false,
+      };
+  }
+}
+
+const createTimerSequence = async (id, dispatch) => {
+  const exercises = await getExercisesForRoutine(id);
+
+  dispatch({
+    type: timerActions.SET_EXERCISE_DATA,
+    numberOfExercises: exercises.length,
+    intervals: processExerciseList(exercises),
+    initialDuration: exercises[0]?.workTime,
+  });
+  // console.log(JSON.stringify(processExerciseList(exercises), null, 2));
+};
+
+const initialState = {
+  totalElapsedTime: 0,
+  totalDuration: 0,
+
+  exerciseSecondsRemaining: 0,
+  isPlaying: false,
+
+  intervals: [{ title: "", tag: "" }], // Might be causing Nan:Nan on startup
+  currentIndex: 0,
+
+  numberOfExercises: 0,
+
+  currentLoop: 1,
+  numberOfLoops: 1,
+
+  shouldResetTimer: false,
+  routineComplete: false,
+};
 
 const getStyles = (theme) =>
   StyleSheet.create({

@@ -76,6 +76,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
                     id: item.id,
                     numberOfLoops: item.numberOfLoops,
                     title: title,
+                    totalDuration: item.duration,
                   })
                 }
                 iconName="play-outline"
