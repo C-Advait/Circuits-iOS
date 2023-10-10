@@ -24,7 +24,6 @@ function RoutinesScreen() {
   const loadRoutines = async () => {
     const routines = await getAllUserCreatedRoutines();
     setRoutines(routines);
-    console.log(routines);
   };
 
   useFocusEffect(

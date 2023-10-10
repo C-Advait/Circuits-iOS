@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,7 +11,7 @@ import formatDuration from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
-import { deleteRoutine } from "../db/DBActions";
+import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 
 function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   // Duration in seconds
@@ -20,6 +20,30 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const [description, setDescription] = useState();
+
+  const createDescription = async () => {
+    const exercises = await getExercisesForRoutine(item.id);
+
+    const formattedExerciseString =
+      exercises
+        .map(
+          (exercise) =>
+            `${exercise.title} (${exercise.numberOfRounds} x ${formatDuration(
+              exercise.workTime,
+            )})`,
+        )
+        .join("\n") + "\n";
+
+    const formattedLoopString =
+      item.numberOfLoops > 1 ? `\nLoops ${item.numberOfLoops} times` : "";
+
+    setDescription(formattedExerciseString + formattedLoopString);
+  };
+
+  useEffect(() => {
+    createDescription();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -43,14 +67,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
 
         <Collapsible collapsed={!isExpanded} duration={350}>
           <>
-            <Text style={styles.body}>
-              Pushups (3x1min){"\n"}
-              Dips (5x60s){"\n"}
-              Hammer Curls (4x30s){"\n"}
-              Bicep Curls (4x30s){"\n"}
-              {"\n"}
-              Loops 2 times
-            </Text>
+            <Text style={styles.body}>{description}</Text>
             <View style={styles.buttonContainer}>
               <RoutineActionButton
                 title="Start"

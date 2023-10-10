@@ -114,31 +114,105 @@ const getNames = async () => {
 };
 
 const createDummyExercises = async () => {
-  const myExercise = new Exercise({
-    routineID: 1,
-    title: "Jumping Jacks",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 5,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Cardio",
-  });
-
-  const myExercise2 = new Exercise({
+  const e1 = new Exercise({
     routineID: 1,
     title: "Pushups",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 60,
+    numberOfRounds: 3,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Arms",
+  });
+
+  const e2 = new Exercise({
+    routineID: 1,
+    title: "Dips",
     exerciseOrder: 2,
     tag: Tag.WORKING,
-    workTime: 40,
+    workTime: 45,
     numberOfRounds: 5,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
     category: "Strength",
   });
-  createExercise(myExercise);
-  createExercise(myExercise2);
+
+  const e3 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e4 = new Exercise({
+    routineID: 1,
+    title: "Biceps curls",
+    exerciseOrder: 4,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e5 = new Exercise({
+    routineID: 2,
+    title: "Demo",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e6 = new Exercise({
+    routineID: 3,
+    title: "Another Demo",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e7 = new Exercise({
+    routineID: 4,
+    title: "Still another demo",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e8 = new Exercise({
+    routineID: 5,
+    title: "You guessed it...",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8];
+
+  Promise.all(exercises.map((e) => createExercise(e)));
 };
 
 const getDummyExercises = async () => {
@@ -190,7 +264,7 @@ function SettingsScreen() {
         onPress={() => createDummyRoutine()}
       />
       <Button
-        title="Create dummy exercise"
+        title="Create 8 dummy exercises"
         onPress={() => createDummyExercises()}
       />
       <Button title="Reset DB" onPress={() => resetDB()} />
