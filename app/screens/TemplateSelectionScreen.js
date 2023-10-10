@@ -88,10 +88,11 @@ const data = [
   },
 ];
 
-const TemplateSelectionScreen = () => {
+const TemplateSelectionScreen = ({ route }) => {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const isEditing = route.params.edit;
 
   const userCreatedData = data.filter((item) => item.userCreated);
   const systemCreatedData = data.filter((item) => !item.userCreated);
@@ -127,7 +128,7 @@ const TemplateSelectionScreen = () => {
             iconName="chevron-left"
             IconFamily={Feather}
             foregroundColor={theme.blue}
-            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
+            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {edit: isEditing})}
           />
         }
         headerText="Templates"
