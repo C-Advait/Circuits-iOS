@@ -377,7 +377,7 @@ function RoutineEditScreen({ route }) {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN);
+                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {edit: isEditing})
               }}
               style={styles.templatePanel}
             >
