@@ -11,8 +11,9 @@ import formatDuration from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
+import { deleteRoutine } from "../db/DBActions";
 
-function RoutineCard({ item, isExpanded, toggleExpand }) {
+function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   // Duration in seconds
   const { color: accentcolor, duration, title } = item;
 
@@ -75,7 +76,7 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
                 iconName="trash-can-outline"
                 IconFamily={MaterialCommunityIcons}
                 foregroundColor={theme.danger}
-                onPress={() => Alert.alert("Delete", "Delete")}
+                onPress={() => confirmDeletion(item, deleteCallback)}
                 style={{ marginLeft: 0, alignItems: "flex-start" }}
               />
             </View>
@@ -85,6 +86,32 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
     </View>
   );
 }
+
+const confirmDeletion = (item, deleteCallback) => {
+  Alert.alert(
+    "Confirm Deletion", // Alert title
+    `Are you sure you want to delete '${item.title}'?`, // Alert message
+    [
+      // Array of buttons
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel", // iOS style for the cancel button
+      },
+      {
+        text: "Delete",
+        onPress: () => {
+          deleteRoutine(item.id);
+          deleteCallback();
+        },
+        style: "destructive", // iOS style indicating a destructive action
+      },
+    ],
+    {
+      cancelable: true, // Whether tapping outside the alert box will cancel it
+    },
+  );
+};
 
 const getStyles = (theme) =>
   StyleSheet.create({

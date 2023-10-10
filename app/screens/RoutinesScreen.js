@@ -20,14 +20,14 @@ function RoutinesScreen() {
   const { theme } = useTheme();
   const [routines, setRoutines] = useState([]);
 
+  const loadRoutines = async () => {
+    const routines = await getAllUserCreatedRoutines();
+    setRoutines(routines);
+    console.log(routines);
+  };
+
   useFocusEffect(
     useCallback(() => {
-      const loadRoutines = async () => {
-        const routines = await getAllUserCreatedRoutines();
-        setRoutines(routines);
-        console.log(routines);
-      };
-
       loadRoutines();
     }, []),
   );
@@ -107,6 +107,13 @@ function RoutinesScreen() {
             item={item}
             isExpanded={expandedStates[index]}
             toggleExpand={() => toggleExpand(index)}
+            deleteCallback={() => {
+              loadRoutines();
+              setExpandedCount(0);
+              setExpandedStates((prev) =>
+                new Array(Math.max(prev.length - 1, 0)).fill(false),
+              );
+            }}
           />
         )}
         keyExtractor={(item) => item.id}
