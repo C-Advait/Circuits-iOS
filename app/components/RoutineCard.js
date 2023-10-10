@@ -83,6 +83,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
                 onPress={() =>
                   navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
                     edit: true,
+                    routineID: item.id
                   })
                 }
                 iconName="edit-2"

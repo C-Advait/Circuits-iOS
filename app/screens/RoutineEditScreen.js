@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Button, SectionList, Text } from "react-native";
-import { useNavigation } from "@react-navigation/core";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { View, StyleSheet, SectionList, Text } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/core";
+import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
 import AuxiliaryCard from "../components/AuxiliaryCard";
@@ -18,6 +18,8 @@ import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useTemplate } from "../contexts/TemplateContext";
+import { getExercisesForRoutine } from "../db/DBActions";
+import formatExerciseInfo from "../utilities/formatExerciseInfo";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -40,8 +42,7 @@ const formatDataForSectionList = (data) => {
         sections.Cooldown.push(item);
         break;
       default:
-        console.warn(`Unexpected tag: ${item.tag}`);
-        break;
+        null;
     }
   });
 
@@ -52,208 +53,37 @@ const formatDataForSectionList = (data) => {
   }));
 };
 
-const DATA = formatDataForSectionList([
-  {
-    id: 1,
-    routineID: 1,
-    title: "Warmup",
-    exerciseOrder: 1,
-    tag: Tag.PREROUTINE,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 2,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 2,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 3,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 4,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 5,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 6,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 7,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 8,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 9,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 10,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 11,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 12,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 13,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 14,
-    routineID: 1,
-    title: "Plank",
-    exerciseOrder: 4,
-    tag: Tag.WORKING,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-  {
-    id: 15,
-    routineID: 1,
-    title: "Cooldown",
-    exerciseOrder: 5,
-    tag: Tag.POSTROUTINE,
-    workTime: 150,
-    numberOfRounds: 1,
-    restBetweenRounds: 50,
-    breakBeforeNext: 0,
-    category: null,
-  },
-]);
-
-const getNumExercises = () => {
-  for (let i = 0; i < DATA.length; i++) {
-    if (DATA[i]["title"] === "Exercises") {
-      return DATA[i]["data"].length - 1;
+const getNumExercises = (exerciseData) => {
+  for (let i = 0; i < exerciseData.length; i++) {
+    if (exerciseData[i]["title"] === "Exercises") {
+      return exerciseData[i]["data"].length - 1;
     }
   }
-  throw new Error(" `Exercises` section array not found in DATA object");
+  return 0;
 };
 const paddingBottomValue = TAB_BAR_HEIGHT / 2;
 
 function RoutineEditScreen({ route }) {
   const navigation = useNavigation();
-  const isEditing = route.params.edit;
-
+  const {edit: isEditing, routineID} = route.params;
   const { selectedTemplate, selectedTemplateID } = useTemplate();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const numExercises = getNumExercises();
 
+  const [exercises, setExercises] = useState([]);
+  const numExercises = useMemo(() => getNumExercises(exercises), [exercises]);
+
+  const loadExercises = async () => {
+    const exers = await getExercisesForRoutine(routineID);
+    setExercises(formatDataForSectionList(exers));
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadExercises();
+    }, []),
+  );
+    
   useEffect(() => {
     console.log(
       `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
@@ -286,10 +116,7 @@ function RoutineEditScreen({ route }) {
         return renderExerciseItem(item, index);
       }
       default:
-        throw new Error(
-          `${item.tag} does not match any expected tags. ` +
-            `Expected one of ${Tag.PREROUTINE}, ${Tag.POSTROUTINE}, ${Tag.WORKING}`,
-        );
+        null;
     }
   };
 
@@ -299,7 +126,7 @@ function RoutineEditScreen({ route }) {
         return (
           <ExerciseCard
             title={item.title}
-            subTitle={item.workTime}
+            subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             clickDrag={true}
             style={{ borderBottomStartRadius: 0 }}
@@ -310,7 +137,7 @@ function RoutineEditScreen({ route }) {
           <View style={{ gap: 12 }}>
             <ExerciseCard
               title={item.title}
-              subTitle={item.workTime}
+              subTitle={formatExerciseInfo(item)}
               accentColor={theme.accentLightPurple}
               clickDrag={true}
               style={{ borderTopStartRadius: 0 }}
@@ -330,7 +157,7 @@ function RoutineEditScreen({ route }) {
         return (
           <ExerciseCard
             title={item.title}
-            subTitle={item.workTime}
+            subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             clickDrag={true}
             style={{ borderRadius: 0 }}
@@ -338,6 +165,8 @@ function RoutineEditScreen({ route }) {
         );
     }
   };
+
+  // console.log(workTime);
 
   return (
     <Screen>
@@ -351,10 +180,10 @@ function RoutineEditScreen({ route }) {
             Cancel
           </AppTextButton>
         }
-        headerText={isEditing ? "Old routine" : "New Routine"}
+        headerText={isEditing ? "Edit Routine" : "New Routine"}
         RightComponent={
           <AppTextButton
-            onPress={() => console.log("Routine created")}
+            onPress={() => console.log("Routine Saved/Created")}
             textStyle={{ fontWeight: "500" }}
           >
             {isEditing ? "Save" : "Create"}
@@ -391,7 +220,7 @@ function RoutineEditScreen({ route }) {
             </TouchableOpacity>
           </>
         }
-        sections={DATA}
+        sections={exercises}
         keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => renderItem(item, index)}
         renderSectionHeader={({ section }) => (

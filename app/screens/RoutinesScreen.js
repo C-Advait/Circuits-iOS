@@ -77,7 +77,7 @@ function RoutinesScreen() {
           iconSize={55}
           foregroundColor={theme.blue}
           onPress={() =>
-            navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: false })
+            navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: false, routineID: 999})
           }
         />
       </View>
