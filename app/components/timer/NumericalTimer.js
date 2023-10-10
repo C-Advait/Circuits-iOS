@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, View, Text, StyleSheet } from "react-native";
 
 import playSound from "../../utilities/playSound"
@@ -9,21 +9,24 @@ const NumericalTimer = ({
   isPlaying,
   secondsRemaining,
   setSecondsRemaining,
+  onFinish,
+  routineComplete,
 }) => {
   useEffect(() => {
     let interval;
     if (isPlaying) {
       interval = setInterval(() => {
         setSecondsRemaining((prevSeconds) => {
-          if (prevSeconds < 1) {  // Modified condition here
-            clearInterval(interval); // Clear interval here
+          if (prevSeconds <= 1) {
+            clearInterval(interval);
+            onFinish();
             return 0;
           }
           if (prevSeconds === 1) {
             playSound(END_EXERCISE_SOUND);
           }
           if (1 < prevSeconds && prevSeconds <= 4) {
-            playSound(COUNTDOWN_BEEP_SOUND); 
+            playSound(COUNTDOWN_BEEP_SOUND);
           }
           return prevSeconds - 1;
         });
@@ -38,15 +41,16 @@ const NumericalTimer = ({
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
-    return `${minutes < 10 ? "0" : ""}${minutes}:${
-      seconds < 10 ? "0" : ""
-    }${seconds}`;
+    return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""
+      }${seconds}`;
   };
 
   return (
     <View style={styles.container}>
       <Text style={[styles.timerText, styles.placeholder]}>88:88</Text>
-      <Text style={styles.timerText}>{formatTime(secondsRemaining)}</Text>
+      <Text style={styles.timerText}>
+        {routineComplete ? "" : formatTime(secondsRemaining)}
+      </Text>
     </View>
   );
 };

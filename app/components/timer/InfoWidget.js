@@ -6,6 +6,8 @@ function InfoWidget({ title, current, total }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
+  if (title !== "Exercise" && total === 1) return null;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
@@ -20,9 +22,9 @@ const getStyles = (theme) =>
   StyleSheet.create({
     container: {
       alignItems: "center",
+      flex: 1,
       backgroundColor: theme.secondaryBackground,
       borderRadius: 12,
-      gap: 4,
       paddingVertical: 8,
       width: "29%",
     },

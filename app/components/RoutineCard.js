@@ -72,7 +72,11 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
               <RoutineActionButton
                 title="Start"
                 onPress={() =>
-                  navigation.navigate(routes.TIMER_SCREEN, { title: title })
+                  navigation.navigate(routes.TIMER_SCREEN, {
+                    id: item.id,
+                    numberOfLoops: item.numberOfLoops,
+                    title: title,
+                  })
                 }
                 iconName="play-outline"
                 IconFamily={Ionicons}

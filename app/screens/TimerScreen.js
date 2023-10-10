@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
@@ -10,14 +10,54 @@ import { useTheme } from "../contexts/ThemeContext";
 import { PlayPause, SkipButton, Timer } from "../components/timer";
 import InfoWidget from "../components/timer/InfoWidget";
 import ProgressSlider from "../components/timer/ProgressSlider";
+import { getExercisesForRoutine } from "../db/DBActions";
+import { processExerciseList } from "../utilities/processExerciseList";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
+
+  const { id: routineID, numberOfLoops, title } = route.params;
 
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [totalElapsed, setTotalElapsed] = useState(563);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const [intervals, setIntervals] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [numberOfExercises, setNumberOfExercises] = useState();
+  const [currentLoop, setCurrentLoop] = useState(1);
+
+  const createTimerSequence = async () => {
+    const exercises = await getExercisesForRoutine(routineID);
+
+    // Decompress exercises
+    setNumberOfExercises(exercises.length); // Does this include warmup yet?
+    setIntervals(processExerciseList(exercises));
+    console.log(JSON.stringify(processExerciseList(exercises), null, 2));
+  };
+
+  useEffect(() => {
+    createTimerSequence();
+  }, []);
+
+  const handleTimerFinish = () => {
+    // If we've reached the end of 'intervals', then either
+    //   a) We need to restart from the beginning and
+    //      increment currentLoop, or
+    //   b) We are done the routine.
+    if (currentIndex === intervals.length - 1) {
+      setCurrentLoop((prev) => prev + 1);
+      if (currentLoop === numberOfLoops) {
+        console.log("Routine is complete.");
+        setCurrentIndex(intervals.length + 1);
+      } else {
+        setCurrentIndex(0);
+      }
+    } else {
+      setCurrentIndex((prev) => prev + 1);
+    }
+  };
 
   const confirmedNavigate = () => {
     Alert.alert(
@@ -41,7 +81,7 @@ function TimerScreen({ route }) {
   return (
     <Screen>
       <View style={styles.topContainer}>
-        <Text style={styles.routineTitle}>{route.params.title}</Text>
+        <Text style={styles.routineTitle}>{title}</Text>
         <View style={styles.backButtonContainer}>
           <LabelledIconButton
             title={"End"}
@@ -54,8 +94,9 @@ function TimerScreen({ route }) {
       <Timer
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
-        duration={5}
-        title="Rest"
+        duration={intervals[currentIndex]?.duration}
+        onFinish={handleTimerFinish}
+        title={intervals[currentIndex]?.title}
       />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
@@ -67,9 +108,17 @@ function TimerScreen({ route }) {
         <SkipButton shouldSkipForward={true} />
       </View>
       <View style={styles.progressRow}>
-        <InfoWidget title="Round" current={2} total={3} />
-        <InfoWidget title="Exercise" current={10} total={10} />
-        <InfoWidget title="Loop" current={2} total={3} />
+        <InfoWidget
+          title="Round"
+          current={intervals[currentIndex]?.currentRound}
+          total={intervals[currentIndex]?.numberOfRounds}
+        />
+        <InfoWidget
+          title="Exercise"
+          current={intervals[currentIndex]?.exerciseOrder}
+          total={numberOfExercises}
+        />
+        <InfoWidget title="Loop" current={currentLoop} total={numberOfLoops} />
       </View>
       <View style={styles.sliderContainer}>
         <ProgressSlider elapsed={totalElapsed} total={1774} />
@@ -114,6 +163,7 @@ const getStyles = (theme) =>
     progressRow: {
       flexDirection: "row",
       justifyContent: "space-between",
+      gap: 10,
       marginHorizontal: 15,
       marginBottom: 22,
     },

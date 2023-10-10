@@ -21,9 +21,34 @@ import {
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
-  const [secondsRemaining, setSecondsRemaining] = useState(duration);
+const Timer = ({ isPlaying, setIsPlaying, title, duration, onFinish }) => {
   const progress = useSharedValue(1);
+  const [secondsRemaining, setSecondsRemaining] = useState(duration);
+  const [hasFinished, setHasFinished] = useState(false);
+
+  const routineComplete = duration === undefined;
+
+  useEffect(() => {
+    if (hasFinished) {
+      if (onFinish) {
+        onFinish();
+      }
+      setSecondsRemaining(duration);
+      progress.value = 1;
+      setHasFinished(false);
+    }
+  }, [hasFinished, onFinish]);
+
+  useEffect(() => {
+    setSecondsRemaining(duration);
+
+    if (isPlaying) {
+      progress.value = withTiming(0, {
+        duration: duration * 1000,
+        easing: Easing.linear,
+      });
+    }
+  }, [duration]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -74,21 +99,25 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
         </G>
       </Svg>
       <View style={styles.overlay}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{routineComplete ? "" : title}</Text>
         <View>
           <NumericalTimer
             isPlaying={isPlaying}
             secondsRemaining={secondsRemaining}
             setSecondsRemaining={setSecondsRemaining}
+            onFinish={() => setHasFinished(true)}
+            routineComplete={routineComplete}
           />
         </View>
-        <ResetButton
-          onPress={() => {
-            setSecondsRemaining(duration);
-            setIsPlaying(false);
-            progress.value = 1;
-          }}
-        />
+        {routineComplete ? null : (
+          <ResetButton
+            onPress={() => {
+              setSecondsRemaining(duration);
+              setIsPlaying(false);
+              progress.value = 1;
+            }}
+          />
+        )}
       </View>
     </View>
   );

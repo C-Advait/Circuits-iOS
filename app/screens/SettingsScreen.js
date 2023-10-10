@@ -92,7 +92,7 @@ const createDummyRoutine = async () => {
   });
 
   const routine4 = new Routine({
-    numberOfLoops: 5,
+    numberOfLoops: 2,
     exerciseSoundID: 1,
     restSoundID: 1,
     breakSoundID: 1,
@@ -200,13 +200,13 @@ const createDummyExercises = async () => {
 
   const e8 = new Exercise({
     routineID: 5,
-    title: "You guessed it...",
+    title: "Push ups",
     exerciseOrder: 1,
     tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
+    workTime: 5,
+    numberOfRounds: 3,
+    restBetweenRounds: 3,
+    breakBeforeNext: 10,
     category: "Strength",
   });
 
