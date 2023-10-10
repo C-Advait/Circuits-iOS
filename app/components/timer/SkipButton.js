@@ -3,7 +3,12 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { IconButton } from "../buttons";
 
-function SkipButton({ shouldSkipForward }) {
+function SkipButton({
+  shouldSkipForward,
+  maxIndex,
+  currentIndex,
+  setCurrentIndex,
+}) {
   return (
     <IconButton
       iconName={
@@ -14,9 +19,9 @@ function SkipButton({ shouldSkipForward }) {
       IconFamily={Ionicons}
       onPress={() => {
         if (shouldSkipForward) {
-          console.log("Skipping next");
+          setCurrentIndex(Math.min(currentIndex + 1, maxIndex));
         } else {
-          console.log("Skipping previous");
+          setCurrentIndex(Math.max(currentIndex - 1, 0));
         }
       }}
     />

@@ -104,9 +104,18 @@ function TimerScreen({ route }) {
         <Text style={styles.nextExercise}>Squats</Text>
       </View>
       <View style={styles.controlRow}>
-        <SkipButton shouldSkipForward={false} />
+        <SkipButton
+          shouldSkipForward={false}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
         <PlayPause isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
-        <SkipButton shouldSkipForward={true} />
+        <SkipButton
+          shouldSkipForward={true}
+          maxIndex={intervals.length}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
       </View>
       <View style={styles.progressRow}>
         <InfoWidget
