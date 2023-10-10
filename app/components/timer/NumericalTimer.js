@@ -19,6 +19,7 @@ const NumericalTimer = ({
         setSecondsRemaining((prevSeconds) => {
           if (prevSeconds < 1) {  // Modified condition here
             clearInterval(interval); // Clear interval here
+            onFinish();
             return 0;
           }
           if (prevSeconds === 1) {
