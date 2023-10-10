@@ -54,7 +54,7 @@ function TimerScreen({ route }) {
       <Timer
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
-        duration={180}
+        duration={5}
         title="Rest"
       />
       <View style={styles.nextContainer}>
