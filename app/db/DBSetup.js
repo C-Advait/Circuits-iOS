@@ -2,22 +2,23 @@ import SQLite from "react-native-sqlite-storage";
 
 let db;
 
-// To be completely safe from race-conditions,
-// we should check when this is complete, and
-// only then should we allow the user to
-// start using the app.
-//
-// In practice, the set up should be fast enough
-// to precede any query made in the app.
-export const initializeDB = () => {
+export const initializeDB = async () => {
   return new Promise((resolve, reject) => {
+    if (db) {
+      resolve(true);
+      return;
+    }
+
     db = SQLite.openDatabase(
       { name: "timer.db", location: "default" },
-      () => {
-        db.executeSql("PRAGMA foreign_keys = ON;", []);
-        createTables()
-          .then(() => resolve())
-          .catch((error) => reject(error));
+      async () => {
+        try {
+          db.executeSql("PRAGMA foreign_keys = ON;", []);
+          await createTables();
+          resolve(true);
+        } catch (error) {
+          reject(error);
+        }
       },
       (error) => reject(error),
     );
@@ -56,8 +57,7 @@ export const createTables = async () => {
         color TEXT,
         userCreated INTEGER,
         timeCreated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        timeMostRecentlyCompleted TIMESTAMP,  
-        emoji TEXT
+        timeMostRecentlyCompleted TIMESTAMP 
       );`,
       [],
       (_tx, _resultSet) => {

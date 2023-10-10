@@ -39,15 +39,11 @@ const dumpDB = async () => {
 
 const createDummySound = async () => {
   const dummySound = new Sound(1, "Beep", "path/to/beep.mp3", "mp3");
-
-  console.log("About to create sound: ", JSON.stringify(dummySound, null, 2));
-
   const id = await createSound(dummySound);
-  console.log("Returned id: ", id);
 };
 
 const createDummyRoutine = async () => {
-  const sampleRoutine = new Routine({
+  const routine0 = new Routine({
     numberOfLoops: 5,
     exerciseSoundID: 1,
     restSoundID: 1,
@@ -59,13 +55,57 @@ const createDummyRoutine = async () => {
     userCreated: true,
   });
 
-  console.log(
-    "About to create routine: ",
-    JSON.stringify(sampleRoutine, null, 2),
-  );
+  const routine1 = new Routine({
+    numberOfLoops: 3,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Morning Stretches",
+    duration: 600, // e.g., 10 minutes
+    color: "#FFDDAA",
+    userCreated: true,
+  });
 
-  const id = await createRoutine(sampleRoutine);
-  console.log("Returned id: ", id);
+  const routine2 = new Routine({
+    numberOfLoops: 6,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Cardio Blast",
+    duration: 1800, // e.g., 30 minutes
+    color: "#CCFFAA",
+    userCreated: true,
+  });
+
+  const routine3 = new Routine({
+    numberOfLoops: 4,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Evening Cool Down",
+    duration: 900, // e.g., 15 minutes
+    color: "#AACCFF",
+    userCreated: true,
+  });
+
+  const routine4 = new Routine({
+    numberOfLoops: 5,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Strength Training",
+    duration: 2400, // e.g., 40 minutes
+    color: "#FFAACC",
+    userCreated: true,
+  });
+
+  const routinesList = [routine0, routine1, routine2, routine3, routine4];
+
+  Promise.all(routinesList.map((r) => createRoutine(r)));
 };
 
 const getNames = async () => {
@@ -74,31 +114,105 @@ const getNames = async () => {
 };
 
 const createDummyExercises = async () => {
-  const myExercise = new Exercise({
-    routineID: 1,
-    title: "Jumping Jacks",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 5,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Cardio",
-  });
-
-  const myExercise2 = new Exercise({
+  const e1 = new Exercise({
     routineID: 1,
     title: "Pushups",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 60,
+    numberOfRounds: 3,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Arms",
+  });
+
+  const e2 = new Exercise({
+    routineID: 1,
+    title: "Dips",
     exerciseOrder: 2,
     tag: Tag.WORKING,
-    workTime: 40,
+    workTime: 45,
     numberOfRounds: 5,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
     category: "Strength",
   });
-  createExercise(myExercise);
-  createExercise(myExercise2);
+
+  const e3 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 3,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e4 = new Exercise({
+    routineID: 1,
+    title: "Biceps curls",
+    exerciseOrder: 4,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e5 = new Exercise({
+    routineID: 2,
+    title: "Demo",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e6 = new Exercise({
+    routineID: 3,
+    title: "Another Demo",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e7 = new Exercise({
+    routineID: 4,
+    title: "Still another demo",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e8 = new Exercise({
+    routineID: 5,
+    title: "You guessed it...",
+    exerciseOrder: 1,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8];
+
+  Promise.all(exercises.map((e) => createExercise(e)));
 };
 
 const getDummyExercises = async () => {
@@ -144,33 +258,34 @@ function SettingsScreen() {
       <View style={styles.topPanel}>
         <Header>Settings</Header>
       </View>
-      <Button title="Dump DB" onPress={() => dumpDB()} />
-      <Button title="Create dummy sound" onPress={() => createDummySound()} />
+      <Button title="Create 1 dummy sound" onPress={() => createDummySound()} />
       <Button
-        title="Create dummy routine"
+        title="Create 5 dummy routines"
         onPress={() => createDummyRoutine()}
       />
       <Button
-        title="Create dummy exercise"
+        title="Create 8 dummy exercises"
         onPress={() => createDummyExercises()}
       />
       <Button title="Reset DB" onPress={() => resetDB()} />
-      <Button title="Get RoutineNames" onPress={() => getNames()} />
-      <Button title="Get exercises" onPress={() => getDummyExercises()} />
-      <Button title="Get single routine" onPress={() => getSingleRoutine()} />
-      <Button title="Delete exercise" onPress={() => deleteEx()} />
-      <Button title="Delete routine" onPress={() => deleteRo()} />
-      <Button
-        title="Update exercise name"
-        onPress={() => updateSingleExercise()}
-      />
-      <Button
-        title="Update routine name"
-        onPress={() => updateSingleRoutine()}
-      />
     </Screen>
   );
 }
+
+// <Button title="Dump DB" onPress={() => dumpDB()} />
+// <Button title="Get RoutineNames" onPress={() => getNames()} />
+// <Button title="Get exercises" onPress={() => getDummyExercises()} />
+// <Button title="Get single routine" onPress={() => getSingleRoutine()} />
+// <Button title="Delete exercise" onPress={() => deleteEx()} />
+// <Button title="Delete routine" onPress={() => deleteRo()} />
+// <Button
+//   title="Update exercise name"
+//   onPress={() => updateSingleExercise()}
+// />
+// <Button
+//   title="Update routine name"
+//   onPress={() => updateSingleRoutine()}
+// />
 
 const styles = StyleSheet.create({
   container: {},
