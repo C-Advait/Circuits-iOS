@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Dimensions, View, Text, StyleSheet } from "react-native";
 
 import playSound from "../../utilities/playSound"
-import { COUNTDOWN_BEEP_SOUND, END_EXERCISE_SOUND } from "../../config/appConstants";
+import { COUNTDOWN_BEEP_SOUND, END_EXERCISE_SOUND, REST_SOUND } from "../../config/appConstants";
 
 
 const NumericalTimer = ({
