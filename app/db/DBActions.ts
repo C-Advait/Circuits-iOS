@@ -63,9 +63,8 @@ const createRoutine = async (routine: Routine) => {
          duration, 
          color, 
          userCreated,
-         timeMostRecentlyCompleted,
-         emoji
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+         timeMostRecentlyCompleted
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
@@ -79,13 +78,15 @@ const createRoutine = async (routine: Routine) => {
           routine.duration,
           routine.color,
           routine.userCreated ? 1 : 0, // converting boolean to integer
-          null,
         ],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.insertId);
         },
         (_txObj: any, error: any) => {
-          reject(error);
+          reject(
+            new Error(`Couldn't create a routine. Error: 
+                        ${error.message || error}`),
+          );
         },
       );
     });
@@ -151,7 +152,7 @@ const getAllUserCreatedRoutines = async () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx: any) => {
       tx.executeSql(
-        "SELECT * FROM Routines WHERE userCreated = 1",
+        "SELECT * FROM Routine WHERE userCreated = 1",
         [],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Routine(row)));
@@ -269,7 +270,6 @@ const updateRoutine = async (routine: Routine) => {
           duration = ?,
           color = ?,
           userCreated = ?,
-          emoji = ?
         WHERE id = ?`;
 
       tx.executeSql(
@@ -284,7 +284,6 @@ const updateRoutine = async (routine: Routine) => {
           routine.duration,
           routine.color,
           routine.userCreated,
-          routine.emoji,
           routine.id,
         ],
         (_txObj: any, resultSet: any) => {

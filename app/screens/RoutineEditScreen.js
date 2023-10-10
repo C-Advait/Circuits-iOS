@@ -245,10 +245,11 @@ const getNumExercises = () => {
 };
 const paddingBottomValue = TAB_BAR_HEIGHT / 2;
 
-function RoutineEditScreen() {
+function RoutineEditScreen({ route }) {
   const navigation = useNavigation();
-  const { selectedTemplate, selectedTemplateID } = useTemplate();
+  const isEditing = route.params.edit;
 
+  const { selectedTemplate, selectedTemplateID } = useTemplate();
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const numExercises = getNumExercises();
@@ -287,7 +288,7 @@ function RoutineEditScreen() {
       default:
         throw new Error(
           `${item.tag} does not match any expected tags. ` +
-          `Expected one of ${Tag.PREROUTINE}, ${Tag.POSTROUTINE}, ${Tag.WORKING}`,
+            `Expected one of ${Tag.PREROUTINE}, ${Tag.POSTROUTINE}, ${Tag.WORKING}`,
         );
     }
   };
@@ -350,12 +351,13 @@ function RoutineEditScreen() {
             Cancel
           </AppTextButton>
         }
-        headerText="New Routine"
+        headerText={isEditing ? "Old routine" : "New Routine"}
         RightComponent={
           <AppTextButton
             onPress={() => console.log("Routine created")}
-            textStyle={{ fontWeight: '500' }}
-          > Create
+            textStyle={{ fontWeight: "500" }}
+          >
+            {isEditing ? "Save" : "Create"}
           </AppTextButton>
         }
       />

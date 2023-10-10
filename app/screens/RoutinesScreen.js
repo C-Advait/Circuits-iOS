@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, FlatList, Alert, Button } from "react-native";
+import React, { useState, useCallback } from "react";
+import { StyleSheet, FlatList, Alert } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Screen from "../components/Screen";
 
 import Header from "../components/Header";
@@ -11,106 +12,29 @@ import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
+import routes from "../navigation/routes";
+import { getAllUserCreatedRoutines } from "../db/DBActions";
+import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 
 function RoutinesScreen() {
+  const navigation = useNavigation();
   const { theme } = useTheme();
+  const [routines, setRoutines] = useState([]);
 
-  const data = [
-    {
-      id: 1,
-      title: "Arms",
-      duration: 3600,
-      accentcolor: theme.accentOrange,
-    },
-    {
-      id: 2,
-      title: "Leg Workout A",
-      duration: 5100,
-      accentcolor: theme.accentLightBlue,
-    },
-    {
-      id: 3,
-      title: "Climbing Circuit",
-      duration: 7200,
-      accentcolor: theme.accentDarkBlue,
-    },
-    {
-      id: 4,
-      title: "Morning Meditation",
-      duration: 300,
-      accentcolor: theme.accentPurple,
-    },
-    {
-      id: 5,
-      title: "Morning Meditation",
-      duration: 300,
-      accentcolor: theme.accentGreen,
-    },
-    {
-      id: 6,
-      title: "Arms",
-      duration: 3600,
-      accentcolor: theme.accentOrange,
-    },
-    {
-      id: 7,
-      title: "Leg Workout A",
-      duration: 5100,
-      accentcolor: theme.accentLightBlue,
-    },
-    {
-      id: 8,
-      title: "Climbing Circuit",
-      duration: 7200,
-      accentcolor: theme.accentDarkBlue,
-    },
-    {
-      id: 9,
-      title: "Morning Meditation",
-      duration: 300,
-      accentcolor: theme.accentPurple,
-    },
-    {
-      id: 10,
-      title: "Morning Meditation",
-      duration: 300,
-      accentcolor: theme.accentGreen,
-    },
-    {
-      id: 11,
-      title: "Arms",
-      duration: 3600,
-      accentcolor: theme.accentOrange,
-    },
-    {
-      id: 12,
-      title: "Leg Workout A",
-      duration: 5100,
-      accentcolor: theme.accentLightBlue,
-    },
-    {
-      id: 13,
-      title: "Climbing Circuit",
-      duration: 7200,
-      accentcolor: theme.accentDarkBlue,
-    },
-    {
-      id: 14,
-      title: "Morning Meditation",
-      duration: 300,
-      accentcolor: theme.accentPurple,
-    },
-    {
-      id: 15,
-      title: "Morning Meditation",
-      duration: 300,
-      accentcolor: theme.accentGreen,
-    },
-  ];
+  const loadRoutines = async () => {
+    const routines = await getAllUserCreatedRoutines();
+    setRoutines(routines);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadRoutines();
+    }, []),
+  );
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
-    new Array(data.length).fill(false),
+    new Array(routines.length).fill(false),
   );
 
   // State to track if all items are expanded or collapsed.
@@ -134,25 +58,27 @@ function RoutinesScreen() {
   );
 
   const expandCollapseAll = useCallback(() => {
-    if (expandedCount === data.length) {
-      setExpandedStates(new Array(data.length).fill(false));
+    if (expandedCount === routines.length) {
+      setExpandedStates(new Array(routines.length).fill(false));
       setExpandedCount(0);
     } else {
-      setExpandedStates(new Array(data.length).fill(true));
-      setExpandedCount(data.length);
+      setExpandedStates(new Array(routines.length).fill(true));
+      setExpandedCount(routines.length);
     }
-  }, [expandedCount, data.length]);
+  }, [expandedCount, routines.length]);
 
   return (
     <Screen>
       <View style={styles.topPanel}>
-        <Header>Routines</Header>
+        <Header>My Routines</Header>
         <IconButton
           iconName="plus"
           IconFamily={Feather}
           iconSize={55}
           foregroundColor={theme.blue}
-          onPress={() => Alert.alert("Add new routine", "Add")}
+          onPress={() =>
+            navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: false })
+          }
         />
       </View>
       <View style={styles.middlePanel}>
@@ -164,7 +90,9 @@ function RoutinesScreen() {
           onPress={() => Alert.alert("Sort", "Sort")}
         />
         <IconButton
-          iconName={expandedCount === data.length ? "minimize-2" : "maximize-2"}
+          iconName={
+            expandedCount === routines.length ? "minimize-2" : "maximize-2"
+          }
           IconFamily={Feather}
           iconSize={40}
           foregroundColor={theme.text87}
@@ -173,12 +101,19 @@ function RoutinesScreen() {
         />
       </View>
       <FlatList
-        data={data}
+        data={routines}
         renderItem={({ item, index }) => (
           <RoutineCard
             item={item}
             isExpanded={expandedStates[index]}
             toggleExpand={() => toggleExpand(index)}
+            deleteCallback={() => {
+              loadRoutines();
+              setExpandedCount(0);
+              setExpandedStates((prev) =>
+                new Array(Math.max(prev.length - 1, 0)).fill(false),
+              );
+            }}
           />
         )}
         keyExtractor={(item) => item.id}
@@ -187,6 +122,7 @@ function RoutinesScreen() {
         ListFooterComponent={() => (
           <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
         )}
+        ListEmptyComponent={EmptyRoutinesListComponent}
       />
     </Screen>
   );

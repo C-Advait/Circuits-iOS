@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,14 +11,39 @@ import formatDuration from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
+import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 
-function RoutineCard({ item, isExpanded, toggleExpand }) {
+function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   // Duration in seconds
-  const { accentcolor, duration, title } = item;
+  const { color: accentcolor, duration, title } = item;
 
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const [description, setDescription] = useState();
+
+  const createDescription = async () => {
+    const exercises = await getExercisesForRoutine(item.id);
+
+    const formattedExerciseString =
+      exercises
+        .map(
+          (exercise) =>
+            `${exercise.title} (${exercise.numberOfRounds} x ${formatDuration(
+              exercise.workTime,
+            )})`,
+        )
+        .join("\n") + "\n";
+
+    const formattedLoopString =
+      item.numberOfLoops > 1 ? `\nLoops ${item.numberOfLoops} times` : "";
+
+    setDescription(formattedExerciseString + formattedLoopString);
+  };
+
+  useEffect(() => {
+    createDescription();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -42,14 +67,7 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
 
         <Collapsible collapsed={!isExpanded} duration={350}>
           <>
-            <Text style={styles.body}>
-              Pushups (3x1min){"\n"}
-              Dips (5x60s){"\n"}
-              Hammer Curls (4x30s){"\n"}
-              Bicep Curls (4x30s){"\n"}
-              {"\n"}
-              Loops 2 times
-            </Text>
+            <Text style={styles.body}>{description}</Text>
             <View style={styles.buttonContainer}>
               <RoutineActionButton
                 title="Start"
@@ -62,7 +80,11 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
               />
               <RoutineActionButton
                 title="Edit"
-                onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
+                onPress={() =>
+                  navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
+                    edit: true,
+                  })
+                }
                 iconName="edit-2"
                 IconFamily={Feather}
                 foregroundColor={theme.text87}
@@ -71,7 +93,7 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
                 iconName="trash-can-outline"
                 IconFamily={MaterialCommunityIcons}
                 foregroundColor={theme.danger}
-                onPress={() => Alert.alert("Delete", "Delete")}
+                onPress={() => confirmDeletion(item, deleteCallback)}
                 style={{ marginLeft: 0, alignItems: "flex-start" }}
               />
             </View>
@@ -81,6 +103,32 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
     </View>
   );
 }
+
+const confirmDeletion = (item, deleteCallback) => {
+  Alert.alert(
+    "Confirm Deletion", // Alert title
+    `Are you sure you want to delete '${item.title}'?`, // Alert message
+    [
+      // Array of buttons
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel", // iOS style for the cancel button
+      },
+      {
+        text: "Delete",
+        onPress: () => {
+          deleteRoutine(item.id);
+          deleteCallback();
+        },
+        style: "destructive", // iOS style indicating a destructive action
+      },
+    ],
+    {
+      cancelable: true, // Whether tapping outside the alert box will cancel it
+    },
+  );
+};
 
 const getStyles = (theme) =>
   StyleSheet.create({
