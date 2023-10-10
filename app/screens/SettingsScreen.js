@@ -39,15 +39,11 @@ const dumpDB = async () => {
 
 const createDummySound = async () => {
   const dummySound = new Sound(1, "Beep", "path/to/beep.mp3", "mp3");
-
-  console.log("About to create sound: ", JSON.stringify(dummySound, null, 2));
-
   const id = await createSound(dummySound);
-  console.log("Returned id: ", id);
 };
 
 const createDummyRoutine = async () => {
-  const sampleRoutine = new Routine({
+  const routine0 = new Routine({
     numberOfLoops: 5,
     exerciseSoundID: 1,
     restSoundID: 1,
@@ -59,13 +55,57 @@ const createDummyRoutine = async () => {
     userCreated: true,
   });
 
-  console.log(
-    "About to create routine: ",
-    JSON.stringify(sampleRoutine, null, 2),
-  );
+  const routine1 = new Routine({
+    numberOfLoops: 3,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Morning Stretches",
+    duration: 600, // e.g., 10 minutes
+    color: "#FFDDAA",
+    userCreated: true,
+  });
 
-  const id = await createRoutine(sampleRoutine);
-  console.log("Returned id: ", id);
+  const routine2 = new Routine({
+    numberOfLoops: 6,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Cardio Blast",
+    duration: 1800, // e.g., 30 minutes
+    color: "#CCFFAA",
+    userCreated: true,
+  });
+
+  const routine3 = new Routine({
+    numberOfLoops: 4,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Evening Cool Down",
+    duration: 900, // e.g., 15 minutes
+    color: "#AACCFF",
+    userCreated: true,
+  });
+
+  const routine4 = new Routine({
+    numberOfLoops: 5,
+    exerciseSoundID: 1,
+    restSoundID: 1,
+    breakSoundID: 1,
+    endSoundID: 1,
+    title: "Strength Training",
+    duration: 2400, // e.g., 40 minutes
+    color: "#FFAACC",
+    userCreated: true,
+  });
+
+  const routinesList = [routine0, routine1, routine2, routine3, routine4];
+
+  Promise.all(routinesList.map((r) => createRoutine(r)));
 };
 
 const getNames = async () => {
@@ -144,10 +184,9 @@ function SettingsScreen() {
       <View style={styles.topPanel}>
         <Header>Settings</Header>
       </View>
-      <Button title="Dump DB" onPress={() => dumpDB()} />
-      <Button title="Create dummy sound" onPress={() => createDummySound()} />
+      <Button title="Create 1 dummy sound" onPress={() => createDummySound()} />
       <Button
-        title="Create dummy routine"
+        title="Create 5 dummy routines"
         onPress={() => createDummyRoutine()}
       />
       <Button
@@ -155,22 +194,24 @@ function SettingsScreen() {
         onPress={() => createDummyExercises()}
       />
       <Button title="Reset DB" onPress={() => resetDB()} />
-      <Button title="Get RoutineNames" onPress={() => getNames()} />
-      <Button title="Get exercises" onPress={() => getDummyExercises()} />
-      <Button title="Get single routine" onPress={() => getSingleRoutine()} />
-      <Button title="Delete exercise" onPress={() => deleteEx()} />
-      <Button title="Delete routine" onPress={() => deleteRo()} />
-      <Button
-        title="Update exercise name"
-        onPress={() => updateSingleExercise()}
-      />
-      <Button
-        title="Update routine name"
-        onPress={() => updateSingleRoutine()}
-      />
     </Screen>
   );
 }
+
+// <Button title="Dump DB" onPress={() => dumpDB()} />
+// <Button title="Get RoutineNames" onPress={() => getNames()} />
+// <Button title="Get exercises" onPress={() => getDummyExercises()} />
+// <Button title="Get single routine" onPress={() => getSingleRoutine()} />
+// <Button title="Delete exercise" onPress={() => deleteEx()} />
+// <Button title="Delete routine" onPress={() => deleteRo()} />
+// <Button
+//   title="Update exercise name"
+//   onPress={() => updateSingleExercise()}
+// />
+// <Button
+//   title="Update routine name"
+//   onPress={() => updateSingleRoutine()}
+// />
 
 const styles = StyleSheet.create({
   container: {},

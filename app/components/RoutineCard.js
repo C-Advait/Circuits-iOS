@@ -14,7 +14,7 @@ import Collapsible from "react-native-collapsible";
 
 function RoutineCard({ item, isExpanded, toggleExpand }) {
   // Duration in seconds
-  const { accentcolor, duration, title } = item;
+  const { color: accentcolor, duration, title } = item;
 
   const navigation = useNavigation();
   const { theme } = useTheme();
