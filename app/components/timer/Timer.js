@@ -18,10 +18,11 @@ import {
   RING_STARTING_OFFSET,
   STROKE_WIDTH,
 } from "./timerContants";
+import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const Timer = ({ isPlaying, setIsPlaying, title, duration, onFinish }) => {
+const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
   const progress = useSharedValue(1);
   const [secondsRemaining, setSecondsRemaining] = useState(duration);
   const [hasFinished, setHasFinished] = useState(false);
@@ -73,8 +74,8 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration, onFinish }) => {
       <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE} fill="transparent">
         <Defs>
           <LinearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor="#9180FF" />
-            <Stop offset="100%" stopColor="#4DB4FF" />
+            <Stop offset="0%" stopColor={getMovingEndColor(tag)} />
+            <Stop offset="100%" stopColor={getFixedEndColor(tag)} />
           </LinearGradient>
         </Defs>
         <G rotation="-90" origin={`${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2}`}>

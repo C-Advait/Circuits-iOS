@@ -97,6 +97,7 @@ function TimerScreen({ route }) {
         duration={intervals[currentIndex]?.duration}
         onFinish={handleTimerFinish}
         title={intervals[currentIndex]?.title}
+        tag={intervals[currentIndex]?.tag}
       />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
