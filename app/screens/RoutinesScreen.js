@@ -14,6 +14,7 @@ import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
 import routes from "../navigation/routes";
 import { getAllUserCreatedRoutines } from "../db/DBActions";
+import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -122,6 +123,7 @@ function RoutinesScreen() {
         ListFooterComponent={() => (
           <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
         )}
+        ListEmptyComponent={EmptyRoutinesListComponent}
       />
     </Screen>
   );
