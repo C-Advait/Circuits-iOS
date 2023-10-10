@@ -62,7 +62,11 @@ function RoutineCard({ item, isExpanded, toggleExpand }) {
               />
               <RoutineActionButton
                 title="Edit"
-                onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
+                onPress={() =>
+                  navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
+                    edit: true,
+                  })
+                }
                 iconName="edit-2"
                 IconFamily={Feather}
                 foregroundColor={theme.text87}

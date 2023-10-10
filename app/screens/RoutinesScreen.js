@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, FlatList, Alert, Button } from "react-native";
+import React, { useState, useCallback } from "react";
+import { StyleSheet, FlatList, Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Screen from "../components/Screen";
 
 import Header from "../components/Header";
@@ -11,8 +12,10 @@ import { TAB_BAR_HEIGHT } from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
+import routes from "../navigation/routes";
 
 function RoutinesScreen() {
+  const navigation = useNavigation();
   const { theme } = useTheme();
 
   const data = [
@@ -146,13 +149,15 @@ function RoutinesScreen() {
   return (
     <Screen>
       <View style={styles.topPanel}>
-        <Header>Routines</Header>
+        <Header>My Routines</Header>
         <IconButton
           iconName="plus"
           IconFamily={Feather}
           iconSize={55}
           foregroundColor={theme.blue}
-          onPress={() => Alert.alert("Add new routine", "Add")}
+          onPress={() =>
+            navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: false })
+          }
         />
       </View>
       <View style={styles.middlePanel}>
