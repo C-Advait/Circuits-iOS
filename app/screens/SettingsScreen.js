@@ -98,7 +98,7 @@ const createDummyRoutine = async () => {
     breakSoundID: 1,
     endSoundID: 1,
     title: "Strength Training",
-    duration: 2400, // e.g., 40 minutes
+    duration: 62, // e.g., 40 minutes
     color: "#FFAACC",
     userCreated: true,
   });

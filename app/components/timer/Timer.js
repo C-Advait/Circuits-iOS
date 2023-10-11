@@ -17,7 +17,7 @@ import {
   CIRCUMFERENCE,
   RING_STARTING_OFFSET,
   STROKE_WIDTH,
-} from "./timerContants";
+} from "./timerConstants";
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
 

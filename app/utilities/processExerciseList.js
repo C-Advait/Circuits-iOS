@@ -53,7 +53,7 @@ const decompress = (arr) => {
 const augmentWithCumulativeTimes = (arr) => {
   let accumulatedDuration = 0;
 
-  return arr.map((obj) => {
+  const ret = arr.map((obj) => {
     const startTime = accumulatedDuration;
     accumulatedDuration += obj.duration;
     return {
@@ -61,6 +61,10 @@ const augmentWithCumulativeTimes = (arr) => {
       startTime: startTime,
     };
   });
+
+  console.log(`Before: ${JSON.stringify(arr, null, 2)}`);
+  console.log(`After: ${JSON.stringify(ret, null, 2)}`);
+  return ret;
 };
 
 export const processExerciseList = (arr) => {

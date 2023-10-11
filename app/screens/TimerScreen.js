@@ -14,6 +14,7 @@ import { getExercisesForRoutine } from "../db/DBActions";
 import { processExerciseList } from "../utilities/processExerciseList";
 import { confirmedNavigate } from "../alerts/endRoutine";
 import timerActions from "../actions/timerActions";
+import { TIMER_UPDATE_INTERVAL } from "../components/timer/timerConstants";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
@@ -23,7 +24,7 @@ function TimerScreen({ route }) {
 
   useEffect(() => {
     dispatch({ type: timerActions.INIT_FROM_PARAMS, params: route.params });
-    createTimerSequence(route.params.id, dispatch);
+    initTimerSequence(route.params.id, dispatch);
   }, []);
 
   // Check header for length, and potentially truncate!
@@ -44,16 +45,7 @@ function TimerScreen({ route }) {
           />
         </View>
       </View>
-      <Timer
-        state={state}
-        dispatch={dispatch}
-      // isPlaying={isPlaying}
-      // setIsPlaying={setIsPlaying}
-      // duration={intervals[currentIndex]?.duration}
-      // onFinish={handleTimerFinish}
-      // title={intervals[currentIndex]?.title}
-      // tag={intervals[currentIndex]?.tag}
-      />
+      <Timer state={state} dispatch={dispatch} />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
         <Text style={styles.nextExercise}>Squats</Text>
@@ -112,12 +104,12 @@ function reducer(state, action) {
         ...action.params,
       };
     case timerActions.SET_EXERCISE_DATA:
-      console.log(`Setting exercise data: ${JSON.stringify(action, null, 2)}`);
       return {
         ...state,
         numberOfExercises: action.numberOfExercises,
         intervals: action.intervals,
         exerciseSecondsRemaining: action.initialDuration,
+        loopDuration: action.loopDuration,
       };
     case timerActions.SKIP_FORWARD:
       // If we've reached the end of 'intervals', then either
@@ -142,6 +134,7 @@ function reducer(state, action) {
             currentLoop: state.currentLoop + 1,
             currentIndex: 0,
             exerciseSecondsRemaining: state.intervals[0]?.duration,
+            totalElapsedTime: state.currentLoop * state.loopDuration,
           };
         }
       } else {
@@ -151,6 +144,9 @@ function reducer(state, action) {
           currentIndex: state.currentIndex + 1,
           exerciseSecondsRemaining:
             state.intervals[state.currentIndex + 1]?.duration,
+          totalElapsedTime:
+            (state.currentLoop - 1) * state.loopDuration +
+            state.intervals[state.currentIndex + 1]?.startTime,
         };
       }
     case timerActions.SKIP_BACKWARD:
@@ -163,14 +159,31 @@ function reducer(state, action) {
           currentIndex: state.currentIndex - 1,
           exerciseSecondsRemaining:
             state.intervals[state.currentIndex - 1]?.duration,
+          totalElapsedTime:
+            (state.currentLoop - 1) * state.loopDuration +
+            state.intervals[state.currentIndex - 1]?.startTime,
         };
-      } else {
-        return state;
+      } else if (state.currentLoop !== 1) {
+        return {
+          ...state,
+          shouldResetTimer: true,
+          currentIndex: state.intervals.length - 1,
+          currentLoop: state.currentLoop - 1,
+          exerciseSecondsRemaining:
+            state.intervals[state.intervals.length - 1]?.duration,
+          totalElapsedTime:
+            (state.currentLoop - 2) * state.loopDuration +
+            state.intervals[state.intervals.length - 1]?.startTime,
+        };
       }
-    case timerActions.DECREMENT_TIMER:
+
+      return state;
+    case timerActions.ELAPSE:
       return {
         ...state,
-        exerciseSecondsRemaining: state.exerciseSecondsRemaining - 1,
+        exerciseSecondsRemaining:
+          state.exerciseSecondsRemaining - TIMER_UPDATE_INTERVAL / 1000,
+        totalElapsedTime: state.totalElapsedTime + TIMER_UPDATE_INTERVAL / 1000,
       };
     case timerActions.TOGGLE_IS_PLAYING:
       return {
@@ -182,6 +195,9 @@ function reducer(state, action) {
         ...state,
         shouldResetTimer: true,
         exerciseSecondsRemaining: state.intervals[state.currentIndex]?.duration,
+        totalElapsedTime:
+          (state.currentLoop - 1) * state.loopDuration +
+          state.intervals[state.currentIndex]?.startTime,
       };
     case timerActions.MARK_TIMER_LOAD_COMPLETE:
       return {
@@ -191,7 +207,7 @@ function reducer(state, action) {
   }
 }
 
-const createTimerSequence = async (id, dispatch) => {
+const initTimerSequence = async (id, dispatch) => {
   const exercises = await getExercisesForRoutine(id);
 
   dispatch({
@@ -199,8 +215,21 @@ const createTimerSequence = async (id, dispatch) => {
     numberOfExercises: exercises.length,
     intervals: processExerciseList(exercises),
     initialDuration: exercises[0]?.workTime,
+    loopDuration: calculateLoopDuration(exercises),
   });
   // console.log(JSON.stringify(processExerciseList(exercises), null, 2));
+};
+
+const calculateLoopDuration = (exerciseList) => {
+  let acc = 0;
+  exerciseList.forEach((exercise) => {
+    acc +=
+      exercise.numberOfRounds * exercise.workTime +
+      (exercise.numberOfRounds - 1) * exercise.restBetweenRounds +
+      exercise.breakBeforeNext;
+  });
+  console.log("Loop duration: ", acc);
+  return acc;
 };
 
 const initialState = {
@@ -217,6 +246,7 @@ const initialState = {
 
   currentLoop: 1,
   numberOfLoops: 1,
+  loopDuration: 0,
 
   shouldResetTimer: false,
   routineComplete: false,

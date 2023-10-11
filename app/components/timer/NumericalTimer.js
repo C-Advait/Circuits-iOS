@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Dimensions, View, Text, StyleSheet } from "react-native";
 import timerActions from "../../actions/timerActions";
+import { TIMER_UPDATE_INTERVAL } from "./timerConstants";
 
 import playSound from "../../utilities/playSound"
 import { COUNTDOWN_BEEP_SOUND, END_EXERCISE_SOUND } from "../../config/appConstants";
@@ -11,13 +12,13 @@ const NumericalTimer = ({ state, dispatch }) => {
 
     if (state.isPlaying) {
       interval = setInterval(() => {
-        if (state.exerciseSecondsRemaining < 1) {
+        if (state.exerciseSecondsRemaining < TIMER_UPDATE_INTERVAL / 1000) {
           dispatch({ type: timerActions.SKIP_FORWARD });
           clearInterval(interval);
         } else {
-          dispatch({ type: timerActions.DECREMENT_TIMER });
+          dispatch({ type: timerActions.ELAPSE });
         }
-      }, 1000);
+      }, TIMER_UPDATE_INTERVAL);
     } else if (state.exerciseSecondsRemaining !== 0) {
       clearInterval(interval);
     }
@@ -39,7 +40,7 @@ const NumericalTimer = ({ state, dispatch }) => {
 
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
+  const seconds = Math.ceil(time % 60);
   return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""
     }${seconds}`;
 };
