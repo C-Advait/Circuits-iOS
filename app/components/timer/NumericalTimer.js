@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import { Dimensions, View, Text, StyleSheet } from "react-native";
 
+import playSound from "../../utilities/playSound"
+import { COUNTDOWN_BEEP_SOUND, END_EXERCISE_SOUND, REST_SOUND } from "../../config/appConstants";
+
+
 const NumericalTimer = ({
   isPlaying,
   secondsRemaining,
@@ -11,9 +15,15 @@ const NumericalTimer = ({
     if (isPlaying) {
       interval = setInterval(() => {
         setSecondsRemaining((prevSeconds) => {
-          if (prevSeconds <= 1) {
-            clearInterval(interval);
+          if (prevSeconds < 1) {  // Modified condition here
+            clearInterval(interval); // Clear interval here
             return 0;
+          }
+          if (prevSeconds === 1) {
+            playSound(END_EXERCISE_SOUND);
+          }
+          if (1 < prevSeconds && prevSeconds <= 4) {
+            playSound(COUNTDOWN_BEEP_SOUND); 
           }
           return prevSeconds - 1;
         });
