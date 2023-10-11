@@ -6,7 +6,7 @@ function InfoWidget({ title, current, total }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
-  if (title !== "Exercise" && total === 1) return null;
+  if (title === "Loop" && total === 1) return null;
 
   return (
     <View style={styles.container}>

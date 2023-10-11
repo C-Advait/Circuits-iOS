@@ -3,10 +3,17 @@ import { Dimensions, View, Text, StyleSheet } from "react-native";
 import timerActions from "../../actions/timerActions";
 import { TIMER_UPDATE_INTERVAL } from "./timerConstants";
 
-import playSound from "../../utilities/playSound"
-import { COUNTDOWN_BEEP_SOUND, END_EXERCISE_SOUND } from "../../config/appConstants";
+import playSound from "../../utilities/playSound";
+import {
+  COUNTDOWN_BEEP_SOUND,
+  BEGIN_EXERCISE_SOUND,
+  REST_SOUND,
+} from "../../config/appConstants";
+import { Tag } from "../../classes/Exercise";
 
-const NumericalTimer = ({ state, dispatch }) => {
+const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
+  const sound = getSoundToPlay(nextExerciseTag);
+
   useEffect(() => {
     let interval;
 
@@ -14,8 +21,16 @@ const NumericalTimer = ({ state, dispatch }) => {
       interval = setInterval(() => {
         if (state.exerciseSecondsRemaining < TIMER_UPDATE_INTERVAL / 1000) {
           dispatch({ type: timerActions.SKIP_FORWARD });
+          playSound(sound);
           clearInterval(interval);
         } else {
+          if (
+            1 < state.exerciseSecondsRemaining &&
+            state.exerciseSecondsRemaining <= 4 &&
+            Number.isInteger(state.exerciseSecondsRemaining)
+          ) {
+            playSound(COUNTDOWN_BEEP_SOUND);
+          }
           dispatch({ type: timerActions.ELAPSE });
         }
       }, TIMER_UPDATE_INTERVAL);
@@ -24,7 +39,7 @@ const NumericalTimer = ({ state, dispatch }) => {
     }
 
     return () => clearInterval(interval); // cleanup on component unmount
-  }, [isPlaying, secondsRemaining]);
+  }, [state.isPlaying, state.exerciseSecondsRemaining]);
 
   return (
     <View style={styles.container}>
@@ -36,6 +51,21 @@ const NumericalTimer = ({ state, dispatch }) => {
       </Text>
     </View>
   );
+};
+
+// Choose appropriate sound based on upcoming tag.
+// Can always switch to DB after this.
+const getSoundToPlay = (tag) => {
+  switch (tag) {
+    case Tag.REST:
+    case Tag.BREAK:
+      return REST_SOUND;
+    case Tag.WORKING:
+    case Tag.PREROUTINE:
+    case Tag.POSTROUTINE:
+    case Tag.FINISH:
+      return BEGIN_EXERCISE_SOUND;
+  }
 };
 
 const formatTime = (time) => {

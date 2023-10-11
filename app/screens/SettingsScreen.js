@@ -203,10 +203,10 @@ const createDummyExercises = async () => {
     title: "Push ups",
     exerciseOrder: 1,
     tag: Tag.WORKING,
-    workTime: 5,
+    workTime: 10,
     numberOfRounds: 3,
-    restBetweenRounds: 3,
-    breakBeforeNext: 10,
+    restBetweenRounds: 8,
+    breakBeforeNext: 12,
     category: "Strength",
   });
 

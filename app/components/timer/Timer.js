@@ -24,7 +24,7 @@ import timerActions from "../../actions/timerActions";
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 // const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
-const Timer = ({ state, dispatch }) => {
+const Timer = ({ state, dispatch, nextExerciseTag }) => {
   const progress = useSharedValue(1);
   // Consider moving into state directly.
   const { title, tag } = state.intervals[state.currentIndex] || {};
@@ -60,28 +60,6 @@ const Timer = ({ state, dispatch }) => {
       cancelAnimation(progress);
     }
   }, [state.isPlaying]);
-
-  // useEffect(() => {
-  //   if (hasFinished) {
-  //     if (onFinish) {
-  //       onFinish();
-  //     }
-  //     setSecondsRemaining(duration);
-  //     progress.value = 1;
-  //     setHasFinished(false);
-  //   }
-  // }, [hasFinished, onFinish]);
-
-  // useEffect(() => {
-  //   setSecondsRemaining(duration);
-
-  //   if (isPlaying) {
-  //     progress.value = withTiming(0, {
-  //       duration: duration * 1000,
-  //       easing: Easing.linear,
-  //     });
-  //   }
-  // }, [duration]);
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
@@ -123,7 +101,11 @@ const Timer = ({ state, dispatch }) => {
       <View style={styles.overlay}>
         <Text style={styles.title}>{state.routineComplete ? "" : title}</Text>
         <View>
-          <NumericalTimer state={state} dispatch={dispatch} />
+          <NumericalTimer
+            state={state}
+            dispatch={dispatch}
+            nextExerciseTag={nextExerciseTag}
+          />
         </View>
         {state.routineComplete ? null : (
           <ResetButton

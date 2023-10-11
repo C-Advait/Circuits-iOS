@@ -15,12 +15,14 @@ import { processExerciseList } from "../utilities/processExerciseList";
 import { confirmedNavigate } from "../alerts/endRoutine";
 import timerActions from "../actions/timerActions";
 import { TIMER_UPDATE_INTERVAL } from "../components/timer/timerConstants";
+import { Tag } from "../classes/Exercise";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [nextExerciseTitle, nextExerciseTag] = getNextExercise(state);
 
   useEffect(() => {
     dispatch({ type: timerActions.INIT_FROM_PARAMS, params: route.params });
@@ -45,10 +47,14 @@ function TimerScreen({ route }) {
           />
         </View>
       </View>
-      <Timer state={state} dispatch={dispatch} />
+      <Timer
+        state={state}
+        dispatch={dispatch}
+        nextExerciseTag={nextExerciseTag}
+      />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
-        <Text style={styles.nextExercise}>Squats</Text>
+        <Text style={styles.nextExercise}>{nextExerciseTitle}</Text>
       </View>
       <View style={styles.controlRow}>
         <SkipButton
@@ -230,6 +236,22 @@ const calculateLoopDuration = (exerciseList) => {
   });
   console.log("Loop duration: ", acc);
   return acc;
+};
+
+// Returns [title, tag]
+const getNextExercise = (state) => {
+  if (
+    state.currentLoop === state.numberOfLoops &&
+    state.currentIndex === state.intervals.length - 1
+  ) {
+    return ["Finish", Tag.FINISH];
+  }
+  const nextIndex =
+    state.currentIndex === state.intervals.length - 1
+      ? 0
+      : state.currentIndex + 1;
+  const { title, tag } = state.intervals[nextIndex] || {};
+  return [title, tag];
 };
 
 const initialState = {

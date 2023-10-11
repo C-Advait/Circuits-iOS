@@ -4,6 +4,7 @@ export enum Tag {
   WORKING = "working",
   BREAK = "break",
   REST = "rest",
+  FINISH = "finish",
 }
 
 export class Exercise {
