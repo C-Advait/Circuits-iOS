@@ -210,7 +210,31 @@ const createDummyExercises = async () => {
     category: "Strength",
   });
 
-  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8];
+  const e9 = new Exercise({
+    routineID: 1,
+    title: "You guessed it...",
+    exerciseOrder: 1,
+    tag: Tag.PREROUTINE,
+    workTime: 100,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const e10 = new Exercise({
+    routineID: 1,
+    title: "You guessed it...",
+    exerciseOrder: 29,
+    tag: Tag.POSTROUTINE,
+    workTime: 10,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Strength",
+  });
+
+  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10];
 
   Promise.all(exercises.map((e) => createExercise(e)));
 };

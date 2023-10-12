@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
 import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
+import { useRoutineContext } from "../contexts/RoutineContext";
 
 function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   // Duration in seconds
@@ -21,6 +22,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [description, setDescription] = useState();
+  const { setContextExercises, setContextRoutine } = useRoutineContext(); // Manage Context Variables
 
   const createDescription = async () => {
     const exercises = await getExercisesForRoutine(item.id);
@@ -44,6 +46,20 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   useEffect(() => {
     createDescription();
   }, []);
+
+  const handleEditRoutineOnpress = async () => {
+    try {
+      const exercises = await getExercisesForRoutine(item.id); // Duplicated backend call here
+      const routine = item;
+      setContextRoutine(routine);
+      setContextExercises(exercises);
+
+      navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: true });
+
+    } catch (error) {
+      console.log("Error in navigating to edit routine: ", error)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -80,12 +96,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
               />
               <RoutineActionButton
                 title="Edit"
-                onPress={() =>
-                  navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
-                    edit: true,
-                    routineID: item.id
-                  })
-                }
+                onPress={() => handleEditRoutineOnpress()}
                 iconName="edit-2"
                 IconFamily={Feather}
                 foregroundColor={theme.text87}

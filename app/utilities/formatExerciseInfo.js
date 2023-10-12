@@ -22,7 +22,5 @@ export default function formatExerciseInfo(exercise) { //exercise == Exercise Ob
         if(restSeconds > 0) timeStr += `${restSeconds}s`;
         timeStr += ' rest';
     }
-    // Remove the trailing space, if present
-    console.log(timeStr);
     return timeStr.trim();
 }

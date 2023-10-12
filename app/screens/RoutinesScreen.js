@@ -6,20 +6,23 @@ import Screen from "../components/Screen";
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
 import { useTheme } from "../contexts/ThemeContext";
-
 import { View } from "react-native";
-import { TAB_BAR_HEIGHT } from "../config/appConstants";
+import { DEFAULT_COOLDOWN, DEFAULT_WARMUP, DEFAULT_EXERCISE, DEFAULT_ROUTINE, TAB_BAR_HEIGHT } from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
 import routes from "../navigation/routes";
-import { getAllUserCreatedRoutines } from "../db/DBActions";
+import { getAllUserCreatedRoutines, getNewRoutineID } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
+import { Exercise } from "../classes/Exercise";
+import { Routine } from "../classes/Routine";
+import { useRoutineContext } from "../contexts/RoutineContext";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const [routines, setRoutines] = useState([]);
+  const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
 
   const loadRoutines = async () => {
     const routines = await getAllUserCreatedRoutines();
@@ -67,6 +70,39 @@ function RoutinesScreen() {
     }
   }, [expandedCount, routines.length]);
 
+  const handleNewRoutineOnpress = async () => {
+    try {
+      const routineID = await getNewRoutineID();
+      const routine = new Routine({
+        ...DEFAULT_ROUTINE,
+        routineID: routineID,
+        title: `My Routine #${routineID}`
+      });
+
+      const warmup = new Exercise({
+        ...DEFAULT_WARMUP,
+        routineID: routineID
+      });
+      const exer = new Exercise({
+        ...DEFAULT_EXERCISE,
+        routineID: routineID
+      })
+      const cooldown = new Exercise({
+        ...DEFAULT_COOLDOWN,
+        routineID: routineID
+      });
+      const exercises = [warmup, exer, cooldown];
+
+      // Set the context variables for ROUTINE_EDIT_SCREEN
+      setContextRoutine(routine);
+      setContextExercises(exercises);
+
+      navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: false });
+    } catch (error) {
+      console.error("Error navigating to new routine:", error);
+    }
+  };
+
   return (
     <Screen>
       <View style={styles.topPanel}>
@@ -77,7 +113,7 @@ function RoutinesScreen() {
           iconSize={55}
           foregroundColor={theme.blue}
           onPress={() =>
-            navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: false, routineID: 999})
+            handleNewRoutineOnpress()
           }
         />
       </View>

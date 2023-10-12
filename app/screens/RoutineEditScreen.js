@@ -6,21 +6,25 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
-import Header from "../components/Header";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
 import { useTheme } from "../contexts/ThemeContext";
 import ExerciseCard from "../components/ExerciseCard";
-import { Tag } from "../classes/Exercise";
-import { TAB_BAR_HEIGHT } from "../config/appConstants";
+import { Exercise, Tag } from "../classes/Exercise";
+import { TAB_BAR_HEIGHT, DEFAULT_ROUTINE, DEFAULT_EXERCISE } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { useTemplate } from "../contexts/TemplateContext";
-import { getExercisesForRoutine } from "../db/DBActions";
+import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import { useTemplateContext } from "../contexts/TemplateContext";
+import { getExercisesForRoutine, updateRoutine, getRoutineByID } from "../db/DBActions";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
+import { Routine } from "../classes/Routine";
+import { useRoutineContext } from "../contexts/RoutineContext";
 
+// const paddingBottomValue = TAB_BAR_HEIGHT / 2;
+
+// Global helper functions
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
   const sections = {
@@ -52,7 +56,6 @@ const formatDataForSectionList = (data) => {
     data: sections[key],
   }));
 };
-
 const getNumExercises = (exerciseData) => {
   for (let i = 0; i < exerciseData.length; i++) {
     if (exerciseData[i]["title"] === "Exercises") {
@@ -61,35 +64,27 @@ const getNumExercises = (exerciseData) => {
   }
   return 0;
 };
-const paddingBottomValue = TAB_BAR_HEIGHT / 2;
 
 function RoutineEditScreen({ route }) {
+
+  // Setup Functionality
   const navigation = useNavigation();
-  const {edit: isEditing, routineID} = route.params;
-  const { selectedTemplate, selectedTemplateID } = useTemplate();
+  const { edit: isEditing } = route.params;
+  const { selectedTemplate, selectedTemplateID } = useTemplateContext();
+  const { contextExercises: exercises, contextRoutine: routine, setContextRoutine } = useRoutineContext();
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
-  const [exercises, setExercises] = useState([]);
+  const data = formatDataForSectionList(exercises);
   const numExercises = useMemo(() => getNumExercises(exercises), [exercises]);
 
-  const loadExercises = async () => {
-    const exers = await getExercisesForRoutine(routineID);
-    setExercises(formatDataForSectionList(exers));
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      loadExercises();
-    }, []),
-  );
-    
   useEffect(() => {
     console.log(
       `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
     );
   }, [selectedTemplate]);
 
+  // Helper Functions
   const renderItem = (item, index) => {
     switch (item.tag) {
       case Tag.PREROUTINE:
@@ -99,7 +94,7 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes" />}
+            InputComponent={() => <DummyInputComponent text={item.duration} />}
           />
         );
       case Tag.POSTROUTINE:
@@ -119,7 +114,6 @@ function RoutineEditScreen({ route }) {
         null;
     }
   };
-
   const renderExerciseItem = (item, index) => {
     switch (index) {
       case 0:
@@ -165,80 +159,101 @@ function RoutineEditScreen({ route }) {
         );
     }
   };
+  function updateRoutineTitle(newTitle) {
+    setContextRoutine({
+      ...routine,
+      title: newTitle,
+    });
+  };
 
-  // console.log(workTime);
-
-  return (
-    <Screen>
-      <NavHeader
-        LeftComponent={
-          <AppTextButton
-            onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-            textStyle={{ fontWeight: "400", color: theme.foreground }}
-          >
-            {" "}
-            Cancel
-          </AppTextButton>
-        }
-        headerText={isEditing ? "Edit Routine" : "New Routine"}
-        RightComponent={
-          <AppTextButton
-            onPress={() => console.log("Routine Saved/Created")}
-            textStyle={{ fontWeight: "500" }}
-          >
-            {isEditing ? "Save" : "Create"}
-          </AppTextButton>
-        }
-      />
-      <SectionList
-        contentContainerStyle={styles.container}
-        ListHeaderComponent={
-          <>
-            <View style={styles.headingPanel}>
-              <LinearGradient
-                colors={["#ffffff", "#3397f3"]} //to be adjusted
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 0.25 }}
-                style={styles.emojiBox}
-              />
-              <Header style={styles.title}>My Routine #11</Header>
-            </View>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => {
-                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {edit: isEditing})
-              }}
-              style={styles.templatePanel}
+  // Rendered Output
+  return (!(routine && exercises)) ? (<Screen />) :
+    (
+      <Screen>
+        <NavHeader
+          LeftComponent={
+            <AppTextButton
+              onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
+              textStyle={{ fontWeight: "400", color: theme.foreground }}
             >
-              <AuxiliaryCard
-                title={"Template"}
-                editable={false}
-                InputComponent={() => (
-                  <DummyInputComponent text={selectedTemplate} />
-                )}
-              />
-            </TouchableOpacity>
-          </>
-        }
-        sections={exercises}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => renderItem(item, index)}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-        )}
-        stickySectionHeadersEnabled={false}
-        renderSectionFooter={() => <View style={{ height: 22 }} />}
-        ItemSeparatorComponent={() => (
-          <View
-            style={{
-              height: StyleSheet.hairlineWidth,
-              backgroundColor: theme.text60,
-            }}
-          />
-        )}
-      />
-    </Screen>
-  );
+              {" "}
+              Cancel
+            </AppTextButton>
+          }
+          headerText={isEditing ? "Edit Routine" : "New Routine"}
+          RightComponent={
+            <AppTextButton
+              onPress={() => console.log("Routine Saved/Created")}
+              textStyle={{ fontWeight: "500" }}
+            >
+              {isEditing ? "Save" : "Create"}
+            </AppTextButton>
+          }
+        />
+        <SectionList
+          contentContainerStyle={styles.container}
+          ListHeaderComponent={
+            <>
+              <View style={styles.headingPanel}>
+                <LinearGradient
+                  colors={["#ffffff", "#3397f3"]} //to be adjusted
+                  start={{ x: 0.5, y: 0 }}
+                  end={{ x: 0.5, y: 0.25 }}
+                  style={styles.emojiBox}
+                />
+                {/* <Header style={styles.title}>My Routine #11</Header> */}
+                <TextInput
+                  style={styles.title}
+                  onChangeText={updateRoutineTitle}
+                  multiline={false}
+                  keyboardType="default"
+                  placeholder={routine ? routine.title : "Loading"}
+                  placeholderTextColor={styles.title.color}
+                  spellCheck={false}
+                  enterKeyHint="done"
+                  onSubmitEditing={(item) => {
+                    updateRoutineTitle(routineID, item.nativeEvent.text).catch(error => {
+                      console.error("Failed to update routine title:", error);
+                    });
+                  }}
+                />
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, { edit: isEditing })
+                }}
+                style={styles.templatePanel}
+              >
+                <AuxiliaryCard
+                  title={"Template"}
+                  editable={false}
+                  InputComponent={() => (
+                    <DummyInputComponent text={selectedTemplate} />
+                  )}
+                />
+              </TouchableOpacity>
+            </>
+          }
+          sections={data}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => renderItem(item, index)}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+          )}
+          stickySectionHeadersEnabled={false}
+          renderSectionFooter={() => <View style={{ height: 22 }} />}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: StyleSheet.hairlineWidth,
+                backgroundColor: theme.text60,
+              }}
+            />
+          )}
+        />
+      </Screen>
+    )
 }
 
 const getStyles = (theme) =>
@@ -246,7 +261,7 @@ const getStyles = (theme) =>
     container: {
       backgroundColor: theme.background,
       paddingHorizontal: 15, //consistency between screens important
-      paddingBottom: paddingBottomValue,
+      // paddingBottom: paddingBottomValue,
     },
     emojiBox: {
       backgroundColor: theme.blue,
@@ -271,6 +286,8 @@ const getStyles = (theme) =>
     },
     title: {
       color: theme.foreground,
+      fontSize: 30,
+      fontWeight: 600,
     },
     templatePanel: {
       marginBottom: 15,

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 
 const TemplateContext = createContext();
 
-export const useTemplate = () => {
+export const useTemplateContext = () => {
   return useContext(TemplateContext);
 };
 
