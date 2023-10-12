@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { useEffect, forwardRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -34,7 +34,7 @@ const SortModal = forwardRef((props, ref) => {
       />
       <BottomSheet
         ref={ref}
-        index={1}
+        index={-1}
         snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
         enablePanDownToClose={true}
         onChange={(isOpen) =>
