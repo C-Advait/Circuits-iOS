@@ -16,6 +16,7 @@ import routes from "../navigation/routes";
 import { getAllUserCreatedRoutines } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 import SortModal from "../components/SortModal";
+import { SortCriteria } from "../classes/SortCriteria";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -24,7 +25,7 @@ function RoutinesScreen() {
 
   const sortModalRef = useRef(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [sortOption, setSortOption] = useState("Recent");
+  const [sortOption, setSortOption] = useState(SortCriteria.RECENTLY_COMPLETED);
 
   const [routines, setRoutines] = useState([]);
 

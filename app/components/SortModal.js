@@ -4,7 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Portal } from "react-native-portalize";
 
+import { SortCriteria } from "../classes/SortCriteria";
 import { useTheme } from "../contexts/ThemeContext";
+
+const MODAL_HEIGHT = 270;
 
 const SortModal = forwardRef((props, ref) => {
   const { isSheetOpen, setIsSheetOpen, sortOption, setSortOption } = props;
@@ -30,7 +33,7 @@ const SortModal = forwardRef((props, ref) => {
       <BottomSheet
         ref={ref}
         index={1}
-        snapPoints={[250, 250]}
+        snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
         enablePanDownToClose={true}
         onChange={(isOpen) =>
           isOpen === 1 ? setIsSheetOpen(true) : setIsSheetOpen(false)
@@ -40,25 +43,28 @@ const SortModal = forwardRef((props, ref) => {
       >
         <View style={styles.contentContainer}>
           <Text style={styles.modalHeader}>Sort by</Text>
-          {["Recent", "Recently added", "Alphabetical", "Duration"].map(
-            (option) => (
-              <TouchableOpacity
-                style={styles.optionContainer}
-                key={option}
-                onPress={() => setSortOption(option)}
-              >
-                <Text style={styles.optionText}>{option}</Text>
-                {sortOption === option && (
-                  <Ionicons
-                    name="checkmark"
-                    color={theme.blue}
-                    size={25}
-                    style={styles.checkmark}
-                  />
-                )}
-              </TouchableOpacity>
-            ),
-          )}
+          {[
+            SortCriteria.RECENTLY_COMPLETED,
+            SortCriteria.RECENTLY_ADDED,
+            SortCriteria.ALPHABETICAL,
+            SortCriteria.DURATION,
+          ].map((option) => (
+            <TouchableOpacity
+              style={styles.optionContainer}
+              key={option}
+              onPress={() => setSortOption(option)}
+            >
+              <Text style={styles.optionText}>{option}</Text>
+              {sortOption === option && (
+                <Ionicons
+                  name="checkmark"
+                  color={theme.blue}
+                  size={25}
+                  style={styles.checkmark}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
         </View>
       </BottomSheet>
     </Portal>
@@ -74,8 +80,8 @@ const getStyles = (theme) =>
     modalHeader: {
       color: "white",
       fontWeight: "bold",
-      fontSize: 16,
-      marginBottom: 8,
+      fontSize: 14,
+      marginBottom: 25,
     },
     optionContainer: {
       flexDirection: "row",
@@ -86,9 +92,6 @@ const getStyles = (theme) =>
       color: theme.primary,
       fontSize: 16,
       marginVertical: 8,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
     },
     checkmark: {
       marginLeft: 10,
