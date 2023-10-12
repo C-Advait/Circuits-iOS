@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useContext,
+} from "react";
 import { StyleSheet, FlatList } from "react-native";
 import Constants from "expo-constants";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -17,6 +23,8 @@ import { getAllUserCreatedRoutines } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 import SortModal from "../components/SortModal";
 import { SortCriteria } from "../classes/SortCriteria";
+import { naturalCompare } from "../utilities/naturalCompare";
+import { useTemplate } from "../contexts/TemplateContext";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -25,13 +33,16 @@ function RoutinesScreen() {
 
   const sortModalRef = useRef(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [sortOption, setSortOption] = useState(SortCriteria.RECENTLY_COMPLETED);
+  const { sortOption, setSortOption } = useTemplate();
 
   const [routines, setRoutines] = useState([]);
 
   const loadRoutines = async () => {
     const routines = await getAllUserCreatedRoutines();
-    setRoutines(routines);
+    const sortedRoutines = [...routines].sort((x, y) =>
+      naturalCompare(x, y, sortOption),
+    );
+    setRoutines(sortedRoutines);
   };
 
   useFocusEffect(
@@ -39,6 +50,14 @@ function RoutinesScreen() {
       loadRoutines();
     }, []),
   );
+
+  useEffect(() => {
+    if (!routines) return;
+    const sortedRoutines = [...routines].sort((x, y) =>
+      naturalCompare(x, y, sortOption),
+    );
+    setRoutines(sortedRoutines);
+  }, [sortOption]);
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -130,16 +149,12 @@ function RoutinesScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ marginHorizontal: 16 }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        ListFooterComponent={() => (
-          <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
-        )}
+        ListFooterComponent={() => <View style={{ height: TAB_BAR_HEIGHT }} />}
         ListEmptyComponent={EmptyRoutinesListComponent}
       />
       <SortModal
         isSheetOpen={isSheetOpen}
         setIsSheetOpen={setIsSheetOpen}
-        sortOption={sortOption}
-        setSortOption={setSortOption}
         ref={sortModalRef}
       />
     </View>
