@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { ThemeProvider } from "./app/contexts/ThemeContext";
+import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { ThemeProvider } from "./app/contexts/ThemeContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 
@@ -19,11 +20,13 @@ export default function App() {
   // Should return loading screen -- not null.
   return ready ? (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider>
-        <NavigationContainer>
-          <AppNavigator />
-        </NavigationContainer>
-      </ThemeProvider>
+      <Host>
+        <ThemeProvider>
+          <NavigationContainer>
+            <AppNavigator />
+          </NavigationContainer>
+        </ThemeProvider>
+      </Host>
     </GestureHandlerRootView>
   ) : null;
 }

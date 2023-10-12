@@ -4,6 +4,7 @@ export const darkTheme = {
   backgroundFaded: "#1e1e1e",
   tileBackground: "#ffffff0c",
   secondaryBackground: "#1c1c1e",
+  tertiaryBackground: "#2c2c2e",
   foreground: "#eeeeee",
   primary: "#ffffff",
   secondary: "#ebebf599",
