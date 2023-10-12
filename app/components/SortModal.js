@@ -1,7 +1,7 @@
 import React, { useEffect, forwardRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Portal } from "react-native-portalize";
 
 import { SortCriteria } from "../classes/SortCriteria";
@@ -19,19 +19,6 @@ const SortModal = forwardRef((props, ref) => {
 
   return (
     <Portal>
-      <TouchableOpacity
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: "#00000050",
-            display: isSheetOpen ? "flex" : "none",
-          },
-        ]}
-        onPress={() => {
-          setIsSheetOpen(false);
-          ref.current?.close();
-        }}
-      />
       <BottomSheet
         ref={ref}
         index={-1}
@@ -41,7 +28,8 @@ const SortModal = forwardRef((props, ref) => {
           isOpen === 1 ? setIsSheetOpen(true) : setIsSheetOpen(false)
         }
         backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
-        handleIndicatorStyle={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+        backdropComponent={BottomSheetBackdrop}
+        handleIndicatorStyle={styles.handleIndicator}
       >
         <View style={styles.contentContainer}>
           <Text style={styles.modalHeader}>Sort by</Text>
@@ -78,6 +66,10 @@ const getStyles = (theme) =>
     contentContainer: {
       flex: 1,
       padding: 16,
+    },
+    handleIndicator: {
+      backgroundColor: "rgba(255, 255, 255, 0.25)",
+      width: 90,
     },
     modalHeader: {
       color: "white",
