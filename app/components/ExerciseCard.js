@@ -13,7 +13,8 @@ function ExerciseCard({
   subTitle,
   accentColor,
   clickDrag = false,
-  style
+  style,
+  ...rest
 }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
@@ -36,7 +37,7 @@ function ExerciseCard({
         />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableWithoutFeedback style={styles.touchable} onPress={() => {navigation.navigate(routes.EXERCISE_EDIT_SCREEN)}}>
+        <TouchableWithoutFeedback style={styles.touchable} onPress={() => { rest.exercise ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, { edit: rest.isEditing, exercise: rest.exercise }) : null }}>
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subTitle}>{subTitle}</Text>
@@ -44,7 +45,7 @@ function ExerciseCard({
         </TouchableWithoutFeedback>
         <View style={[styles.dragContainer]}>
           {clickDrag && (
-              <MaterialIcons name="drag-indicator" size={32} color={theme.text60} /> // Color needs to be changed
+            <MaterialIcons name="drag-indicator" size={32} color={theme.text60} /> // Color needs to be changed
           )}
         </View>
       </View>
@@ -74,9 +75,9 @@ const getStyles = (theme) => StyleSheet.create({
     paddingVertical: 10
   },
   contentContainer: {
-    flex: 1, 
-    alignItems: 'center', 
-    flexDirection: 'row', 
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'space-between'
   },
   closeButton: {
@@ -87,12 +88,12 @@ const getStyles = (theme) => StyleSheet.create({
     marginLeft: 5,
   },
   dragContainer: {
-    width:40,
-    marginRight:7,
+    width: 40,
+    marginRight: 7,
   },
   infoContainer: {
     justifyContent: 'center',
-    width:'80%',
+    width: '80%',
   },
   title: {
     color: theme.text87,
