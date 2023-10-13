@@ -2,21 +2,25 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
 import { IconButton } from "../buttons";
+import timerActions from "../../actions/timerActions";
+import { useTheme } from "../../contexts/ThemeContext";
 
-function SkipButton({ shouldSkipForward }) {
+function SkipButton({ shouldSkipForward, dispatch, active = true }) {
+  const { theme } = useTheme();
+
   return (
     <IconButton
       iconName={
         shouldSkipForward ? "md-play-skip-forward" : "md-play-skip-back"
       }
       iconSize={70}
-      foregroundColor="white"
+      foregroundColor={active ? theme.primary : theme.tertiary}
       IconFamily={Ionicons}
       onPress={() => {
         if (shouldSkipForward) {
-          console.log("Skipping next");
+          dispatch({ type: timerActions.SKIP_FORWARD });
         } else {
-          console.log("Skipping previous");
+          dispatch({ type: timerActions.SKIP_BACKWARD });
         }
       }}
     />

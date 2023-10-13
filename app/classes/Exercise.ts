@@ -2,6 +2,9 @@ export enum Tag {
   PREROUTINE = "preroutine",
   POSTROUTINE = "postroutine",
   WORKING = "working",
+  BREAK = "break",
+  REST = "rest",
+  FINISH = "finish",
 }
 
 export class Exercise {
