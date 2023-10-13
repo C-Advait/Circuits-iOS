@@ -16,7 +16,7 @@ export const darkTheme = {
   accentGreen: "#bcdc49",
   accentPurple: "#c45fc6",
   accentLightPurple: "#d893c3",
-  accentDarkBlue: "#326cfd",
+  accentDarkBlue: "#1b5cfd",
   accentLightBlue: "#9ed3ce",
   accentOrange: "#ffae35",
   tabBarActiveTintColor: "#eee",
