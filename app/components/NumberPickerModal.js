@@ -1,46 +1,38 @@
-import React, { useState, useRef } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import React, { useState, useEffect, useRef } from "react";
+import { Button, View, StyleSheet, Text } from "react-native";
+import NumberWheelPicker from "./NumberWheelPicker";
 import { Portal } from "react-native-portalize";
-
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { useTheme } from "../contexts/ThemeContext";
-import TimeWheelPicker from "./TimeWheelPicker";
 
 const MODAL_HEIGHT = 390;
 
-function TimePickerModal({
-  startingMinute = "10",
-  startingSecond = " 0",
-  enabled = true,
+function NumberPickerModal({
   promptTitle,
   promptSubtitle,
-  data,
+  startingNumber = " 1",
+  onApply,
 }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
+  const [number, setNumber] = useState(startingNumber);
+  const [previousNumber, setPreviousNumber] = useState();
+
   const modalRef = useRef(null);
-
-  const [selectedMinute, setSelectedMinute] = useState(startingMinute);
-  const [selectedSecond, setSelectedSecond] = useState(startingSecond);
-
-  const [previousMinute, setPreviousMinute] = useState();
-  const [previousSecond, setPreviousSecond] = useState();
-
   const [applyFlag, setApplyFlag] = useState(false);
 
-  // Required to listen to state changes in
-  // other pickers.
-  if (data) {
-    enabled = data !== " 1";
-  }
+  // useEffect(() => {
+  //   console.log("Inside useEffect: ", number)
+  //   onValueChange?.(number);
+  // }, [number])
 
   return (
     <>
       <Text
-        style={enabled ? styles.activationButton : styles.disabledButton}
-        onPress={() => (enabled ? modalRef.current?.expand() : null)}
+        style={styles.activationButton}
+        onPress={() => modalRef.current?.expand()}
       >
-        {`${selectedMinute}m ${selectedSecond}s`}
+        {number}
       </Text>
 
       <Portal>
@@ -65,13 +57,11 @@ function TimePickerModal({
             // values to which to revert when
             // cancelling.
             if (isOpen === 1) {
-              setPreviousMinute(selectedMinute);
-              setPreviousSecond(selectedSecond);
+              setPreviousNumber(number);
             } else if (applyFlag) {
               setApplyFlag(false);
             } else {
-              setSelectedMinute(previousMinute);
-              setSelectedSecond(previousSecond);
+              setNumber(previousNumber);
             }
           }}
         >
@@ -79,20 +69,17 @@ function TimePickerModal({
             <Text style={styles.title}>{promptTitle}</Text>
             <Text style={styles.subtitle}>{promptSubtitle}</Text>
           </View>
-          <TimeWheelPicker
+          <NumberWheelPicker
+            number={number}
+            setNumber={setNumber}
             theme={theme}
-            selectedMinute={selectedMinute}
-            setSelectedMinute={setSelectedMinute}
-            selectedSecond={selectedSecond}
-            setSelectedSecond={setSelectedSecond}
           />
           <View style={styles.footer}>
             <View style={styles.buttonContainer}>
               <Button
                 title="Cancel"
                 onPress={() => {
-                  setSelectedMinute(previousMinute);
-                  setSelectedSecond(previousSecond);
+                  setNumber(previousNumber);
                   modalRef.current?.close();
                 }}
                 color={theme.primary}
@@ -103,6 +90,7 @@ function TimePickerModal({
                 title="Apply"
                 onPress={() => {
                   setApplyFlag(true);
+                  onApply(number);
                   modalRef.current?.close();
                 }}
                 color={theme.blue}
@@ -162,4 +150,4 @@ const getStyles = (theme) =>
     },
   });
 
-export default TimePickerModal;
+export default NumberPickerModal;

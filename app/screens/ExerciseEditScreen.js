@@ -9,9 +9,11 @@ import { IconButton } from "../components/buttons";
 import { useTheme } from "../contexts/ThemeContext";
 import routes from "../navigation/routes";
 import AuxilaryCard from "../components/AuxiliaryCard";
-import DummyInputComponent from "../components/DummyInputComponent";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import TimePickerModal from "../components/TimePickerModal";
+import NumberPickerModal from "../components/NumberPickerModal";
+
+import Receiver from "../events/Receiver";
+import eventManager from "../events/eventManager";
 
 function ExerciseEditScreen(props) {
   const navigation = useNavigation();
@@ -47,31 +49,36 @@ function ExerciseEditScreen(props) {
             />
           )}
         />
-        <TouchableOpacity
-          onPress={() =>
-            restEnabled ? setRestEnabled(false) : setRestEnabled(true)
-          }
-        >
-          <AuxilaryCard
-            editable={false}
-            bold={false}
-            title={"Number of rounds"}
-            InputComponent={() => <DummyInputComponent text="1" />}
-          />
-        </TouchableOpacity>
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Number of rounds"}
+          InputComponent={() => (
+            <NumberPickerModal
+              promptTitle="Number of rounds"
+              promptSubtitle="Repetitions of the current exercise."
+              onApply={(number) => {
+                console.log("number: ", number);
+                eventManager.emit("numberOfRounds", number);
+              }}
+            />
+          )}
+        />
         <AuxilaryCard
           editable={false}
           bold={false}
           disabled={restEnabled}
           title={"Rest between rounds"}
           InputComponent={() => (
-            <TimePickerModal
-              promptTitle="Rest"
-              promptSubtitle="Duration of rest between subsequent rounds."
-              startingMinute=" 0"
-              startingSecond="30"
-              enabled={restEnabled}
-            />
+            <Receiver>
+              <TimePickerModal
+                promptTitle="Rest"
+                promptSubtitle="Duration of rest between subsequent rounds."
+                startingMinute=" 0"
+                startingSecond="30"
+                enabled={restEnabled}
+              />
+            </Receiver>
           )}
         />
         <AuxilaryCard
