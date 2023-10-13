@@ -311,10 +311,10 @@ const createDummyExercises = async () => {
     title: "Warmup",
     exerciseOrder: 1,
     tag: Tag.PREROUTINE,
-    workTime: 20,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
+    workTime: 600,
+    numberOfRounds: 1,
+    restBetweenRounds: 0,
+    breakBeforeNext: 0,
     category: "Uncategorized",
   });
 
@@ -323,10 +323,10 @@ const createDummyExercises = async () => {
     title: "Cooldown",
     exerciseOrder: 1,
     tag: Tag.POSTROUTINE,
-    workTime: 7000,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
+    workTime: 600,
+    numberOfRounds: 1,
+    restBetweenRounds: 0,
+    breakBeforeNext: 0,
     category: "Uncategorized",
   });
 
