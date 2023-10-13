@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, View, StyleSheet, Text } from "react-native";
+import React, { useState, useRef } from "react";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import NumberWheelPicker from "./NumberWheelPicker";
-import { Portal } from "react-native-portalize";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+
 import { useTheme } from "../contexts/ThemeContext";
 import InputModal from "./InputModal";
-
-const MODAL_HEIGHT = 390;
 
 function NumberPickerModal({
   promptTitle,
@@ -48,19 +45,20 @@ function NumberPickerModal({
 
   return (
     <>
-      <Text
-        style={styles.activationButton}
+      <TouchableOpacity
+        activeOpacity={0.8}
         onPress={() => modalRef.current?.expand()}
+        style={styles.touchable}
       >
-        {number}
-      </Text>
+        <Text style={styles.text}>{number}</Text>
+      </TouchableOpacity>
 
       <InputModal
         onChange={onModalChange}
         onCancel={onCancel}
         onApply={onApply}
         promptTitle={promptTitle}
-        promptSubitle={promptSubtitle}
+        promptSubtitle={promptSubtitle}
         ref={modalRef}
       >
         <NumberWheelPicker
@@ -75,9 +73,14 @@ function NumberPickerModal({
 
 const getStyles = (theme) =>
   StyleSheet.create({
-    activationButton: {
+    text: {
       color: theme.primary,
       fontSize: 15,
+    },
+    touchable: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      width: 100,
     },
   });
 

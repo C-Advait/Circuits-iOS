@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 import { useTheme } from "../contexts/ThemeContext";
 import TimeWheelPicker from "./TimeWheelPicker";
@@ -61,12 +61,15 @@ function TimePickerModal({
 
   return (
     <>
-      <Text
-        style={enabled ? styles.activationButton : styles.disabledButton}
+      <TouchableOpacity
+        activeOpacity={0.8}
         onPress={() => (enabled ? modalRef.current?.expand() : null)}
+        style={styles.touchable}
       >
-        {`${selectedMinute}m ${selectedSecond}s`}
-      </Text>
+        <Text style={enabled ? styles.active : styles.disabled}>
+          {`${selectedMinute}m ${selectedSecond}s`}
+        </Text>
+      </TouchableOpacity>
 
       <InputModal
         onChange={onModalChange}
@@ -90,9 +93,18 @@ function TimePickerModal({
 
 const getStyles = (theme) =>
   StyleSheet.create({
-    activationButton: {
+    active: {
       color: theme.primary,
       fontSize: 15,
+    },
+    disabled: {
+      color: theme.textDisabled,
+      fontSize: 15,
+    },
+    touchable: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      width: 100,
     },
   });
 
