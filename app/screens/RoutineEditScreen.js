@@ -18,6 +18,7 @@ import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useTemplate } from "../contexts/TemplateContext";
+import TimePickerModal from "../components/TimePickerModal";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -377,7 +378,9 @@ function RoutineEditScreen({ route }) {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {edit: isEditing})
+                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {
+                  edit: isEditing,
+                });
               }}
               style={styles.templatePanel}
             >
@@ -408,6 +411,7 @@ function RoutineEditScreen({ route }) {
           />
         )}
       />
+      <TimePickerModal />
     </Screen>
   );
 }
