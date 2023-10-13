@@ -23,15 +23,15 @@ export const DEFAULT_ROUTINE = new Routine({ // missing routineID && Title incom
 
 // These do not include associated routineID's
 export const DEFAULT_WARMUP = new Exercise({ // missing routineID
-    title: "Warmup",
-    exerciseOrder: 1,
-    tag: Tag.PREROUTINE,
-    workTime: 30,
-    numberOfRounds: 1,
-    restBetweenRounds: 0,
-    breakBeforeNext: 0,
-    category: "Uncategorized",
-  });
+  title: "Warmup",
+  exerciseOrder: 1,
+  tag: Tag.PREROUTINE,
+  workTime: 300,
+  numberOfRounds: 1,
+  restBetweenRounds: 0,
+  breakBeforeNext: 0,
+  category: "Uncategorized",
+});
 
 export const DEFAULT_EXERCISE = new Exercise({ // missing routineID
   title: "Plank",
@@ -45,12 +45,12 @@ export const DEFAULT_EXERCISE = new Exercise({ // missing routineID
 });
 
 export const DEFAULT_COOLDOWN = new Exercise({ // missing routineID
-    title: "Cooldown",
-    exerciseOrder: 1,
-    tag: Tag.POSTROUTINE,
-    workTime: 3000,
-    numberOfRounds: 1,
-    restBetweenRounds: 0,
-    breakBeforeNext: 0,
-    category: "Uncategorized",
-  });
+  title: "Cooldown",
+  exerciseOrder: 1,
+  tag: Tag.POSTROUTINE,
+  workTime: 300,
+  numberOfRounds: 1,
+  restBetweenRounds: 0,
+  breakBeforeNext: 0,
+  category: "Uncategorized",
+});
