@@ -91,7 +91,7 @@ function RoutinesScreen() {
         ...DEFAULT_COOLDOWN,
         routineID: routineID
       });
-      const exercises = [warmup, exer, cooldown];
+      const exercises = [warmup, cooldown];
 
       // Set the context variables for ROUTINE_EDIT_SCREEN
       setContextRoutine(routine);
