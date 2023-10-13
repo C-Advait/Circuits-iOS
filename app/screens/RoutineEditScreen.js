@@ -270,7 +270,7 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes" />}
+            InputComponent={TimePickerModal}
           />
         );
       case Tag.POSTROUTINE:
@@ -411,7 +411,6 @@ function RoutineEditScreen({ route }) {
           />
         )}
       />
-      <TimePickerModal />
     </Screen>
   );
 }

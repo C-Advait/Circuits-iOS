@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useTheme } from "../contexts/ThemeContext";
 
-const TimeWheelPicker = () => {
-  const { theme } = useTheme();
+// Theme must be passed in by consumer.
+// This is because the current component
+// is only ever consumed by components wrapped
+// in <Portal>. <Portal> is known to not work
+// with context.
+const TimeWheelPicker = ({
+  theme,
+  selectedMinute,
+  setSelectedMinute,
+  selectedSecond,
+  setSelectedSecond,
+}) => {
   const styles = getStyles(theme);
-
-  const [selectedMinute, setSelectedMinute] = useState(" 0");
-  const [selectedSecond, setSelectedSecond] = useState(" 0");
 
   const items = [...Array(60).keys()].map((i) =>
     i < 10 ? ` ${i}` : i.toString(),
@@ -26,7 +32,6 @@ const TimeWheelPicker = () => {
         style={styles.minutesPicker}
         onValueChange={(itemValue) => {
           setSelectedMinute(itemValue);
-          console.log("minute: ", itemValue);
           if (itemValue === " 0") {
             setFilteredSeconds(items.slice(5)); // starts from '05'
             if (parseInt(selectedSecond) < 5) {
