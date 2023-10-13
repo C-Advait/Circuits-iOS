@@ -11,6 +11,7 @@ const MODAL_HEIGHT = 390;
 function TimePickerModal({
   startingMinute = "10",
   startingSecond = " 0",
+  enabled = true,
   promptTitle,
   promptSubtitle,
 }) {
@@ -29,8 +30,8 @@ function TimePickerModal({
   return (
     <>
       <Text
-        style={styles.activationButton}
-        onPress={() => modalRef.current?.expand()}
+        style={enabled ? styles.activationButton : styles.disabledButton}
+        onPress={() => (enabled ? modalRef.current?.expand() : null)}
       >
         {`${selectedMinute}m ${selectedSecond}s`}
       </Text>
@@ -116,6 +117,10 @@ const getStyles = (theme) =>
     buttonContainer: {
       marginHorizontal: 16,
       marginTop: 12,
+    },
+    disabledButton: {
+      color: theme.textDisabled,
+      fontSize: 15,
     },
     footer: {
       backgroundColor: theme.secondaryBackground,
