@@ -26,6 +26,17 @@ function ExerciseCard({
     console.log('pressed');
   };
 
+  const handleExerciseEditNavigation = () => {
+    rest.exercise ?
+      navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
+        isRoutineEditing: rest.isRoutineEditing,
+        isExerciseEditing: rest.isExerciseEditing,
+        referenceExercise: rest.referenceExercise,
+        exercise: rest.exercise
+      })
+      : null
+  }
+
   return (
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
@@ -37,7 +48,9 @@ function ExerciseCard({
         />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableWithoutFeedback style={styles.touchable} onPress={() => { rest.exercise ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, { edit: rest.isEditing, exercise: rest.exercise }) : null }}>
+        <TouchableWithoutFeedback
+          style={styles.touchable}
+          onPress={() => handleExerciseEditNavigation()}>
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subTitle}>{subTitle}</Text>

@@ -22,9 +22,8 @@ export const DEFAULT_ROUTINE = new Routine({ // missing routineID && Title incom
 })
 
 // These do not include associated routineID's
-export const DEFAULT_WARMUP = new Exercise({ // missing routineID
+export const DEFAULT_WARMUP = new Exercise({ // missing routineID && ID && exerciseOrder
   title: "Warmup",
-  exerciseOrder: 1,
   tag: Tag.PREROUTINE,
   workTime: 300,
   numberOfRounds: 1,
@@ -33,20 +32,18 @@ export const DEFAULT_WARMUP = new Exercise({ // missing routineID
   category: "Uncategorized",
 });
 
-export const DEFAULT_EXERCISE = new Exercise({ // missing routineID
-  title: "Plank",
-  exerciseOrder: 1,
+export const DEFAULT_EXERCISE = new Exercise({ // missing routineID && ID && exerciseOrder
+  title: "Exercise",
   tag: Tag.WORKING,
-  workTime: 30,
+  workTime: 60,
   numberOfRounds: 1,
   restBetweenRounds: 0,
   breakBeforeNext: 0,
   category: "Uncategorized",
 });
 
-export const DEFAULT_COOLDOWN = new Exercise({ // missing routineID
+export const DEFAULT_COOLDOWN = new Exercise({ // missing routineID && ID && exerciseOrder
   title: "Cooldown",
-  exerciseOrder: 1,
   tag: Tag.POSTROUTINE,
   workTime: 300,
   numberOfRounds: 1,

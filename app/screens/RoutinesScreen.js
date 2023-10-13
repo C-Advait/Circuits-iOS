@@ -75,21 +75,24 @@ function RoutinesScreen() {
       const routineID = await getNewRoutineID();
       const routine = new Routine({
         ...DEFAULT_ROUTINE,
-        routineID: routineID,
+        id: routineID,
         title: `My Routine #${routineID}`
       });
 
       const warmup = new Exercise({
         ...DEFAULT_WARMUP,
-        routineID: routineID
+        routineID: routineID,
+        exerciseOrder: 1,
       });
       const exer = new Exercise({
         ...DEFAULT_EXERCISE,
-        routineID: routineID
+        routineID: routineID,
+        exerciseOrder: 1,
       })
       const cooldown = new Exercise({
         ...DEFAULT_COOLDOWN,
-        routineID: routineID
+        routineID: routineID,
+        exerciseOrder: 1
       });
       const exercises = [warmup, cooldown];
 
