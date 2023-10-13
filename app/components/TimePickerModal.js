@@ -8,7 +8,12 @@ import TimeWheelPicker from "./TimeWheelPicker";
 
 const MODAL_HEIGHT = 390;
 
-function TimePickerModal({ startingMinute = "10", startingSecond = " 0" }) {
+function TimePickerModal({
+  startingMinute = "10",
+  startingSecond = " 0",
+  promptTitle,
+  promptSubtitle,
+}) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const modalRef = useRef(null);
@@ -63,10 +68,8 @@ function TimePickerModal({ startingMinute = "10", startingSecond = " 0" }) {
           }}
         >
           <View style={styles.header}>
-            <Text style={styles.title}>Warmup</Text>
-            <Text style={styles.subtitle}>
-              Duration of the something or other.
-            </Text>
+            <Text style={styles.title}>{promptTitle}</Text>
+            <Text style={styles.subtitle}>{promptSubtitle}</Text>
           </View>
           <TimeWheelPicker
             theme={theme}

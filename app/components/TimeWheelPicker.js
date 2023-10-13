@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
+const UNIT_OFFSET = 48;
+const GAP_REDUCTION = 50;
+// Offsetting the seconds by GAP + UNIT is just a hair off.
+const ADJUSTMENT = 2;
+
 // Theme must be passed in by consumer.
 // This is because the current component
 // is only ever consumed by components wrapped
@@ -26,49 +31,61 @@ const TimeWheelPicker = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.overlay} />
-      <Picker
-        selectedValue={selectedMinute}
-        style={styles.minutesPicker}
-        onValueChange={(itemValue) => {
-          setSelectedMinute(itemValue);
-          if (itemValue === " 0") {
-            setFilteredSeconds(items.slice(5)); // starts from '05'
-            if (parseInt(selectedSecond) < 5) {
-              setSelectedSecond(" 5");
+      <View style={styles.pickersContainer}>
+        <View style={styles.overlay} />
+        <Picker
+          selectedValue={selectedMinute}
+          style={styles.minutesPicker}
+          selectionColor={theme.tertiaryTranslucentBackground}
+          onValueChange={(itemValue) => {
+            setSelectedMinute(itemValue);
+            if (itemValue === " 0") {
+              setFilteredSeconds(items.slice(5)); // starts from '05'
+              if (parseInt(selectedSecond) < 5) {
+                setSelectedSecond(" 5");
+              }
+            } else {
+              setFilteredSeconds(items); // reset to the full range
             }
-          } else {
-            setFilteredSeconds(items); // reset to the full range
-          }
-        }}
-        color={theme.primary}
-        selectionColor={theme.tertiaryTranslucentBackground}
-        itemStyle={{
-          color: theme.primary,
-          backgroundColor: "transparent",
-        }}
-      >
-        {items.map((item) => (
-          <Picker.Item key={item} label={item} value={item} />
-        ))}
-      </Picker>
-      <View style={styles.unitContainer}>
-        <Text style={styles.unit}>min</Text>
-      </View>
-      <Picker
-        key={key}
-        selectedValue={selectedSecond}
-        style={styles.secondsPicker}
-        onValueChange={(itemValue) => setSelectedSecond(itemValue)}
-        selectionColor={theme.tertiaryTranslucentBackground}
-        itemStyle={{ color: theme.primary }}
-      >
-        {filteredSeconds.map((item) => (
-          <Picker.Item key={item} label={item} value={item} />
-        ))}
-      </Picker>
-      <View style={styles.unitContainer}>
-        <Text style={styles.unit}>sec</Text>
+          }}
+          color={theme.primary}
+          itemStyle={{
+            color: theme.primary,
+            backgroundColor: "transparent",
+          }}
+        >
+          {items.map((item) => (
+            <Picker.Item key={item} label={item} value={item} />
+          ))}
+        </Picker>
+        <View style={styles.unitContainer} pointerEvents="none">
+          <Text style={styles.unit}>min</Text>
+        </View>
+        <Picker
+          key={key}
+          selectedValue={selectedSecond}
+          style={styles.secondsPicker}
+          selectionColor={theme.tertiaryTranslucentBackground}
+          onValueChange={(itemValue) => setSelectedSecond(itemValue)}
+          itemStyle={{ color: theme.primary }}
+        >
+          {filteredSeconds.map((item) => (
+            <Picker.Item key={item} label={item} value={item} />
+          ))}
+        </Picker>
+        <View
+          style={[
+            styles.unitContainer,
+            {
+              transform: [
+                { translateX: -(GAP_REDUCTION + UNIT_OFFSET + ADJUSTMENT) },
+              ],
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={styles.unit}>sec</Text>
+        </View>
       </View>
     </View>
   );
@@ -78,36 +95,41 @@ const getStyles = (theme) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
-      justifyContent: "center",
       alignItems: "center",
+      justifyContent: "center",
     },
     overlay: {
       position: "absolute",
       borderRadius: 8,
       backgroundColor: "rgba(255, 255, 255, 0.1)",
       height: 32,
-      width: "53%",
+      width: "80%",
       top: "77%",
-      left: "23%",
+      left: "18%",
       zIndex: 3,
     },
     minutesPicker: {
       color: "white",
-      width: 85,
+      width: 130,
       height: 120,
-      paddingLeft: 0,
+    },
+    pickersContainer: {
+      flexDirection: "row",
+      width: "60%",
+      height: "100%",
+      marginRight: "8%",
     },
     secondsPicker: {
-      width: 85,
+      width: 130,
       height: 120,
+      transform: [{ translateX: -GAP_REDUCTION }],
     },
     unitContainer: {
       backgroundColor: theme.tertiaryBackground,
       height: 80,
       justifyContent: "center",
-      padding: 5,
-      top: 50,
-      transform: [{ translateX: -30 }],
+      top: 68,
+      transform: [{ translateX: -UNIT_OFFSET }],
       zIndex: 2,
     },
     unit: {

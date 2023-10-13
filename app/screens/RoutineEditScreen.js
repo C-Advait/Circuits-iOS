@@ -270,7 +270,12 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={TimePickerModal}
+            InputComponent={() => (
+              <TimePickerModal
+                promptTitle="Warmup"
+                promptSubtitle="Duration of the warmup phase."
+              />
+            )}
           />
         );
       case Tag.POSTROUTINE:
@@ -280,7 +285,12 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes" />}
+            InputComponent={() => (
+              <TimePickerModal
+                promptTitle="Cooldown"
+                promptSubtitle="Duration of the cooldown phase."
+              />
+            )}
           />
         );
       case Tag.WORKING: {
