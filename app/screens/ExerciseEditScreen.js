@@ -57,8 +57,7 @@ function ExerciseEditScreen(props) {
             <NumberPickerModal
               promptTitle="Number of rounds"
               promptSubtitle="Repetitions of the current exercise."
-              onApply={(number) => {
-                console.log("number: ", number);
+              onSubmit={(number) => {
                 eventManager.emit("numberOfRounds", number);
               }}
             />
