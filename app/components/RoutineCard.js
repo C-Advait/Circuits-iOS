@@ -13,9 +13,9 @@ import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
 import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 
-function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
+function RoutineCard({ item: routine, isExpanded, toggleExpand, deleteCallback }) {
   // Duration in seconds
-  const { color: accentcolor, duration, title } = item;
+  // const { color: accentcolor, duration, title } = routine;
 
   const navigation = useNavigation();
   const { theme } = useTheme();
@@ -23,7 +23,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
   const [description, setDescription] = useState();
 
   const createDescription = async () => {
-    const exercises = await getExercisesForRoutine(item.id);
+    const exercises = await getExercisesForRoutine(routine.id);
 
     const formattedExerciseString =
       exercises
@@ -36,7 +36,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
         .join("\n") + "\n";
 
     const formattedLoopString =
-      item.numberOfLoops > 1 ? `\nLoops ${item.numberOfLoops} times` : "";
+      routine.numberOfLoops > 1 ? `\nLoops ${routine.numberOfLoops} times` : "";
 
     setDescription(formattedExerciseString + formattedLoopString);
   };
@@ -47,14 +47,14 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
 
   return (
     <View style={styles.container}>
-      {accentcolor ? (
-        <View style={[styles.accent, { backgroundColor: accentcolor }]} />
+      {routine.color ? (
+        <View style={[styles.accent, { backgroundColor: routine.color }]} />
       ) : null}
       <TouchableOpacity onPress={() => toggleExpand()} activeOpacity={0.8}>
         <View style={styles.permanentInfoContainer}>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.header}>{title}</Text>
-            <Text style={styles.duration}>{formatDuration(duration)}</Text>
+            <Text style={styles.header}>{routine.title}</Text>
+            <Text style={styles.duration}>{formatDuration(routine.duration)}</Text>
           </View>
           <IconButton
             iconName={isExpanded ? "chevron-up" : "chevron-down"}
@@ -73,10 +73,10 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
                 title="Start"
                 onPress={() =>
                   navigation.navigate(routes.TIMER_SCREEN, {
-                    id: item.id,
-                    numberOfLoops: item.numberOfLoops,
-                    title: title,
-                    totalDuration: item.duration,
+                    id: routine.id,
+                    numberOfLoops: routine.numberOfLoops,
+                    title: routine.title,
+                    totalDuration: routine.duration,
                   })
                 }
                 iconName="play-outline"
@@ -98,7 +98,7 @@ function RoutineCard({ item, isExpanded, toggleExpand, deleteCallback }) {
                 iconName="trash-can-outline"
                 IconFamily={MaterialCommunityIcons}
                 foregroundColor={theme.danger}
-                onPress={() => confirmDeletion(item, deleteCallback)}
+                onPress={() => confirmDeletion(routine, deleteCallback)}
                 style={{ marginLeft: 0, alignItems: "flex-start" }}
               />
             </View>
