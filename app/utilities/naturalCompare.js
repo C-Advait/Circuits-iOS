@@ -23,11 +23,6 @@ export function naturalCompare(x, y, sortOption) {
       break;
   }
 
-  console.log(field);
-  // console.log(x, y)
-  console.log(x[field]);
-  console.log(y[field]);
-
   // Convert numbers to strings for comparison
   a = x[field] === null ? "" : x[field].toString();
   b = y[field] === null ? "" : y[field].toString();

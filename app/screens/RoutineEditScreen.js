@@ -18,6 +18,7 @@ import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useTemplate } from "../contexts/TemplateContext";
+import TimePickerModal from "../components/TimePickerModal";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -269,7 +270,12 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes" />}
+            InputComponent={() => (
+              <TimePickerModal
+                promptTitle="Warmup"
+                promptSubtitle="Duration of the warmup phase."
+              />
+            )}
           />
         );
       case Tag.POSTROUTINE:
@@ -279,7 +285,12 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text="10 minutes" />}
+            InputComponent={() => (
+              <TimePickerModal
+                promptTitle="Cooldown"
+                promptSubtitle="Duration of the cooldown phase."
+              />
+            )}
           />
         );
       case Tag.WORKING: {
@@ -377,7 +388,9 @@ function RoutineEditScreen({ route }) {
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => {
-                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {edit: isEditing})
+                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {
+                  edit: isEditing,
+                });
               }}
               style={styles.templatePanel}
             >
