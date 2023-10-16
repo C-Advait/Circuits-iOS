@@ -185,7 +185,6 @@ function reducer(state, action) {
 
       return state;
     case timerActions.ELAPSE:
-      console.log("Inside elapse: ", Date.now());
       return {
         ...state,
         exerciseSecondsRemaining: state.exerciseSecondsRemaining - 1,
@@ -197,7 +196,6 @@ function reducer(state, action) {
         isPlaying: !state.isPlaying,
       };
     case timerActions.RESET_TIMER:
-      console.log("Reseting timer");
       return {
         ...state,
         shouldResetTimer: true,
@@ -234,7 +232,6 @@ const calculateLoopDuration = (exerciseList) => {
       (exercise.numberOfRounds - 1) * exercise.restBetweenRounds +
       exercise.breakBeforeNext;
   });
-  console.log("Loop duration: ", acc);
   return acc;
 };
 

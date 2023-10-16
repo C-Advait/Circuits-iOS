@@ -14,7 +14,6 @@ import { Tag } from "../../classes/Exercise";
 const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
   const transitionSound = getSoundToPlay(nextExerciseTag);
 
-  console.log(state.intervals[state.currentIndex]?.duration);
   const [exerciseSecondsRemaining, setExerciseSecondsRemaining] = useState(
     state.intervals[state.currentIndex]?.duration,
   );
