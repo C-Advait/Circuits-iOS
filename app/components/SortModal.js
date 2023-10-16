@@ -29,7 +29,7 @@ const SortModal = forwardRef((props, ref) => {
         }
         backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
         backdropComponent={BottomSheetBackdrop}
-        handleIndicatorStyle={{ backgroundColor: "rgba(255, 255, 255, 0.25)" }}
+        handleIndicatorStyle={styles.handleIndicator}
       >
         <View style={styles.contentContainer}>
           <Text style={styles.modalHeader}>Sort by</Text>
@@ -66,6 +66,10 @@ const getStyles = (theme) =>
     contentContainer: {
       flex: 1,
       padding: 16,
+    },
+    handleIndicator: {
+      backgroundColor: "rgba(255, 255, 255, 0.25)",
+      width: 90,
     },
     modalHeader: {
       color: "white",
