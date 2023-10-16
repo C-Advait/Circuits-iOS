@@ -1,7 +1,13 @@
-import React, { useState, useCallback } from "react";
-import { StyleSheet, FlatList, Alert } from "react-native";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useContext,
+} from "react";
+import { StyleSheet, FlatList } from "react-native";
+import Constants from "expo-constants";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import Screen from "../components/Screen";
 
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
@@ -17,16 +23,29 @@ import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import { useRoutineContext } from "../contexts/RoutineContext";
+import SortModal from "../components/SortModal";
+import { SortCriteria } from "../classes/SortCriteria";
+import { naturalCompare } from "../utilities/naturalCompare";
+import { useTemplate } from "../contexts/TemplateContext";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
   const { theme } = useTheme();
+  const styles = getStyles(theme);
+
+  const sortModalRef = useRef(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const { sortOption, setSortOption } = useTemplate();
+
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
 
   const loadRoutines = async () => {
     const routines = await getAllUserCreatedRoutines();
-    setRoutines(routines);
+    const sortedRoutines = [...routines].sort((x, y) =>
+      naturalCompare(x, y, sortOption),
+    );
+    setRoutines(sortedRoutines);
   };
 
   useFocusEffect(
@@ -34,6 +53,14 @@ function RoutinesScreen() {
       loadRoutines();
     }, []),
   );
+
+  useEffect(() => {
+    if (!routines) return;
+    const sortedRoutines = [...routines].sort((x, y) =>
+      naturalCompare(x, y, sortOption),
+    );
+    setRoutines(sortedRoutines);
+  }, [sortOption]);
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -107,7 +134,7 @@ function RoutinesScreen() {
   };
 
   return (
-    <Screen>
+    <View style={styles.container}>
       <View style={styles.topPanel}>
         <Header>My Routines</Header>
         <IconButton
@@ -125,8 +152,11 @@ function RoutinesScreen() {
           iconName="sort-ascending"
           IconFamily={MaterialCommunityIcons}
           foregroundColor={theme.text87}
-          title="Recent"
-          onPress={() => Alert.alert("Sort", "Sort")}
+          title={sortOption}
+          onPress={() => {
+            setIsSheetOpen(true);
+            sortModalRef.current?.expand();
+          }}
         />
         <IconButton
           iconName={
@@ -158,33 +188,43 @@ function RoutinesScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ marginHorizontal: 16 }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        ListFooterComponent={() => (
-          <View style={{ height: TAB_BAR_HEIGHT - 15 }} />
-        )}
+        ListFooterComponent={() => <View style={{ height: TAB_BAR_HEIGHT }} />}
         ListEmptyComponent={EmptyRoutinesListComponent}
       />
-    </Screen>
+      <SortModal
+        isSheetOpen={isSheetOpen}
+        setIsSheetOpen={setIsSheetOpen}
+        ref={sortModalRef}
+      />
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  topPanel: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginLeft: 15,
-    marginBottom: 34,
-    marginHorizontal: 10,
-    marginTop: 25,
-  },
-  middlePanel: {
-    height: 25,
-    marginLeft: 16,
-    marginBottom: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-});
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.background,
+      paddingTop: Constants.statusBarHeight,
+      flex: 1,
+      // height: "100%"
+    },
+    topPanel: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginLeft: 15,
+      marginBottom: 34,
+      marginHorizontal: 10,
+      marginTop: 25,
+    },
+    middlePanel: {
+      height: 25,
+      marginLeft: 16,
+      marginBottom: 12,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+  });
 
 export default RoutinesScreen;

@@ -3,14 +3,17 @@ import { View, StyleSheet, Text } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from '@expo/vector-icons'
 
-import Screen from '../components/Screen';
-import Navheader from "../components/NavHeader"
-import { IconButton } from '../components/buttons';
-import { useTheme } from '../contexts/ThemeContext';
-import routes from '../navigation/routes';
-import AuxilaryCard from "../components/AuxiliaryCard"
-import DummyInputComponent from "../components/DummyInputComponent";
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import Screen from "../components/Screen";
+import Navheader from "../components/NavHeader";
+import { IconButton } from "../components/buttons";
+import { useTheme } from "../contexts/ThemeContext";
+import routes from "../navigation/routes";
+import AuxilaryCard from "../components/AuxiliaryCard";
+import TimePickerModal from "../components/TimePickerModal";
+import NumberPickerModal from "../components/NumberPickerModal";
+
+import Receiver from "../events/Receiver";
+import eventManager from "../events/eventManager";
 import formatDuration from '../utilities/formatDuration';
 import AppTextButton from '../components/buttons/AppTextButton';
 import { Exercise } from '../classes/Exercise';
@@ -18,102 +21,176 @@ import { useRoutineContext } from '../contexts/RoutineContext';
 
 function ExerciseEditScreen({ route }) {
 
-    const navigation = useNavigation();
-    const { theme } = useTheme();
-    const styles = getStyles(theme);
-    const [restEnabled, setRestEnabled] = useState(false);
-    const [infoChanged, setInfoChanged] = useState(false);
-    const { isRoutineEditing, isExerciseEditing, referenceExercise, exercise } = route.params;
-    const { contextExercises, setContextExercises } = useRoutineContext();
+  const navigation = useNavigation();
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
+  const [restEnabled, setRestEnabled] = useState(false);
+  const [infoChanged, setInfoChanged] = useState(false);
+  const { isRoutineEditing, isExerciseEditing, referenceExercise, exercise } = route.params;
+  const { contextExercises, setContextExercises } = useRoutineContext();
 
-    // Define a state variable to track the exercise title
-    const [exerciseTitle, setExerciseTitle] = useState(exercise.title); // POC to verify if input changes propogated
+  // Define a state variable to track the exercise title
+  const [exerciseTitle, setExerciseTitle] = useState(exercise.title); // POC to verify if input changes propogated
 
 
-    const handleSaveOnPress = () => {
-        //Set reference exercise object to the exercise object
-        exercise.title = exerciseTitle;
-        Object.assign(referenceExercise, exercise);
-        if (!isExerciseEditing) { // Is a new exercise
-            // Add exercise to the exercises array so it is added
-            setContextExercises([...contextExercises, referenceExercise]);
-        }
-
-        navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+  const handleSaveOnPress = () => {
+    //Set reference exercise object to the exercise object
+    exercise.title = exerciseTitle;
+    Object.assign(referenceExercise, exercise);
+    if (!isExerciseEditing) { // Is a new exercise
+      // Add exercise to the exercises array so it is added
+      setContextExercises([...contextExercises, referenceExercise]);
     }
 
-    return (
-        <Screen style={{ flex: 1 }}>
-            <Navheader style={styles.navPanel}
-                LeftComponent={
-                    <IconButton
-                        iconName={"chevron-left"}
-                        IconFamily={Feather}
-                        iconSize={52}
-                        foregroundColor={theme.blue}
-                        onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing })}
-                    />
-                }
-                headerText={`Edit ${exerciseTitle}`}
-                RightComponent={
-                    infoChanged ?
-                        (
-                            <AppTextButton
-                                onPress={() => handleSaveOnPress()}
-                                textStyle={{ fontWeight: "500" }}
-                            >
-                                {isExerciseEditing ? "Save" : "Create"}
-                            </AppTextButton>
-                        ) :
-                        null
-                }
+    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+  }
+
+  return (
+    <Screen style={{ flex: 1 }}>
+      <Navheader style={styles.navPanel}
+        LeftComponent={
+          <IconButton
+            iconName={"chevron-left"}
+            IconFamily={Feather}
+            iconSize={52}
+            foregroundColor={theme.blue}
+            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing })}
+          />
+        }
+        headerText={`Edit ${exerciseTitle}`}
+        RightComponent={
+          infoChanged ?
+            (
+              <AppTextButton
+                onPress={() => handleSaveOnPress()}
+                textStyle={{ fontWeight: "500" }}
+              >
+                {isExerciseEditing ? "Save" : "Create"}
+              </AppTextButton>
+            ) :
+            null
+        }
+      />
+      <View style={{ gap: 10, paddingHorizontal: 11 }}>
+        <TouchableOpacity onPress={() => {
+          setInfoChanged(true);
+          exerciseTitle === "Changed Name" ? setExerciseTitle("Pushups") : setExerciseTitle("Changed Name");
+        }}>
+          <AuxilaryCard
+            editable={false}
+            bold={false}
+            title={"Name"}
+            InputComponent={() => <DummyInputComponent text={`${exerciseTitle}`} />}
+          />
+        </TouchableOpacity>
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Work time"}
+          InputComponent={() => <DummyInputComponent text={`${formatDuration(exercise.workTime)}`} />}
+        />
+        <TouchableOpacity onPress={() => restEnabled ? setRestEnabled(false) : setRestEnabled(true)}>
+          <AuxilaryCard
+            editable={false}
+            bold={false}
+            title={"Number of rounds"}
+            InputComponent={() => <DummyInputComponent text={`${exercise.numberOfRounds}`} />}
+          />
+        </TouchableOpacity>
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          disabled={restEnabled}
+          title={"Rest between rounds"}
+          InputComponent={() => <DummyInputComponent text={`${formatDuration(exercise.restBetweenRounds)}`} disabled={restEnabled} />}
+        />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Break until next exercise"}
+          InputComponent={() => <DummyInputComponent text={`${formatDuration(exercise.breakBeforeNext)}`} />}
+        />
+      </View>
+    </Screen>
+  );
+  return (
+    <Screen style={{ flex: 1 }}>
+      <Navheader
+        style={styles.navPanel}
+        LeftComponent={
+          <IconButton
+            iconName={"chevron-left"}
+            IconFamily={Feather}
+            iconSize={52}
+            foregroundColor={"#3397f3"}
+            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN)}
+          />
+        }
+        headerText="Edit Planks"
+      />
+      <View style={{ gap: 10, paddingHorizontal: 11 }}>
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Work time"}
+          InputComponent={() => (
+            <TimePickerModal
+              promptTitle="Work time"
+              promptSubtitle="Duration of the work round."
+              startingMinute=" 1"
             />
-            <View style={{ gap: 10, paddingHorizontal: 11 }}>
-                <TouchableOpacity onPress={() => {
-                    setInfoChanged(true);
-                    exerciseTitle === "Changed Name" ? setExerciseTitle("Pushups") : setExerciseTitle("Changed Name");
-                }}>
-                    <AuxilaryCard
-                        editable={false}
-                        bold={false}
-                        title={"Name"}
-                        InputComponent={() => <DummyInputComponent text={`${exerciseTitle}`} />}
-                    />
-                </TouchableOpacity>
-                <AuxilaryCard
-                    editable={false}
-                    bold={false}
-                    title={"Work time"}
-                    InputComponent={() => <DummyInputComponent text={`${formatDuration(exercise.workTime)}`} />}
-                />
-                <TouchableOpacity onPress={() => restEnabled ? setRestEnabled(false) : setRestEnabled(true)}>
-                    <AuxilaryCard
-                        editable={false}
-                        bold={false}
-                        title={"Number of rounds"}
-                        InputComponent={() => <DummyInputComponent text={`${exercise.numberOfRounds}`} />}
-                    />
-                </TouchableOpacity>
-                <AuxilaryCard
-                    editable={false}
-                    bold={false}
-                    disabled={restEnabled}
-                    title={"Rest between rounds"}
-                    InputComponent={() => <DummyInputComponent text={`${formatDuration(exercise.restBetweenRounds)}`} disabled={restEnabled} />}
-                />
-                <AuxilaryCard
-                    editable={false}
-                    bold={false}
-                    title={"Break until next exercise"}
-                    InputComponent={() => <DummyInputComponent text={`${formatDuration(exercise.breakBeforeNext)}`} />}
-                />
-            </View>
-        </Screen>
-    );
+          )}
+        />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Number of rounds"}
+          InputComponent={() => (
+            <NumberPickerModal
+              promptTitle="Number of rounds"
+              promptSubtitle="Repetitions of the current exercise."
+              onSubmit={(number) => {
+                eventManager.emit("numberOfRounds", number);
+              }}
+            />
+          )}
+        />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          disabled={restEnabled}
+          title={"Rest between rounds"}
+          InputComponent={() => (
+            <Receiver>
+              <TimePickerModal
+                promptTitle="Rest"
+                promptSubtitle="Duration of rest between subsequent rounds."
+                startingMinute=" 0"
+                startingSecond="30"
+                enabled={restEnabled}
+              />
+            </Receiver>
+          )}
+        />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Break until next exercise"}
+          InputComponent={() => (
+            <TimePickerModal
+              promptTitle="Break"
+              promptSubtitle="Duration of break before next exercise."
+              startingMinute=" 1"
+            />
+          )}
+        />
+      </View>
+    </Screen>
+  );
 }
 
 const getStyles = (theme) =>
-    StyleSheet.create({
-    })
+  StyleSheet.create({
+  })
 
 export default ExerciseEditScreen;

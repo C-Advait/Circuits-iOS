@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Button, Text } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Text } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -17,24 +17,49 @@ import {
   CIRCUMFERENCE,
   RING_STARTING_OFFSET,
   STROKE_WIDTH,
-} from "./timerContants";
+} from "./timerConstants";
+import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
+import timerActions from "../../actions/timerActions";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
-  const [secondsRemaining, setSecondsRemaining] = useState(duration);
+// const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
+const Timer = ({ state, dispatch, nextExerciseTag }) => {
   const progress = useSharedValue(1);
+  // Consider moving into state directly.
+  const { title, tag } = state.intervals[state.currentIndex] || {};
 
+  // Reload timer when flag set, then unset flag.
   useEffect(() => {
-    if (isPlaying) {
+    if (state.shouldResetTimer) {
+      progress.value = 1;
+      dispatch({ type: timerActions.MARK_TIMER_LOAD_COMPLETE });
+
+      const exerciseDuration = state.intervals[state.currentIndex]?.duration;
+
+      if (state.isPlaying) {
+        progress.value = withTiming(0, {
+          duration: exerciseDuration * 1000,
+          easing: Easing.linear,
+        });
+      }
+    }
+  }, [state.shouldResetTimer]);
+
+  // Handle play / pause.
+  useEffect(() => {
+    // Can use exerciseSecondsRemaining?
+    const exerciseDuration = state.intervals[state.currentIndex]?.duration;
+
+    if (exerciseDuration && state.isPlaying) {
       progress.value = withTiming(0, {
-        duration: duration * 1000,
+        duration: exerciseDuration * 1000,
         easing: Easing.linear,
       });
     } else {
       cancelAnimation(progress);
     }
-  }, [isPlaying]);
+  }, [state.isPlaying]);
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
@@ -48,8 +73,8 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
       <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE} fill="transparent">
         <Defs>
           <LinearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor="#9180FF" />
-            <Stop offset="100%" stopColor="#4DB4FF" />
+            <Stop offset="0%" stopColor={getMovingEndColor(tag)} />
+            <Stop offset="100%" stopColor={getFixedEndColor(tag)} />
           </LinearGradient>
         </Defs>
         <G rotation="-90" origin={`${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2}`}>
@@ -74,21 +99,19 @@ const Timer = ({ isPlaying, setIsPlaying, title, duration }) => {
         </G>
       </Svg>
       <View style={styles.overlay}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title}>{state.routineComplete ? "" : title}</Text>
         <View>
           <NumericalTimer
-            isPlaying={isPlaying}
-            secondsRemaining={secondsRemaining}
-            setSecondsRemaining={setSecondsRemaining}
+            state={state}
+            dispatch={dispatch}
+            nextExerciseTag={nextExerciseTag}
           />
         </View>
-        <ResetButton
-          onPress={() => {
-            setSecondsRemaining(duration);
-            setIsPlaying(false);
-            progress.value = 1;
-          }}
-        />
+        {state.routineComplete ? null : (
+          <ResetButton
+            onPress={() => dispatch({ type: timerActions.RESET_TIMER })}
+          />
+        )}
       </View>
     </View>
   );

@@ -3,6 +3,7 @@ import { Routine } from "../classes/Routine";
 
 export const TAB_BAR_HEIGHT = 90;
 
+// Font
 export const PARAGRAPH_FONT_SIZE = 17;
 export const ROUTINE_TITLE_FONT_SIZE = 18;
 export const ROUTINE_PARAGRAPH_FONT_SIZE = 15;
@@ -51,3 +52,8 @@ export const DEFAULT_COOLDOWN = new Exercise({ // missing routineID && ID && exe
   breakBeforeNext: 0,
   category: "Uncategorized",
 });
+
+// Sound
+export const COUNTDOWN_BEEP_SOUND = require("../assets/sounds/short_beep.mp3");
+export const BEGIN_EXERCISE_SOUND = require("../assets/sounds/begin_exercise_beep.mp3");
+export const REST_SOUND = require("../assets/sounds/triangle_rest.mp3");

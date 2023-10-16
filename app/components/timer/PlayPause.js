@@ -2,15 +2,16 @@ import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
+import timerActions from "../../actions/timerActions";
 
 const BUTTON_SIZE = 50;
 
-function PlayPause({ isPlaying, setIsPlaying }) {
+function PlayPause({ isPlaying, dispatch }) {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => {
-        setIsPlaying((prev) => !prev);
+        dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
       }}
       style={styles.background}
     >

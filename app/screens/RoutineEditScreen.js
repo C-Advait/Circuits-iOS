@@ -24,6 +24,7 @@ import getExerciseLength from "../utilities/getExerciseLength";
 import formatDurationExact from "../utilities/formatDurationExact";
 import { createExercise, createRoutine, updateExercise, updateRoutine } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
+import TimePickerModal from "../components/TimePickerModal";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -108,7 +109,12 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text={formatDuration(item.workTime)} />}
+            InputComponent={() => (
+              <TimePickerModal
+                promptTitle="Warmup"
+                promptSubtitle="Duration of the warmup phase."
+              />
+            )}
           />
         );
       case Tag.POSTROUTINE:
@@ -118,7 +124,12 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => <DummyInputComponent text={formatDuration(item.workTime)} />}
+            InputComponent={() => (
+              <TimePickerModal
+                promptTitle="Cooldown"
+                promptSubtitle="Duration of the cooldown phase."
+              />
+            )}
           />
         );
       case Tag.WORKING: {

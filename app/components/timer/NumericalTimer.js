@@ -1,44 +1,78 @@
 import React, { useEffect } from "react";
 import { Dimensions, View, Text, StyleSheet } from "react-native";
+import timerActions from "../../actions/timerActions";
+import { TIMER_UPDATE_INTERVAL } from "./timerConstants";
 
-const NumericalTimer = ({
-  isPlaying,
-  secondsRemaining,
-  setSecondsRemaining,
-}) => {
+import playSound from "../../utilities/playSound";
+import {
+  COUNTDOWN_BEEP_SOUND,
+  BEGIN_EXERCISE_SOUND,
+  REST_SOUND,
+} from "../../config/appConstants";
+import { Tag } from "../../classes/Exercise";
+
+const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
+  const sound = getSoundToPlay(nextExerciseTag);
+
   useEffect(() => {
     let interval;
-    if (isPlaying) {
+
+    if (state.isPlaying) {
       interval = setInterval(() => {
-        setSecondsRemaining((prevSeconds) => {
-          if (prevSeconds <= 1) {
-            clearInterval(interval);
-            return 0;
+        if (state.exerciseSecondsRemaining < TIMER_UPDATE_INTERVAL / 1000) {
+          dispatch({ type: timerActions.SKIP_FORWARD });
+          playSound(sound);
+          clearInterval(interval);
+        } else {
+          if (
+            1 < state.exerciseSecondsRemaining &&
+            state.exerciseSecondsRemaining <= 4 &&
+            Number.isInteger(state.exerciseSecondsRemaining)
+          ) {
+            playSound(COUNTDOWN_BEEP_SOUND);
           }
-          return prevSeconds - 1;
-        });
-      }, 1000);
-    } else if (!isPlaying && secondsRemaining !== 0) {
+          dispatch({ type: timerActions.ELAPSE });
+        }
+      }, TIMER_UPDATE_INTERVAL);
+    } else if (state.exerciseSecondsRemaining !== 0) {
       clearInterval(interval);
     }
 
     return () => clearInterval(interval); // cleanup on component unmount
-  }, [isPlaying, secondsRemaining]);
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes < 10 ? "0" : ""}${minutes}:${
-      seconds < 10 ? "0" : ""
-    }${seconds}`;
-  };
+  }, [state.isPlaying, state.exerciseSecondsRemaining]);
 
   return (
     <View style={styles.container}>
       <Text style={[styles.timerText, styles.placeholder]}>88:88</Text>
-      <Text style={styles.timerText}>{formatTime(secondsRemaining)}</Text>
+      <Text style={styles.timerText}>
+        {state.routineComplete
+          ? ""
+          : formatTime(state.exerciseSecondsRemaining)}
+      </Text>
     </View>
   );
+};
+
+// Choose appropriate sound based on upcoming tag.
+// Can always switch to DB after this.
+const getSoundToPlay = (tag) => {
+  switch (tag) {
+    case Tag.REST:
+    case Tag.BREAK:
+      return REST_SOUND;
+    case Tag.WORKING:
+    case Tag.PREROUTINE:
+    case Tag.POSTROUTINE:
+    case Tag.FINISH:
+      return BEGIN_EXERCISE_SOUND;
+  }
+};
+
+const formatTime = (time) => {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.ceil(time % 60);
+  return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""
+    }${seconds}`;
 };
 
 const { width } = Dimensions.get("window");
