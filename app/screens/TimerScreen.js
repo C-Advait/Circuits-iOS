@@ -185,11 +185,11 @@ function reducer(state, action) {
 
       return state;
     case timerActions.ELAPSE:
+      console.log("Inside elapse: ", Date.now());
       return {
         ...state,
-        exerciseSecondsRemaining:
-          state.exerciseSecondsRemaining - TIMER_UPDATE_INTERVAL / 1000,
-        totalElapsedTime: state.totalElapsedTime + TIMER_UPDATE_INTERVAL / 1000,
+        exerciseSecondsRemaining: state.exerciseSecondsRemaining - 1,
+        totalElapsedTime: state.totalElapsedTime + 1,
       };
     case timerActions.TOGGLE_IS_PLAYING:
       return {
@@ -197,6 +197,7 @@ function reducer(state, action) {
         isPlaying: !state.isPlaying,
       };
     case timerActions.RESET_TIMER:
+      console.log("Reseting timer");
       return {
         ...state,
         shouldResetTimer: true,
@@ -223,7 +224,6 @@ const initTimerSequence = async (id, dispatch) => {
     initialDuration: exercises[0]?.workTime,
     loopDuration: calculateLoopDuration(exercises),
   });
-  // console.log(JSON.stringify(processExerciseList(exercises), null, 2));
 };
 
 const calculateLoopDuration = (exerciseList) => {
