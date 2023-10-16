@@ -14,16 +14,13 @@ import Collapsible from "react-native-collapsible";
 import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 import { useRoutineContext } from "../contexts/RoutineContext";
 
-function RoutineCard({ item: routine, isExpanded, toggleExpand, deleteCallback }) {
-  // Duration in seconds
-  // const { color: accentcolor, duration, title } = routine;
-
+function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const [description, setDescription] = useState();
   const { setContextExercises, setContextRoutine } = useRoutineContext(); // Manage Context Variables
-
+  // console.log(routine);
   const createDescription = async () => {
     const exercises = await getExercisesForRoutine(routine.id);
 
@@ -49,11 +46,10 @@ function RoutineCard({ item: routine, isExpanded, toggleExpand, deleteCallback }
 
   const handleEditRoutineOnpress = async () => {
     try {
-      const exercises = await getExercisesForRoutine(item.id); // Duplicated backend call here
-      const routine = item;
+      const exercises = await getExercisesForRoutine(routine.id); // Duplicated backend call here
+
       setContextRoutine(routine);
       setContextExercises(exercises);
-
       navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: true });
 
     } catch (error) {

@@ -23,7 +23,7 @@ function ExerciseCard({
   accentColor = accentColor ? accentColor : theme.tileBackground;
 
   const handlePress = () => {
-    console.log('pressed');
+    console.log('Delete Pressed');
   };
 
   const handleExerciseEditNavigation = () => {

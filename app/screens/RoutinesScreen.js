@@ -26,7 +26,7 @@ import { useRoutineContext } from "../contexts/RoutineContext";
 import SortModal from "../components/SortModal";
 import { SortCriteria } from "../classes/SortCriteria";
 import { naturalCompare } from "../utilities/naturalCompare";
-import { useTemplate } from "../contexts/TemplateContext";
+import { useTemplateContext } from "../contexts/TemplateContext";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -35,7 +35,7 @@ function RoutinesScreen() {
 
   const sortModalRef = useRef(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { sortOption, setSortOption } = useTemplate();
+  const { sortOption, setSortOption } = useTemplateContext();
 
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
@@ -171,9 +171,9 @@ function RoutinesScreen() {
       </View>
       <FlatList
         data={routines}
-        renderItem={({ item, index }) => (
+        renderItem={({ item: routine, index }) => (
           <RoutineCard
-            item={item}
+            routine={routine}
             isExpanded={expandedStates[index]}
             toggleExpand={() => toggleExpand(index)}
             deleteCallback={() => {
