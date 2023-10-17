@@ -6,14 +6,14 @@ const items = [...Array(99).keys()].map((i) =>
   i < 10 ? ` ${i + 1}` : (i + 1).toString(),
 );
 
-function NumberWheelPicker({ number, setNumber, theme }) {
+function NumberWheelPicker({ number, onValueChange, theme }) {
   return (
     <View style={styles.pickerContainer}>
       <Picker
         selectedValue={number}
         style={styles.picker}
         selectionColor={theme.tertiaryTranslucentBackground}
-        onValueChange={(itemValue) => setNumber(itemValue)}
+        onValueChange={onValueChange}
         color={theme.primary}
         itemStyle={{
           color: theme.primary,

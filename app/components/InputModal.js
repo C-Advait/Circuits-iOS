@@ -14,40 +14,38 @@ const InputModal = forwardRef((props, ref) => {
   const styles = getStyles(theme);
 
   return (
-    <Portal>
-      <BottomSheet
-        ref={ref}
-        index={-1}
-        snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
-        enablePanDownToClose={true}
-        backdropComponent={BottomSheetBackdrop}
-        backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
-        handleStyle={{
-          backgroundColor: theme.secondaryBackground,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-        }}
-        handleIndicatorStyle={{
-          backgroundColor: "rgba(255, 255, 255, 0.25)",
-          width: 90,
-        }}
-        onChange={(isOpen) => onChange(isOpen)}
-      >
-        <View style={styles.header}>
-          <Text style={styles.title}>{promptTitle}</Text>
-          <Text style={styles.subtitle}>{promptSubtitle}</Text>
+    <BottomSheet
+      ref={ref}
+      index={-1}
+      snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
+      enablePanDownToClose={true}
+      backdropComponent={BottomSheetBackdrop}
+      backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
+      handleStyle={{
+        backgroundColor: theme.secondaryBackground,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      }}
+      handleIndicatorStyle={{
+        backgroundColor: "rgba(255, 255, 255, 0.25)",
+        width: 90,
+      }}
+      onChange={(isOpen) => onChange(isOpen)}
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>{promptTitle}</Text>
+        <Text style={styles.subtitle}>{promptSubtitle}</Text>
+      </View>
+      {children}
+      <View style={styles.footer}>
+        <View style={styles.buttonContainer}>
+          <Button title="Cancel" onPress={onCancel} color={theme.primary} />
         </View>
-        {children}
-        <View style={styles.footer}>
-          <View style={styles.buttonContainer}>
-            <Button title="Cancel" onPress={onCancel} color={theme.primary} />
-          </View>
-          <View style={styles.buttonContainer}>
-            <Button title="Apply" onPress={onApply} color={theme.blue} />
-          </View>
+        <View style={styles.buttonContainer}>
+          <Button title="Apply" onPress={onApply} color={theme.blue} />
         </View>
-      </BottomSheet>
-    </Portal>
+      </View>
+    </BottomSheet>
   );
 });
 
