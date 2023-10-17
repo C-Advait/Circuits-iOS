@@ -18,13 +18,13 @@ import NavHeader from "../components/NavHeader";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
 import { useRoutineContext } from "../contexts/RoutineContext";
-import formatDuration from "../utilities/formatDuration";
 import { BlurView } from "expo-blur";
 import getExerciseLength from "../utilities/getExerciseLength";
 import formatDurationExact from "../utilities/formatDurationExact";
 import { createExercise, createRoutine, updateExercise, updateRoutine } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
 import TimePickerModal from "../components/TimePickerModal";
+import { FlatList } from "react-native-gesture-handler";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -68,14 +68,33 @@ const formatDataForSectionList = (data) => {
     CooldownTime
   ];
 };
-const getNumExercises = (exerciseData) => {
-  for (let i = 0; i < exerciseData.length; i++) {
-    if (exerciseData[i]["title"] === "Exercises") {
-      return exerciseData[i]["data"].length - 1;
+const sortExercises = (exercises) => {
+  return exercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder);
+}
+const getExerciseInfo = (exercises) => {
+
+  let warmupTime = 0, workingTime = 0, cooldownTime = 0, numExercises = 1, greatestExerciseOrder = 0;
+
+  exercises.forEach(exercise => {
+    if (exercise.exerciseOrder > greatestExerciseOrder) greatestExerciseOrder = exercise.exerciseOrder;
+    switch (exercise.tag) {
+      case Tag.PREROUTINE:
+        warmupTime += getExerciseLength(exercise);
+        break;
+      case Tag.WORKING:
+        workingTime += getExerciseLength(exercise);
+        numExercises += 1;
+        break;
+      case Tag.POSTROUTINE:
+        cooldownTime += getExerciseLength(exercise);
+        break;
+      default:
+        null;
     }
-  }
-  return 0;
-};
+  });
+
+  return [warmupTime, workingTime, cooldownTime, numExercises, greatestExerciseOrder];
+}
 
 function RoutineEditScreen({ route }) {
 
@@ -86,12 +105,14 @@ function RoutineEditScreen({ route }) {
   const { contextExercises: exercises, contextRoutine: routine, setContextRoutine, setContextExercises } = useRoutineContext();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  // const [maxExerciseOrder, setMaxExerciseOrder] = useState(0);
-  // const [maxExerciseID, setMaxExerciseID] = useState(0);
 
-  const [formattedExercises, warmupTime, exerciseTime, cooldownTime] = formatDataForSectionList(exercises);
-  const totalRoutineTime = warmupTime + exerciseTime + cooldownTime;
-  const numExercises = useMemo(() => getNumExercises(formattedExercises), [formattedExercises]);
+  const ordered_exer_arr = sortExercises(exercises);
+  const [warmupTime, workingTime, cooldownTime, numExercises, maxExerciseOrder] = getExerciseInfo(exercises);
+  // console.log(ordered_exer_arr);
+  // console.log(warmupTime, workingTime, cooldownTime);
+
+  const totalRoutineTime = warmupTime + workingTime + cooldownTime;
+  // const numExercises = useMemo(() => getNumExercises(formattedExercises), [formattedExercises]);
 
   useEffect(() => {
     console.log(
@@ -280,14 +301,6 @@ function RoutineEditScreen({ route }) {
     }
   }
 
-  //  Clear up context variables (??)
-  // const handleContextCleanup = async () => {
-  //   setContextRoutine(null);
-  //   setContextExercises([]);
-  //   setSelectedTemplate("Custom");
-  //   setSelectedTemplateID(1);
-  // }
-
   const handleSavePress = async () => {
 
     if (isRoutineEditing) {
@@ -330,47 +343,60 @@ function RoutineEditScreen({ route }) {
               </AppTextButton>
             }
           />
-          <SectionList // SectionList
+          <View style={styles.headingPanel}>
+            <LinearGradient
+              colors={["#ffffff", "#3397f3"]} //to be adjusted
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 0.25 }}
+              style={styles.emojiBox}
+            />
+            <TextInput
+              style={styles.title}
+              onChangeText={updateRoutineTitle}
+              multiline={false}
+              keyboardType="default"
+              onpre
+              placeholder={routine ? routine.title : "Loading"}
+              placeholderTextColor={styles.title.color}
+              spellCheck={false}
+              enterKeyHint="done"
+              onSubmitEditing={(item) => {
+                updateRoutineTitle(item.nativeEvent.text);
+              }}
+            />
+          </View>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, { edit: isRoutineEditing })
+            }}
+            style={styles.templatePanel}
+          >
+            <AuxiliaryCard
+              title={"Template"}
+              editable={false}
+              InputComponent={() => (
+                <DummyInputComponent text={selectedTemplate} />
+              )}
+            />
+          </TouchableOpacity>
+          <AuxiliaryCard
+            title={"Warmup"}
+            editable={false}
+            InputComponent={() => (
+              <DummyInputComponent text={selectedTemplate} />
+            )}
+            accentcolor={theme.accentGreen}
+          />
+          <FlatList
+            data={ordered_exer_arr}
+            renderItem={({ item, index }) => renderExerciseItem(item, index)}
+          />
+          {/* <SectionList // SectionList
             contentContainerStyle={styles.container}
             ListHeaderComponent={ // Title and Header (added here so it does not "stick", i.e. scrolls along with List)
               <>
-                <View style={styles.headingPanel}>
-                  <LinearGradient
-                    colors={["#ffffff", "#3397f3"]} //to be adjusted
-                    start={{ x: 0.5, y: 0 }}
-                    end={{ x: 0.5, y: 0.25 }}
-                    style={styles.emojiBox}
-                  />
-                  <TextInput
-                    style={styles.title}
-                    onChangeText={updateRoutineTitle}
-                    multiline={false}
-                    keyboardType="default"
-                    onpre
-                    placeholder={routine ? routine.title : "Loading"}
-                    placeholderTextColor={styles.title.color}
-                    spellCheck={false}
-                    enterKeyHint="done"
-                    onSubmitEditing={(item) => {
-                      updateRoutineTitle(item.nativeEvent.text);
-                    }}
-                  />
-                </View>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => {
-                    navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, { edit: isRoutineEditing })
-                  }}
-                  style={styles.templatePanel}
-                >
-                  <AuxiliaryCard
-                    title={"Template"}
-                    editable={false}
-                    InputComponent={() => (
-                      <DummyInputComponent text={selectedTemplate} />
-                    )}
-                  />
-                </TouchableOpacity>
+
               </>
             }
             sections={formattedExercises}
@@ -389,7 +415,7 @@ function RoutineEditScreen({ route }) {
                 }}
               />
             )}
-          />
+          /> */}
         </Screen>
         <BlurView style={styles.timeTabContainer}
           tint="dark"
@@ -404,7 +430,7 @@ function RoutineEditScreen({ route }) {
             }}> {`Total time: ${formatDurationExact(totalRoutineTime)}`} </Text>
             <View style={styles.timeColorBar}>
               <View style={[styles.timeWarmup, { flex: warmupTime }]} />
-              <View style={[styles.timeWorkout, { flex: exerciseTime }]} />
+              <View style={[styles.timeWorkout, { flex: workingTime }]} />
               <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
             </View>
           </View>

@@ -116,14 +116,14 @@ const getNames = async () => {
 const createDummyExercises = async () => {
   const e1 = new Exercise({
     routineID: 1,
-    title: "Pushups",
+    title: "Warmup",
     exerciseOrder: 1,
-    tag: Tag.WORKING,
+    tag: Tag.PREROUTINE,
     workTime: 60,
     numberOfRounds: 3,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Arms",
+    category: "Warmup",
   });
 
   const e2 = new Exercise({
@@ -150,7 +150,79 @@ const createDummyExercises = async () => {
     category: "Uncategorized",
   });
 
-  const e99 = new Exercise({
+  const e4 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 4,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e5 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 5,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e6 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 6,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e7 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 7,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e8 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 8,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e9 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 9,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e10 = new Exercise({
     routineID: 1,
     title: "Hammer Curls",
     exerciseOrder: 10,
@@ -162,10 +234,10 @@ const createDummyExercises = async () => {
     category: "Uncategorized",
   });
 
-  const e98 = new Exercise({
+  const e11 = new Exercise({
     routineID: 1,
     title: "Hammer Curls",
-    exerciseOrder: 31,
+    exerciseOrder: 11,
     tag: Tag.WORKING,
     workTime: 30,
     numberOfRounds: 4,
@@ -174,82 +246,10 @@ const createDummyExercises = async () => {
     category: "Uncategorized",
   });
 
-  const e96 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 32,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e97 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 33,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e90 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 34,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e95 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 35,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e94 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 36,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e93 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 37,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e4 = new Exercise({
+  const e12 = new Exercise({
     routineID: 1,
     title: "Biceps curls",
-    exerciseOrder: 48,
+    exerciseOrder: 12,
     tag: Tag.WORKING,
     workTime: 30,
     numberOfRounds: 4,
@@ -258,79 +258,19 @@ const createDummyExercises = async () => {
     category: "Uncategorized",
   });
 
-  const e5 = new Exercise({
-    routineID: 2,
-    title: "Demo",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e6 = new Exercise({
-    routineID: 3,
-    title: "Another Demo",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e7 = new Exercise({
-    routineID: 4,
-    title: "Still another demo",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e8 = new Exercise({
-    routineID: 5,
-    title: "Push ups",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e9 = new Exercise({
-    routineID: 1,
-    title: "Warmup",
-    exerciseOrder: 1,
-    tag: Tag.PREROUTINE,
-    workTime: 600,
-    numberOfRounds: 1,
-    restBetweenRounds: 0,
-    breakBeforeNext: 0,
-    category: "Uncategorized",
-  });
-
-  const e10 = new Exercise({
+  const e13 = new Exercise({
     routineID: 1,
     title: "Cooldown",
-    exerciseOrder: 1,
+    exerciseOrder: 13,
     tag: Tag.POSTROUTINE,
-    workTime: 600,
-    numberOfRounds: 1,
-    restBetweenRounds: 0,
-    breakBeforeNext: 0,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
     category: "Uncategorized",
   });
 
-  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e99, e98, e97, e96, e95, e94, e93, e90];
+  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13];
 
   Promise.all(exercises.map((e) => createExercise(e)));
 };
