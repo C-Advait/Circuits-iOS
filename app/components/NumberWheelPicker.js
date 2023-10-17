@@ -1,12 +1,15 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { useTheme } from "../contexts/ThemeContext";
 
 const items = [...Array(99).keys()].map((i) =>
   i < 10 ? ` ${i + 1}` : (i + 1).toString(),
 );
 
-function NumberWheelPicker({ number, onValueChange, theme }) {
+function NumberWheelPicker({ number, onValueChange }) {
+  const { theme } = useTheme();
+
   return (
     <View style={styles.pickerContainer}>
       <Picker

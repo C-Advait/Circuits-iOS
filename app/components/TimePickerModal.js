@@ -78,18 +78,18 @@ function TimePickerModal({
         promptTitle={promptTitle}
         promptSubitle={promptSubtitle}
         ref={modalRef}
-      >
-        <TimeWheelPicker
-          theme={theme}
-          selectedMinute={selectedMinute}
-          setSelectedMinute={setSelectedMinute}
-          selectedSecond={selectedSecond}
-          setSelectedSecond={setSelectedSecond}
-        />
-      </InputModal>
+      ></InputModal>
     </>
   );
 }
+
+// <TimeWheelPicker
+//   theme={theme}
+//   selectedMinute={selectedMinute}
+//   setSelectedMinute={setSelectedMinute}
+//   selectedSecond={selectedSecond}
+//   setSelectedSecond={setSelectedSecond}
+// />
 
 const getStyles = (theme) =>
   StyleSheet.create({

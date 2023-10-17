@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import { useTheme } from "../contexts/ThemeContext";
 
 const UNIT_OFFSET = 48;
 const GAP_REDUCTION = 50;
@@ -12,18 +13,16 @@ const ADJUSTMENT = 2;
 // is only ever consumed by components wrapped
 // in <Portal>. <Portal> is known to not work
 // with context.
-const TimeWheelPicker = ({
-  theme,
-  selectedMinute,
-  setSelectedMinute,
-  selectedSecond,
-  setSelectedSecond,
-}) => {
+const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
+  const { theme } = useTheme();
   const styles = getStyles(theme);
 
-  const items = [...Array(60).keys()].map((i) =>
-    i < 10 ? ` ${i}` : i.toString(),
+  const items = [...Array(60).keys()];
+
+  const [selectedMinute, setSelectedMinute] = useState(
+    Math.floor(startingTime / 60),
   );
+  const [selectedSecond, setSelectedSecond] = useState(startingTime % 60);
 
   const [filteredSeconds, setFilteredSeconds] = useState(items.slice(5));
 
@@ -38,15 +37,19 @@ const TimeWheelPicker = ({
           style={styles.minutesPicker}
           selectionColor={theme.tertiaryTranslucentBackground}
           onValueChange={(itemValue) => {
+            console.log("itemValue: ", itemValue);
             setSelectedMinute(itemValue);
-            if (itemValue === " 0") {
-              setFilteredSeconds(items.slice(5)); // starts from '05'
+            if (itemValue === 0) {
+              setFilteredSeconds(items.slice(5)); // starts from ' 5'
               if (parseInt(selectedSecond) < 5) {
-                setSelectedSecond(" 5");
+                setSelectedSecond(5);
               }
             } else {
               setFilteredSeconds(items); // reset to the full range
             }
+            console.log(`selectedMinute: ${selectedMinute}`);
+            console.log(`selectedSecond: ${selectedSecond}`);
+            onValueChange(itemValue * 60 + selectedSecond);
           }}
           color={theme.primary}
           itemStyle={{
@@ -55,7 +58,11 @@ const TimeWheelPicker = ({
           }}
         >
           {items.map((item) => (
-            <Picker.Item key={item} label={item} value={item} />
+            <Picker.Item
+              key={item}
+              label={item.toString().padStart(2, " ")}
+              value={item}
+            />
           ))}
         </Picker>
         <View style={styles.unitContainer} pointerEvents="none">
@@ -66,11 +73,18 @@ const TimeWheelPicker = ({
           selectedValue={selectedSecond}
           style={styles.secondsPicker}
           selectionColor={theme.tertiaryTranslucentBackground}
-          onValueChange={(itemValue) => setSelectedSecond(itemValue)}
+          onValueChange={(itemValue) => {
+            setSelectedSecond(itemValue);
+            onValueChange(selectedMinute * 60 + itemValue);
+          }}
           itemStyle={{ color: theme.primary }}
         >
           {filteredSeconds.map((item) => (
-            <Picker.Item key={item} label={item} value={item} />
+            <Picker.Item
+              key={item}
+              label={item.toString().padStart(2, " ")}
+              value={item}
+            />
           ))}
         </Picker>
         <View

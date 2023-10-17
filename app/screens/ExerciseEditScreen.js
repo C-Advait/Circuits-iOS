@@ -26,6 +26,8 @@ import eventManager from "../events/eventManager";
 import exerciseEditActions from "../actions/exerciseEditActions";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import NumberWheelPicker from "../components/NumberWheelPicker";
+import TimeWheelPicker from "../components/TimeWheelPicker";
+import { formatMinutesSeconds } from "../utilities/formatDuration";
 
 const MODAL_HEIGHT = 350;
 
@@ -48,10 +50,15 @@ function ExerciseEditScreen({ route }) {
       title: "Number of rounds",
       subtitle: "Repetitions of the current exercise.",
     },
+    WORK_TIME: {
+      key: "workTime",
+      title: "Work time",
+      subtitle: "Duration of the work round.",
+    },
   };
 
   useEffect(() => {
-    dispatch({ type: exerciseEditActions.INIT, params: originalExercise });
+    dispatch({ type: exerciseEditActions.INIT, payload: originalExercise });
   }, []);
 
   const modalRef = useRef(null);
@@ -65,7 +72,7 @@ function ExerciseEditScreen({ route }) {
     if (isOpen === 1) {
       dispatch({
         type: exerciseEditActions.SET_PREVIOUS,
-        data: state[state.activeKey],
+        payload: state[state.activeKey],
       });
     } else if (state.apply) {
       dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
@@ -107,6 +114,27 @@ function ExerciseEditScreen({ route }) {
         <AuxilaryCard
           editable={false}
           bold={false}
+          title={"Work time"}
+          InputComponent={() => (
+            <Text
+              style={{ color: "white" }}
+              onPress={() => {
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: MODAL_CONTENT_ENUM.WORK_TIME.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                setContentType(MODAL_CONTENT_ENUM.WORK_TIME);
+                modalRef.current?.expand();
+              }}
+            >
+              {formatMinutesSeconds(state.workTime)}
+            </Text>
+          )}
+        />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
           title={"Number of rounds"}
           InputComponent={() => (
             <Text
@@ -114,7 +142,7 @@ function ExerciseEditScreen({ route }) {
               onPress={() => {
                 dispatch({
                   type: exerciseEditActions.SET_ACTIVE_KEY,
-                  key: MODAL_CONTENT_ENUM.ROUNDS.key,
+                  payload: MODAL_CONTENT_ENUM.ROUNDS.key,
                 });
                 dispatch({ type: exerciseEditActions.SET_PREVIOUS });
                 setContentType(MODAL_CONTENT_ENUM.ROUNDS);
@@ -151,13 +179,24 @@ function ExerciseEditScreen({ route }) {
         {contentType.key === MODAL_CONTENT_ENUM.ROUNDS.key && (
           <NumberWheelPicker
             number={state.numberOfRounds}
-            onValueChange={(n) =>
+            onValueChange={(data) =>
               dispatch({
-                type: exerciseEditActions.SET_NUMBER_ROUNDS,
-                numberOfRounds: n,
+                type: exerciseEditActions.SET_ROUNDS,
+                payload: data,
               })
             }
-            theme={theme}
+          />
+        )}
+        {contentType.key === MODAL_CONTENT_ENUM.WORK_TIME.key && (
+          <TimeWheelPicker
+            key={state.workTime}
+            startingTime={state.workTime}
+            onValueChange={(data) =>
+              dispatch({
+                type: exerciseEditActions.SET_WORK_TIME,
+                payload: data,
+              })
+            }
           />
         )}
         <View style={styles.footer}>
@@ -202,136 +241,50 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case exerciseEditActions.INIT:
-      return { ...state, ...action.params };
+      return { ...state, ...action.payload };
+
     case exerciseEditActions.SET_ACTIVE_KEY:
-      return { ...state, activeKey: action.key };
-    case exerciseEditActions.SET_NUMBER_ROUNDS:
-      return { ...state, numberOfRounds: action.numberOfRounds };
+      return { ...state, activeKey: action.payload };
+
+    case exerciseEditActions.SET_WORK_TIME:
+      return { ...state, workTime: action.payload };
+
+    case exerciseEditActions.SET_BREAK:
+      return { ...state, breakBeforeNext: action.payload };
+
+    case exerciseEditActions.SET_ROUNDS:
+      return { ...state, numberOfRounds: action.payload };
+
+    case exerciseEditActions.TITLE:
+      return { ...state, title: action.payload };
+
     case exerciseEditActions.SET_PREVIOUS:
-      return { ...state, previous: action.data };
+      console.log(
+        "setting previous",
+        "activeKey",
+        state.activeKey,
+        "payload: ",
+        action.payload,
+      );
+      return { ...state, previous: action.payload };
+
     case exerciseEditActions.REVERT_PREVIOUS:
+      console.log(
+        "reverting",
+        "activeKey",
+        state.activeKey,
+        "payload: ",
+        action.payload,
+      );
       return { ...state, [state.activeKey]: state.previous };
+
     case exerciseEditActions.FLAG_DIRTY:
       return { ...state, dirty: true };
+
     case exerciseEditActions.TOGGLE_APPLY_FLAG:
       return { ...state, apply: !state.apply };
   }
 };
-// <View style={styles.tile}>
-//   <Text style={{ color: "white" }}>Rounds</Text>
-//   <Text
-//     style={{ color: "white" }}
-//     onPress={() => {
-//       dispatch({
-//         type: exerciseEditActions.SET_ACTIVE_KEY,
-//         key: MODAL_CONTENT_ENUM.ROUNDS.key
-//       })
-//       dispatch({ type: exerciseEditActions.SET_PREVIOUS })
-//       setContentType(MODAL_CONTENT_ENUM.ROUNDS);
-//       modalRef.current?.expand();
-//     }}>{state.numberOfRounds}</Text>
-// </View>
-
-// onChange={(isOpen) => onChange(isOpen)}
-
-// <AuxilaryCard
-//   editable={false}
-//   bold={false}
-//   title={"Name"}
-//   InputComponent={() => (
-//     <EditableText
-//       exercise={exercise}
-//       onSubmit={(text) => {
-//         updateTitle(text);
-//         setInfoChanged(true);
-//       }}
-//     />
-//   )}
-// />
-// <AuxilaryCard
-//   editable={false}
-//   bold={false}
-//   title={"Work time"}
-//   InputComponent={() => {
-//     const [startingMinute, startingSecond] = extractStartingPickerTime(
-//       originalExercise,
-//       "workTime",
-//     );
-
-//     return (
-//       <TimePickerModal
-//         promptTitle="Work time"
-//         promptSubtitle="Duration of the work round."
-//         startingMinute={startingMinute}
-//         startingSecond={startingSecond}
-//         onSubmit={(minutes, seconds) => {
-//           handleWorkTimeUpdate(minutes, seconds);
-//         }}
-//       />
-//     );
-//   }}
-// />
-// <AuxilaryCard
-//   editable={false}
-//   bold={false}
-//   title={"Number of rounds"}
-//   InputComponent={() => (
-//     <NumberPickerModal
-//       promptTitle="Number of rounds"
-//       promptSubtitle="Repetitions of the current exercise."
-//       startingNumber={extractStartingRounds(originalExercise)}
-//       state={state}
-//       dispatch={dispatch}
-//     />
-//   )}
-// />
-// <AuxilaryCard
-//   editable={false}
-//   bold={false}
-//   title={"Rest between rounds"}
-//   InputComponent={() => {
-//     const [startingMinute, startingSecond] = extractStartingPickerTime(
-//       originalExercise,
-//       "restBetweenRounds",
-//       " 0",
-//       "30",
-//     );
-
-//     return (
-//       <Receiver>
-//         <TimePickerModal
-//           promptTitle="Rest"
-//           promptSubtitle="Duration of rest between subsequent rounds."
-//           startingMinute={startingMinute}
-//           startingSecond={startingSecond}
-//           enabled={parseInt(extractStartingRounds(originalExercise)) > 1}
-//         />
-//       </Receiver>
-//     );
-//   }}
-// />
-// <AuxilaryCard
-//   editable={false}
-//   bold={false}
-//   title={"Break until next exercise"}
-//   InputComponent={() => {
-//     const [startingMinute, startingSecond] = extractStartingPickerTime(
-//       originalExercise,
-//       "breakBeforeNext",
-//       " 0",
-//       "30",
-//     );
-
-//     return (
-//       <TimePickerModal
-//         promptTitle="Break"
-//         promptSubtitle="Duration of break before next exercise."
-//         startingMinute={startingMinute}
-//         startingSecond={startingSecond}
-//       />
-//     );
-//   }}
-// />
 
 const getStyles = (theme) =>
   StyleSheet.create({
