@@ -17,6 +17,8 @@ function SkipButton({ shouldSkipForward, dispatch, active = true }) {
       foregroundColor={active ? theme.primary : theme.tertiary}
       IconFamily={Ionicons}
       onPress={() => {
+        if (!active) return;
+
         if (shouldSkipForward) {
           dispatch({ type: timerActions.SKIP_FORWARD });
         } else {
