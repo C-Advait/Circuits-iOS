@@ -55,6 +55,16 @@ function ExerciseEditScreen({ route }) {
       title: "Work time",
       subtitle: "Duration of the work round.",
     },
+    REST_TIME: {
+      key: "restBetweenRounds",
+      title: "Rest",
+      subtitle: "Rest duration between consecutive rounds.",
+    },
+    BREAK_TIME: {
+      key: "breakBeforenext",
+      title: "Break",
+      subtitle: "Break duration beforel next exercise.",
+    },
   };
 
   useEffect(() => {
@@ -88,7 +98,7 @@ function ExerciseEditScreen({ route }) {
         LeftComponent={
           <IconButton
             iconName={"chevron-left"}
-            IconFamily={Feather}
+            IconFamikly={Feather}
             iconSize={52}
             foregroundColor={theme.blue}
             onPress={() =>
@@ -153,6 +163,55 @@ function ExerciseEditScreen({ route }) {
             </Text>
           )}
         />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Rest between rounds"}
+          InputComponent={() => (
+            <Text
+              style={{
+                color:
+                  state.numberOfRounds > 1 ? theme.primary : theme.textDisabled,
+              }}
+              onPress={
+                state.numberOfRounds > 1
+                  ? () => {
+                      dispatch({
+                        type: exerciseEditActions.SET_ACTIVE_KEY,
+                        payload: MODAL_CONTENT_ENUM.REST_TIME.key,
+                      });
+                      dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                      setContentType(MODAL_CONTENT_ENUM.REST_TIME);
+                      modalRef.current?.expand();
+                    }
+                  : () => null
+              }
+            >
+              {formatMinutesSeconds(state.restBetweenRounds)}
+            </Text>
+          )}
+        />
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Break before next exercise"}
+          InputComponent={() => (
+            <Text
+              style={{ color: "white" }}
+              onPress={() => {
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: MODAL_CONTENT_ENUM.BREAK_TIME.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                setContentType(MODAL_CONTENT_ENUM.BREAK_TIME);
+                modalRef.current?.expand();
+              }}
+            >
+              {formatMinutesSeconds(state.breakBeforeNext)}
+            </Text>
+          )}
+        />
       </View>
       <BottomSheet
         ref={modalRef}
@@ -194,6 +253,30 @@ function ExerciseEditScreen({ route }) {
             onValueChange={(data) =>
               dispatch({
                 type: exerciseEditActions.SET_WORK_TIME,
+                payload: data,
+              })
+            }
+          />
+        )}
+        {contentType.key === MODAL_CONTENT_ENUM.REST_TIME.key && (
+          <TimeWheelPicker
+            key={state.restBetweenRounds}
+            startingTime={state.restBetweenRounds}
+            onValueChange={(data) =>
+              dispatch({
+                type: exerciseEditActions.SET_REST,
+                payload: data,
+              })
+            }
+          />
+        )}
+        {contentType.key === MODAL_CONTENT_ENUM.BREAK_TIME.key && (
+          <TimeWheelPicker
+            key={state.breakBeforeNext}
+            startingTime={state.breakBeforeNext}
+            onValueChange={(data) =>
+              dispatch({
+                type: exerciseEditActions.SET_BREAK,
                 payload: data,
               })
             }
@@ -249,6 +332,9 @@ const reducer = (state, action) => {
     case exerciseEditActions.SET_WORK_TIME:
       return { ...state, workTime: action.payload };
 
+    case exerciseEditActions.SET_REST:
+      return { ...state, restBetweenRounds: action.payload };
+
     case exerciseEditActions.SET_BREAK:
       return { ...state, breakBeforeNext: action.payload };
 
@@ -259,23 +345,9 @@ const reducer = (state, action) => {
       return { ...state, title: action.payload };
 
     case exerciseEditActions.SET_PREVIOUS:
-      console.log(
-        "setting previous",
-        "activeKey",
-        state.activeKey,
-        "payload: ",
-        action.payload,
-      );
       return { ...state, previous: action.payload };
 
     case exerciseEditActions.REVERT_PREVIOUS:
-      console.log(
-        "reverting",
-        "activeKey",
-        state.activeKey,
-        "payload: ",
-        action.payload,
-      );
       return { ...state, [state.activeKey]: state.previous };
 
     case exerciseEditActions.FLAG_DIRTY:
