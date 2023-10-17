@@ -1,9 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import NumberWheelPicker from "./NumberWheelPicker";
 
 import { useTheme } from "../contexts/ThemeContext";
 import InputModal from "./InputModal";
+import eventManager from "../events/eventManager";
 
 function NumberPickerModal({
   promptTitle,
@@ -18,6 +19,11 @@ function NumberPickerModal({
 
   const modalRef = useRef(null);
   const [applyFlag, setApplyFlag] = useState(false);
+
+  useEffect(() => {
+    console.log("about to emit from numberpicker", number);
+    eventManager.emit("numberOfRounds", number);
+  }, [number]);
 
   onModalChange = (isOpen) => {
     // If opening BottomSheet, save
@@ -39,7 +45,7 @@ function NumberPickerModal({
 
   onApply = () => {
     setApplyFlag(true);
-    onSubmit(number);
+    // onSubmit(number);
     modalRef.current?.close();
   };
 

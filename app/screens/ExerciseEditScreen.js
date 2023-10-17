@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import { Feather } from '@expo/vector-icons'
+import { Feather } from "@expo/vector-icons";
 
 import Screen from "../components/Screen";
 import Navheader from "../components/NavHeader";
@@ -13,37 +13,42 @@ import TimePickerModal from "../components/TimePickerModal";
 import NumberPickerModal from "../components/NumberPickerModal";
 
 import Receiver from "../events/Receiver";
+import AppTextButton from "../components/buttons/AppTextButton";
+import { useRoutineContext } from "../contexts/RoutineContext";
+import EditableText from "../components/EditableText";
+import {
+  extractStartingPickerTime,
+  extractStartingRounds,
+} from "../utilities/extractStartingPickerValue";
 import eventManager from "../events/eventManager";
-import formatDuration from '../utilities/formatDuration';
-import AppTextButton from '../components/buttons/AppTextButton';
-import { useRoutineContext } from '../contexts/RoutineContext';
-import DummyInputComponent from '../components/DummyInputComponent';
-import EditableText from '../components/EditableText';
 
 function ExerciseEditScreen({ route }) {
-
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const [restEnabled] = useState(false);
   const [infoChanged, setInfoChanged] = useState(false);
-  const { isRoutineEditing, isExerciseEditing, referenceExercise } = route.params;
-  const { contextExercises, setContextExercises } = useRoutineContext();
+  const {
+    isRoutineEditing,
+    isExerciseEditing,
+    referenceExercise,
+    exercise: passedExercise,
+  } = route.params;
 
+  const { contextExercises, setContextExercises } = useRoutineContext();
   const [exercise, setExercise] = useState(referenceExercise);
 
   // Update the exercise title and trigger a re-render
   const updateTitle = (newTitle) => {
-    setExercise(prevExercise => ({
+    setExercise((prevExercise) => ({
       ...prevExercise,
       title: newTitle,
     }));
   };
 
   const handleWorkTimeUpdate = (selectedMinute, selectedSecond) => {
-    setExercise(prevExercise => ({
+    setExercise((prevExercise) => ({
       ...prevExercise,
-      workTime: (parseInt(selectedMinute) * 60 + parseInt(selectedSecond))
+      workTime: parseInt(selectedMinute) * 60 + parseInt(selectedSecond),
     }));
     setInfoChanged(true);
     console.log(exercise);
@@ -63,38 +68,42 @@ function ExerciseEditScreen({ route }) {
   const handleSaveOnPress = () => {
     //Set changed state exercise object to the reference object
     Object.assign(referenceExercise, exercise);
-    if (!isExerciseEditing) { // Is a new exercise
+    if (!isExerciseEditing) {
+      // Is a new exercise
       // Append new exercise to the exercises array managed by context
       // Handles rendering
       setContextExercises([...contextExercises, referenceExercise]);
     }
     navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
-  }
+  };
 
   return (
     <Screen style={{ flex: 1 }}>
-      <Navheader style={styles.navPanel}
+      <Navheader
+        style={styles.navPanel}
         LeftComponent={
           <IconButton
             iconName={"chevron-left"}
             IconFamily={Feather}
             iconSize={52}
             foregroundColor={theme.blue}
-            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing })}
+            onPress={() =>
+              navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
+                edit: isRoutineEditing,
+              })
+            }
           />
         }
         headerText={`Edit ${exercise.title}`}
         RightComponent={
-          infoChanged ?
-            (
-              <AppTextButton
-                onPress={() => handleSaveOnPress()}
-                textStyle={{ fontWeight: "500" }}
-              >
-                {isExerciseEditing ? "Save" : "Create"}
-              </AppTextButton>
-            ) :
-            null
+          infoChanged ? (
+            <AppTextButton
+              onPress={() => handleSaveOnPress()}
+              textStyle={{ fontWeight: "500" }}
+            >
+              {isExerciseEditing ? "Save" : "Create"}
+            </AppTextButton>
+          ) : null
         }
       />
       <View style={{ gap: 10, paddingHorizontal: 11 }}>
@@ -102,25 +111,38 @@ function ExerciseEditScreen({ route }) {
           editable={false}
           bold={false}
           title={"Name"}
-          InputComponent={() => <EditableText exercise={exercise}
-            onSubmit={text => {
-              updateTitle(text);
-              setInfoChanged(true);
-            }}
-          />}
+          InputComponent={() => (
+            <EditableText
+              exercise={exercise}
+              onSubmit={(text) => {
+                updateTitle(text);
+                setInfoChanged(true);
+              }}
+            />
+          )}
         />
         <AuxilaryCard
           editable={false}
           bold={false}
           title={"Work time"}
-          InputComponent={() => (
-            <TimePickerModal
-              promptTitle="Work time"
-              promptSubtitle="Duration of the work round."
-              startingMinute=" 1"
-              onSubmit={(minutes, seconds) => { handleWorkTimeUpdate(minutes, seconds) }}
-            />
-          )}
+          InputComponent={() => {
+            const [startingMinute, startingSecond] = extractStartingPickerTime(
+              passedExercise,
+              "workTime",
+            );
+
+            return (
+              <TimePickerModal
+                promptTitle="Work time"
+                promptSubtitle="Duration of the work round."
+                startingMinute={startingMinute}
+                startingSecond={startingSecond}
+                onSubmit={(minutes, seconds) => {
+                  handleWorkTimeUpdate(minutes, seconds);
+                }}
+              />
+            );
+          }}
         />
         <AuxilaryCard
           editable={false}
@@ -130,46 +152,63 @@ function ExerciseEditScreen({ route }) {
             <NumberPickerModal
               promptTitle="Number of rounds"
               promptSubtitle="Repetitions of the current exercise."
-              onSubmit={() => null}
+              startingNumber={extractStartingRounds(passedExercise)}
+              onSubmit={(number) => console.log("numberOfRounds", number)}
             />
           )}
         />
         <AuxilaryCard
           editable={false}
           bold={false}
-          disabled={restEnabled}
           title={"Rest between rounds"}
-          InputComponent={() => (
-            <Receiver>
-              <TimePickerModal
-                promptTitle="Rest"
-                promptSubtitle="Duration of rest between subsequent rounds."
-                startingMinute=" 0"
-                startingSecond="30"
-                enabled={restEnabled}
-              />
-            </Receiver>
-          )}
+          InputComponent={() => {
+            const [startingMinute, startingSecond] = extractStartingPickerTime(
+              passedExercise,
+              "restBetweenRounds",
+              " 0",
+              "30",
+            );
+
+            return (
+              <Receiver>
+                <TimePickerModal
+                  promptTitle="Rest"
+                  promptSubtitle="Duration of rest between subsequent rounds."
+                  startingMinute={startingMinute}
+                  startingSecond={startingSecond}
+                  enabled={parseInt(extractStartingRounds(passedExercise)) > 1}
+                />
+              </Receiver>
+            );
+          }}
         />
         <AuxilaryCard
           editable={false}
           bold={false}
           title={"Break until next exercise"}
-          InputComponent={() => (
-            <TimePickerModal
-              promptTitle="Break"
-              promptSubtitle="Duration of break before next exercise."
-              startingMinute=" 1"
-            />
-          )}
+          InputComponent={() => {
+            const [startingMinute, startingSecond] = extractStartingPickerTime(
+              passedExercise,
+              "breakBeforeNext",
+              " 0",
+              "30",
+            );
+
+            return (
+              <TimePickerModal
+                promptTitle="Break"
+                promptSubtitle="Duration of break before next exercise."
+                startingMinute={startingMinute}
+                startingSecond={startingSecond}
+              />
+            );
+          }}
         />
       </View>
     </Screen>
   );
-};
+}
 
-const getStyles = (theme) =>
-  StyleSheet.create({
-  })
+const getStyles = (theme) => StyleSheet.create({});
 
 export default ExerciseEditScreen;

@@ -119,8 +119,8 @@ const createDummyExercises = async () => {
     title: "Pushups",
     exerciseOrder: 1,
     tag: Tag.WORKING,
-    workTime: 60,
-    numberOfRounds: 3,
+    workTime: 79,
+    numberOfRounds: 1,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
     category: "Arms",
@@ -330,7 +330,26 @@ const createDummyExercises = async () => {
     category: "Uncategorized",
   });
 
-  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e99, e98, e97, e96, e95, e94, e93, e90];
+  const exercises = [
+    e1,
+    e2,
+    e3,
+    e4,
+    e5,
+    e6,
+    e7,
+    e8,
+    e9,
+    e10,
+    e99,
+    e98,
+    e97,
+    e96,
+    e95,
+    e94,
+    e93,
+    e90,
+  ];
 
   Promise.all(exercises.map((e) => createExercise(e)));
 };
