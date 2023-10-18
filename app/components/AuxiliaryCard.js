@@ -77,7 +77,6 @@ const getStylesActive = (theme) =>
     },
     iconContainer: {
       marginLeft: 10,
-      marginRight: -10,
     },
     subtitle: {
       fontSize: 18,

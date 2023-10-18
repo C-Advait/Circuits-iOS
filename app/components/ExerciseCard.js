@@ -33,11 +33,11 @@ function ExerciseCard({
   const handleExerciseEditNavigation = () => {
     rest.exercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-          isRoutineEditing: rest.isRoutineEditing,
-          isExerciseEditing: rest.isExerciseEditing,
-          originalExercise: rest.referenceExercise,
-          exercise: rest.exercise,
-        })
+        isRoutineEditing: rest.isRoutineEditing,
+        isExerciseEditing: rest.isExerciseEditing,
+        referenceExercise: rest.referenceExercise,
+        exercise: rest.exercise,
+      })
       : null;
   };
 
@@ -53,8 +53,12 @@ function ExerciseCard({
           onPress={() => handleExerciseEditNavigation()}
         >
           <View style={styles.infoContainer}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subTitle}>{subTitle}</Text>
+            <Text style={styles.title} numberOfLines={1}>
+              {title}
+            </Text>
+            <Text style={styles.subTitle} numberOfLines={1}>
+              {subTitle}
+            </Text>
           </View>
         </TouchableWithoutFeedback>
         <View style={[styles.dragContainer]}>

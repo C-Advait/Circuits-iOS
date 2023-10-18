@@ -406,8 +406,8 @@ function RoutineEditScreen({ route }) {
           sections={formattedExercises}
           keyExtractor={(item) => item.exerciseOrder}
           renderItem={({ item, index }) => renderItem(item, index)}
-          renderSectionHeader={
-            ({ section }) => renderSectionHeader(section)
+          renderSectionHeader={({ section }) =>
+            renderSectionHeader(section)
             //<Text style=//{styles.sectionTitle}>{section.title}</Text>
           }
           stickySectionHeadersEnabled={false}
