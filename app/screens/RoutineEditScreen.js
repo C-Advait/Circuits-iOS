@@ -128,7 +128,21 @@ function RoutineEditScreen({ route }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
 
-  console.log("state", state);
+  // Initialize state
+  useEffect(() => {
+    if (exercises) {
+      const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE);
+      const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
+
+      dispatch({
+        type: routineEditActions.INIT,
+        payload: {
+          warmupDuration: warmup.workTime,
+          cooldownDuration: cooldown.workTime,
+        },
+      });
+    }
+  }, [exercises]);
 
   useEffect(() => {
     console.log(
@@ -587,6 +601,9 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case routineEditActions.INIT:
+      return { ...state, ...action.payload };
+
     case routineEditActions.SET_ACTIVE_KEY:
       return { ...state, activeKey: action.payload };
 
