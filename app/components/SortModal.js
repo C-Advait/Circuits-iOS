@@ -6,13 +6,13 @@ import { Portal } from "react-native-portalize";
 
 import { SortCriteria } from "../classes/SortCriteria";
 import { useTheme } from "../contexts/ThemeContext";
-import { useTemplate } from "../contexts/TemplateContext";
+import { useTemplateContext } from "../contexts/TemplateContext";
 
 const MODAL_HEIGHT = 270;
 
 const SortModal = forwardRef((props, ref) => {
   const { isSheetOpen, setIsSheetOpen } = props;
-  const { sortOption, setSortOption } = useTemplate();
+  const { sortOption, setSortOption } = useTemplateContext();
 
   const { theme } = useTheme();
   const styles = getStyles(theme);
