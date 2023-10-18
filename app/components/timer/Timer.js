@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import Animated, {
   useSharedValue,
@@ -20,11 +20,13 @@ import {
 } from "./timerConstants";
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
+import CountdownModal from "./CountdownModal";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-// const Timer = ({ isPlaying, setIsPlaying, title, duration, tag, onFinish }) => {
 const Timer = ({ state, dispatch, nextExerciseTag }) => {
+  const [isAnimationVisible, setIsAnimationVisible] = useState(true);
+
   const progress = useSharedValue(1);
   // Consider moving into state directly.
   const { title, tag } = state.intervals[state.currentIndex] || {};
@@ -98,7 +100,19 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
           />
         </G>
       </Svg>
-      <View style={styles.overlay}>
+      <CountdownModal
+        isAnimationVisible={isAnimationVisible}
+        setIsAnimationVisible={setIsAnimationVisible}
+        onClose={() => {
+          dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
+        }}
+      />
+      <View
+        style={[
+          styles.overlay,
+          { display: isAnimationVisible ? "none" : "flex" },
+        ]}
+      >
         <Text style={styles.title}>{state.routineComplete ? "" : title}</Text>
         <View>
           <NumericalTimer

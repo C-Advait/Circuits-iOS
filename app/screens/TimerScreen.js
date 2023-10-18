@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
@@ -10,17 +10,21 @@ import { useTheme } from "../contexts/ThemeContext";
 import { PlayPause, SkipButton, Timer } from "../components/timer";
 import InfoWidget from "../components/timer/InfoWidget";
 import ProgressSlider from "../components/timer/ProgressSlider";
+import SuccessModal from "../components/timer/SuccessModal";
+
 import { getExercisesForRoutine } from "../db/DBActions";
 import { processExerciseList } from "../utilities/processExerciseList";
 import { confirmedNavigate } from "../alerts/endRoutine";
 import timerActions from "../actions/timerActions";
-import { TIMER_UPDATE_INTERVAL } from "../components/timer/timerConstants";
 import { Tag } from "../classes/Exercise";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [state, dispatch] = useReducer(reducer, initialState);
   const [nextExerciseTitle, nextExerciseTag] = getNextExercise(state);
 
@@ -28,6 +32,12 @@ function TimerScreen({ route }) {
     dispatch({ type: timerActions.INIT_FROM_PARAMS, params: route.params });
     initTimerSequence(route.params.id, dispatch);
   }, []);
+
+  useEffect(() => {
+    if (state.routineComplete) {
+      setShowSuccess(true);
+    }
+  }, [state.routineComplete]);
 
   // Check header for length, and potentially truncate!
   return (
@@ -98,6 +108,11 @@ function TimerScreen({ route }) {
           total={state.totalDuration}
         />
       </View>
+      <SuccessModal
+        routineTitle={state.title}
+        visible={showSuccess}
+        setVisible={setShowSuccess}
+      />
     </Screen>
   );
 }
