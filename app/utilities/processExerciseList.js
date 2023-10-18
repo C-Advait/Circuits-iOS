@@ -62,8 +62,6 @@ const augmentWithCumulativeTimes = (arr) => {
     };
   });
 
-  console.log(`Before: ${JSON.stringify(arr, null, 2)}`);
-  console.log(`After: ${JSON.stringify(ret, null, 2)}`);
   return ret;
 };
 

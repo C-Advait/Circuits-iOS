@@ -187,9 +187,8 @@ function reducer(state, action) {
     case timerActions.ELAPSE:
       return {
         ...state,
-        exerciseSecondsRemaining:
-          state.exerciseSecondsRemaining - TIMER_UPDATE_INTERVAL / 1000,
-        totalElapsedTime: state.totalElapsedTime + TIMER_UPDATE_INTERVAL / 1000,
+        exerciseSecondsRemaining: state.exerciseSecondsRemaining - 1,
+        totalElapsedTime: state.totalElapsedTime + 1,
       };
     case timerActions.TOGGLE_IS_PLAYING:
       return {
@@ -223,7 +222,6 @@ const initTimerSequence = async (id, dispatch) => {
     initialDuration: exercises[0]?.workTime,
     loopDuration: calculateLoopDuration(exercises),
   });
-  // console.log(JSON.stringify(processExerciseList(exercises), null, 2));
 };
 
 const calculateLoopDuration = (exerciseList) => {
@@ -234,7 +232,6 @@ const calculateLoopDuration = (exerciseList) => {
       (exercise.numberOfRounds - 1) * exercise.restBetweenRounds +
       exercise.breakBeforeNext;
   });
-  console.log("Loop duration: ", acc);
   return acc;
 };
 
