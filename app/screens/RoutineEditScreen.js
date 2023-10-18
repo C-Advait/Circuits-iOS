@@ -35,7 +35,6 @@ import {
   updateRoutine,
 } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
-import TimePickerModal from "../components/TimePickerModal";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -133,12 +132,7 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => (
-              <TimePickerModal
-                promptTitle="Warmup"
-                promptSubtitle="Duration of the warmup phase."
-              />
-            )}
+            InputComponent={() => <DummyInputComponent />}
           />
         );
       case Tag.POSTROUTINE:
@@ -148,12 +142,7 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => (
-              <TimePickerModal
-                promptTitle="Cooldown"
-                promptSubtitle="Duration of the cooldown phase."
-              />
-            )}
+            InputComponent={() => <DummyInputComponent />}
           />
         );
       case Tag.WORKING: {
@@ -417,8 +406,8 @@ function RoutineEditScreen({ route }) {
           sections={formattedExercises}
           keyExtractor={(item) => item.exerciseOrder}
           renderItem={({ item, index }) => renderItem(item, index)}
-          renderSectionHeader={({ section }) =>
-            renderSectionHeader(section)
+          renderSectionHeader={
+            ({ section }) => renderSectionHeader(section)
             //<Text style=//{styles.sectionTitle}>{section.title}</Text>
           }
           stickySectionHeadersEnabled={false}

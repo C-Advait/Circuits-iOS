@@ -11,18 +11,9 @@ import { IconButton } from "../components/buttons";
 import { useTheme } from "../contexts/ThemeContext";
 import routes from "../navigation/routes";
 import AuxilaryCard from "../components/AuxiliaryCard";
-import TimePickerModal from "../components/TimePickerModal";
-import NumberPickerModal from "../components/NumberPickerModal";
 
-import Receiver from "../events/Receiver";
 import AppTextButton from "../components/buttons/AppTextButton";
-import { useRoutineContext } from "../contexts/RoutineContext";
 import EditableText from "../components/EditableText";
-import {
-  extractStartingPickerTime,
-  extractStartingRounds,
-} from "../utilities/extractStartingPickerValue";
-import eventManager from "../events/eventManager";
 import exerciseEditActions from "../actions/exerciseEditActions";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import NumberWheelPicker from "../components/NumberWheelPicker";
@@ -102,6 +93,7 @@ function ExerciseEditScreen({ route }) {
       numberOfRounds: state.numberOfRounds,
       restBetweenRounds: state.restBetweenRounds,
       breakBeforeNext: state.breakBeforeNext,
+      title: state.title,
     };
 
     Object.assign(originalExercise, exercise);
