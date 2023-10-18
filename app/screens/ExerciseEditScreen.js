@@ -22,6 +22,7 @@ import { formatMinutesSeconds } from "../utilities/formatDuration";
 
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
 import { confirmedNavigate } from "../alerts/discardExerciseEdits";
+import { Exercise } from "../classes/Exercise";
 
 const MODAL_HEIGHT = 350;
 
@@ -29,7 +30,7 @@ function ExerciseEditScreen({ route }) {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const { isRoutineEditing, isExerciseEditing, originalExercise } =
+  const { isRoutineEditing, isExerciseEditing, referenceExercise: originalExercise } =
     route.params;
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -66,14 +67,17 @@ function ExerciseEditScreen({ route }) {
   };
 
   const onSave = () => {
-    const exercise = {
+    const exercise = new Exercise({
       ...originalExercise,
       workTime: state.workTime,
       numberOfRounds: state.numberOfRounds,
       restBetweenRounds: state.restBetweenRounds,
       breakBeforeNext: state.breakBeforeNext,
       title: state.title,
-    };
+    });
+
+    console.log(originalExercise);
+    console.log(exercise);
 
     Object.assign(originalExercise, exercise);
     navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
@@ -85,15 +89,15 @@ function ExerciseEditScreen({ route }) {
       onPress={
         enabled
           ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              modalRef.current?.expand();
-            }
+            dispatch({
+              type: exerciseEditActions.SET_ACTIVE_KEY,
+              payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+            });
+            dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+            dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+            setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+            modalRef.current?.expand();
+          }
           : () => null
       }
     >
@@ -268,7 +272,7 @@ const initialState = {
   activeKey: "",
   workTime: 5,
   numberOfRounds: 1,
-  restBetweenRounds: 5,
+  restBetweenRounds: 0,
   breakBeforeNext: 5,
   previous: null,
   shouldRefreshPicker: false,

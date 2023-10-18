@@ -237,7 +237,6 @@ function RoutineEditScreen({ route }) {
       isRoutineEditing: isRoutineEditing,
       isExerciseEditing: false,
       referenceExercise: exer,
-      exercise: exer,
     });
   };
 

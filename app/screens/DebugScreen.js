@@ -1,8 +1,7 @@
 import React from "react";
-import { View, StyleSheet, Button } from "react-native";
+import { View, StyleSheet, Button, Alert } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
-import { Alert } from "react-native";
 
 import {
   dropTable,
@@ -21,41 +20,6 @@ import { createTables } from "../db/DBSetup";
 import { Exercise, Tag } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import { Sound } from "../classes/Sound";
-
-function DebugScreen() {
-  return (
-    <Screen>
-      <View style={styles.topPanel}>
-        <Header>Debug</Header>
-      </View>
-      <Button title="Create 1 dummy sound" onPress={() => createDummySound()} />
-      <Button
-        title="Create 5 dummy routines"
-        onPress={() => createDummyRoutine()}
-      />
-      <Button
-        title="Create 8 dummy exercises"
-        onPress={() => createDummyExercises()}
-      />
-      <Button title="Reset DB" onPress={() => resetDB()} />
-    </Screen>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {},
-  topPanel: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginLeft: 15,
-    marginBottom: 34,
-    marginHorizontal: 10,
-    marginTop: 25,
-  },
-});
-
-export default DebugScreen;
 
 const resetDB = async () => {
   dropTable("Exercise")
@@ -133,8 +97,8 @@ const createDummyRoutine = async () => {
     restSoundID: 1,
     breakSoundID: 1,
     endSoundID: 1,
-    title: "Strength Training",
-    duration: 62, // e.g., 40 minutes
+    title: "Uncategorized Training",
+    duration: 2400, // e.g., 40 minutes
     color: "#FFAACC",
     userCreated: true,
   });
@@ -152,14 +116,14 @@ const getNames = async () => {
 const createDummyExercises = async () => {
   const e1 = new Exercise({
     routineID: 1,
-    title: "Pushups",
+    title: "Warmup",
     exerciseOrder: 1,
-    tag: Tag.WORKING,
+    tag: Tag.PREROUTINE,
     workTime: 60,
     numberOfRounds: 3,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Arms",
+    category: "Warmup",
   });
 
   const e2 = new Exercise({
@@ -171,7 +135,7 @@ const createDummyExercises = async () => {
     numberOfRounds: 5,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Strength",
+    category: "Uncategorized",
   });
 
   const e3 = new Exercise({
@@ -183,70 +147,130 @@ const createDummyExercises = async () => {
     numberOfRounds: 4,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Strength",
+    category: "Uncategorized",
   });
 
   const e4 = new Exercise({
     routineID: 1,
-    title: "Biceps curls",
+    title: "Hammer Curls",
     exerciseOrder: 4,
     tag: Tag.WORKING,
     workTime: 30,
     numberOfRounds: 4,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Strength",
+    category: "Uncategorized",
   });
 
   const e5 = new Exercise({
-    routineID: 2,
-    title: "Demo",
-    exerciseOrder: 1,
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 5,
     tag: Tag.WORKING,
     workTime: 30,
     numberOfRounds: 4,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Strength",
+    category: "Uncategorized",
   });
 
   const e6 = new Exercise({
-    routineID: 3,
-    title: "Another Demo",
-    exerciseOrder: 1,
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 6,
     tag: Tag.WORKING,
     workTime: 30,
     numberOfRounds: 4,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Strength",
+    category: "Uncategorized",
   });
 
   const e7 = new Exercise({
-    routineID: 4,
-    title: "Still another demo",
-    exerciseOrder: 1,
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 7,
     tag: Tag.WORKING,
     workTime: 30,
     numberOfRounds: 4,
     restBetweenRounds: 10,
     breakBeforeNext: 15,
-    category: "Strength",
+    category: "Uncategorized",
   });
 
   const e8 = new Exercise({
-    routineID: 5,
-    title: "Push ups",
-    exerciseOrder: 1,
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 8,
     tag: Tag.WORKING,
-    workTime: 10,
-    numberOfRounds: 3,
-    restBetweenRounds: 8,
-    breakBeforeNext: 12,
-    category: "Strength",
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
   });
 
-  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8];
+  const e9 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 9,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e10 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 10,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e11 = new Exercise({
+    routineID: 1,
+    title: "Hammer Curls",
+    exerciseOrder: 11,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e12 = new Exercise({
+    routineID: 1,
+    title: "Biceps curls",
+    exerciseOrder: 12,
+    tag: Tag.WORKING,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const e13 = new Exercise({
+    routineID: 1,
+    title: "Cooldown",
+    exerciseOrder: 13,
+    tag: Tag.POSTROUTINE,
+    workTime: 30,
+    numberOfRounds: 4,
+    restBetweenRounds: 10,
+    breakBeforeNext: 15,
+    category: "Uncategorized",
+  });
+
+  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13];
 
   Promise.all(exercises.map((e) => createExercise(e)));
 };
@@ -288,6 +312,26 @@ const updateSingleRoutine = async () => {
   console.log(rowsAffected);
 };
 
+function DebugScreen() {
+  return (
+    <Screen>
+      <View style={styles.topPanel}>
+        <Header>Settings</Header>
+      </View>
+      <Button title="Create 1 dummy sound" onPress={() => createDummySound()} />
+      <Button
+        title="Create 5 dummy routines"
+        onPress={() => createDummyRoutine()}
+      />
+      <Button
+        title="Create 8 dummy exercises"
+        onPress={() => createDummyExercises()}
+      />
+      <Button title="Reset DB" onPress={() => resetDB()} />
+    </Screen>
+  );
+}
+
 // <Button title="Dump DB" onPress={() => dumpDB()} />
 // <Button title="Get RoutineNames" onPress={() => getNames()} />
 // <Button title="Get exercises" onPress={() => getDummyExercises()} />
@@ -302,3 +346,17 @@ const updateSingleRoutine = async () => {
 //   title="Update routine name"
 //   onPress={() => updateSingleRoutine()}
 // />
+
+const styles = StyleSheet.create({
+  container: {},
+  topPanel: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginLeft: 15,
+    marginBottom: 34,
+    marginHorizontal: 10,
+    marginTop: 25,
+  },
+});
+export default DebugScreen;
