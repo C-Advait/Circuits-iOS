@@ -132,7 +132,8 @@ function ExerciseEditScreen({ route }) {
       <View style={{ gap: 10, paddingHorizontal: 11 }}>
         <AuxiliaryCard title="Name">
           <EditableText
-            placeholder={state.title}
+            original={state.title}
+            placeholder="Exercise Name"
             onSubmit={(text) => {
               dispatch({
                 type: exerciseEditActions.SET_TITLE,

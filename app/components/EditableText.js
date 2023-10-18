@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   TextInput,
   View,
@@ -9,29 +9,37 @@ import {
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import { useTheme } from "../contexts/ThemeContext";
 
-const EditableText = ({ placeholder, onSubmit, maxLength }) => {
-  const [text, setText] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef(null);
-
+const EditableText = ({ original, placeholder, onSubmit, maxLength }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
+  const [text, setText] = useState(original);
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    setText(original);
+  }, [original]);
+
   const handleFocus = () => {
-    setText("");
-    inputRef.current.setNativeProps({ selection: { start: 0, end: 0 } });
+    if (text === placeholder) {
+      setText("");
+    }
   };
 
   const handleBlur = () => {
     setIsEditing(false);
     if (text !== "") {
       onSubmit(text);
+      setText(text);
     } else {
+      onSubmit(placeholder);
       setText(placeholder);
     }
   };
 
-  const textStyle = text ? styles.text : [styles.text, styles.placeholderText];
+  const textStyle =
+    text && text.length ? styles.text : [styles.text, styles.placeholderText];
 
   return (
     <TouchableOpacity
@@ -41,7 +49,7 @@ const EditableText = ({ placeholder, onSubmit, maxLength }) => {
       {isEditing ? (
         <View style={styles.inputContainer}>
           <Text style={[styles.text, styles.fadedSuggestion]} numberOfLines={1}>
-            {text ? "" : placeholder}
+            {text === "" ? placeholder : text}
           </Text>
           <TextInput
             ref={inputRef}
@@ -57,9 +65,11 @@ const EditableText = ({ placeholder, onSubmit, maxLength }) => {
           />
         </View>
       ) : (
-        <Text style={textStyle} numberOfLines={1}>
-          {text || placeholder}
-        </Text>
+        <View style={styles.inputContainer}>
+          <Text style={textStyle} numberOfLines={1}>
+            {text || placeholder}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );
@@ -72,9 +82,11 @@ const getStyles = (theme) =>
     },
     inputContainer: {
       position: "relative",
+      flexDirection: "row",
+      justifyContent: "flex-end",
     },
     text: {
-      fontSize: PARAGRAPH_FONT_SIZE,
+      color: theme.primary,
     },
     placeholderText: {
       color: theme.text60,
@@ -85,7 +97,6 @@ const getStyles = (theme) =>
       zIndex: -1,
     },
     textInput: {
-      fontSize: PARAGRAPH_FONT_SIZE,
       color: theme.foreground,
     },
   });
