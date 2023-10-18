@@ -73,8 +73,9 @@ function RoutineEditScreen({ route }) {
   }, [selectedTemplate]);
 
   // Helper Functions
-  const renderExerciseItem = (item, index, drag, isActive) => {
-    switch (index) {
+  const renderExerciseItem = (item, getIndex, drag, isActive) => {
+    console.log(getIndex());
+    switch (getIndex()) {
       case 0:
         return (
           <ExerciseCard
@@ -89,7 +90,7 @@ function RoutineEditScreen({ route }) {
             exercise={new Exercise({ ...item })} // pass a copy to edit
           />
         );
-      case numExercises:
+      case (numExercises - 2):
         return (
           <View style={{ gap: 12 }}>
             <ExerciseCard
@@ -246,10 +247,41 @@ function RoutineEditScreen({ route }) {
                 accentcolor={theme.accentGreen}
               />
             </View>
-            <Text style={styles.sectionTitle}>Intervals</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.sectionTitle}>Intervals</Text>
+              <View style={{ marginBottom: 0 }}>
+                <IconButton
+                  iconName="plus"
+                  IconFamily={Feather}
+                  iconSize={45}
+                  foregroundColor={'white'}
+                  onPress={() => handleAddExerciseOnPress()}
+                />
+              </View>
+            </View>
+            {workingSet.length === 0 && (
+              <TouchableOpacity activeOpacity={0.8} onPress={() => handleAddExerciseOnPress()}>
+                <AuxiliaryCard
+                  title={"Add Exercise"}
+                  Icon={() => (
+                    <IconButton
+                      iconName="plus"
+                      IconFamily={Feather}
+                      iconSize={45}
+                      foregroundColor={'white'}
+                      onPress={() => handleAddExerciseOnPress()}
+                    />
+                  )}
+                  editable={false}
+                  InputComponent={() => (
+                    <></>
+                  )}
+                />
+              </TouchableOpacity>
+            )}
             <DraggableFlatList
               data={workingSet}
-              renderItem={({ item, index, drag, isActive }) => renderExerciseItem(item, index, drag, isActive)}
+              renderItem={({ item, getIndex, drag, isActive }) => renderExerciseItem(item, getIndex, drag, isActive)}
               scrollEnabled={false}
               keyExtractor={(item) => item.exerciseOrder}
               onDragEnd={({ data }) => {
