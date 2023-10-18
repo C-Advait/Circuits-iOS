@@ -21,6 +21,7 @@ import TimeWheelPicker from "../components/TimeWheelPicker";
 import { formatMinutesSeconds } from "../utilities/formatDuration";
 
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
+import { confirmedNavigate } from "../alerts/discardExerciseEdits";
 
 const MODAL_HEIGHT = 350;
 
@@ -100,6 +101,12 @@ function ExerciseEditScreen({ route }) {
     </Text>
   );
 
+  const goBack = () => {
+    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+  };
+
+  const confirmDiscard = () => confirmedNavigate(goBack);
+
   return (
     <Screen style={{ flex: 1 }}>
       <Navheader
@@ -107,20 +114,16 @@ function ExerciseEditScreen({ route }) {
         LeftComponent={
           <IconButton
             iconName={"chevron-left"}
-            IconFamikly={Feather}
+            IconFamily={Feather}
             iconSize={52}
             foregroundColor={theme.blue}
-            onPress={() =>
-              navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
-                edit: isRoutineEditing,
-              })
-            }
+            onPress={state.dirty ? confirmDiscard : goBack}
           />
         }
         headerText={`Edit ${state.title}`}
         RightComponent={
           state.dirty ? (
-            <AppTextButton onPress={onSave} textStyle={{ fontWeight: "500" }}>
+            <AppTextButton onPress={onSave} textStyle={{ fontWeight: 300 }}>
               {isExerciseEditing ? "Save" : "Create"}
             </AppTextButton>
           ) : null
