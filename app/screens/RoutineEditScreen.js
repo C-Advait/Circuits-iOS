@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, StyleSheet, SectionList, Text, TouchableOpacity, TextInput, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/core";
+import { useNavigation, useFocusEffect } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -31,7 +31,7 @@ const sortedExercises = (exercises) => {
 }
 const getExerciseInfo = (exercises) => {
 
-  let warmupTime = 0, workingTime = 0, cooldownTime = 0, numExercises = 1, greatestExerciseOrder = 0;
+  let warmupTime = 0, workingTime = 0, cooldownTime = 0, numExercises = 0, greatestExerciseOrder = 0;
 
   exercises.forEach(exercise => {
     if (exercise.exerciseOrder > greatestExerciseOrder) greatestExerciseOrder = exercise.exerciseOrder;
@@ -72,9 +72,19 @@ function RoutineEditScreen({ route }) {
     );
   }, [selectedTemplate]);
 
+
+  useFocusEffect(
+    useCallback(() => {
+      setWorkingSet(sortedExercises(exercises).slice(1, -1));
+      return () => {
+        // You can add any cleanup logic here if necessary.
+      };
+    }, [exercises]) // Depend on exercises so the callback updates if exercises change
+  );
+
   // Helper Functions
   const renderExerciseItem = (item, getIndex, drag, isActive) => {
-    console.log(getIndex());
+    // console.log(getIndex());
     switch (getIndex()) {
       case 0:
         return (
@@ -87,33 +97,20 @@ function RoutineEditScreen({ route }) {
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item} // pass reference
-            exercise={new Exercise({ ...item })} // pass a copy to edit
           />
         );
-      case (numExercises - 2):
+      case (numExercises - 1):
         return (
-          <View style={{ gap: 12 }}>
-            <ExerciseCard
-              title={item.title}
-              subTitle={formatExerciseInfo(item)}
-              accentColor={theme.accentLightPurple}
-              drag={drag}
-              style={[{ borderTopStartRadius: 0 }, isActive && styles.activeItem]}
-              isRoutineEditing={isRoutineEditing}
-              isExerciseEditing={true} // Is the exercise being edited?
-              referenceExercise={item} // pass reference
-              exercise={new Exercise({ ...item })} // pass a copy to edit
-            />
-            <AuxiliaryCard
-              editable={false}
-              bold={false}
-              title={"Loops"}
-              InputComponent={() => <DummyInputComponent text="Once" />}
-              Icon={() => (
-                <Feather name="repeat" size={24} color={theme.foreground} />
-              )}
-            />
-          </View>
+          <ExerciseCard
+            title={item.title}
+            subTitle={formatExerciseInfo(item)}
+            accentColor={theme.accentLightPurple}
+            drag={drag}
+            style={[{ borderTopStartRadius: 0 }, isActive && styles.activeItem]}
+            isRoutineEditing={isRoutineEditing}
+            isExerciseEditing={true} // Is the exercise being edited?
+            referenceExercise={item} // pass reference
+          />
         );
       default:
         return (
@@ -126,7 +123,6 @@ function RoutineEditScreen({ route }) {
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
-            exercise={new Exercise({ ...item })} // pass a copy to edit
           />
         );
     }
@@ -138,24 +134,25 @@ function RoutineEditScreen({ route }) {
     });
   };
   const handleAddExerciseOnPress = () => {
-
-    exer = new Exercise({
+    const newExercise = new Exercise({
       ...DEFAULT_EXERCISE,
       routineID: routine.id,
-      exerciseOrder: numExercises // Bind exerciseOrder to number of exercises ATM
+      exerciseOrder: maxExerciseOrder
     });
 
     navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
       isRoutineEditing: isRoutineEditing,
       isExerciseEditing: false,
-      referenceExercise: exer,
-      exercise: exer,
+      referenceExercise: newExercise,
     });
-  }
+  };
+
   const handleSavePress = async () => {
 
-    const finalExercises = [exercises[0], ...workingSet, exercises[exercises.length - 1]];
-    finalExercises.forEach((exercise, index) => {
+    const exerciseOrderSorted = sortedExercises(exercises);
+
+    const finalExercises = [exerciseOrderSorted[0], ...workingSet, exerciseOrderSorted[exercises.length - 1]];
+    finalExercises.forEach((exercise, index) => { // final fix
       exercise.exerciseOrder = index;
     });
 
@@ -289,6 +286,17 @@ function RoutineEditScreen({ route }) {
               }}
               containerStyle={{ marginBottom: 22 }}
             />
+            <View style={{ marginBottom: 22 }}>
+              <AuxiliaryCard
+                editable={false}
+                bold={false}
+                title={"Loops"}
+                InputComponent={() => <DummyInputComponent text="Once" />}
+                Icon={() => (
+                  <Feather name="repeat" size={24} color={theme.foreground} />
+                )}
+              />
+            </View>
             <View style={{}}>
               <AuxiliaryCard
                 title={"Cooldown"}

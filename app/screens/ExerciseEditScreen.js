@@ -11,6 +11,7 @@ import routes from "../navigation/routes";
 import AuxilaryCard from "../components/AuxiliaryCard";
 import TimePickerModal from "../components/TimePickerModal";
 import NumberPickerModal from "../components/NumberPickerModal";
+import { Tag } from '../classes/Exercise';
 
 import Receiver from "../events/Receiver";
 import eventManager from "../events/eventManager";
@@ -63,8 +64,14 @@ function ExerciseEditScreen({ route }) {
     //Set changed state exercise object to the reference object
     Object.assign(referenceExercise, exercise);
     if (!isExerciseEditing) { // Is a new exercise
-      // Append new exercise to the exercises array managed by context
-      // Handles rendering
+
+      // Must update exerciseOrder of cooldown exercise to + 1
+      const cooldown = contextExercises.find(ex => ex.tag === Tag.POSTROUTINE);
+      if (cooldown && cooldown.exerciseOrder <= referenceExercise.exerciseOrder) {
+        cooldown.exerciseOrder = referenceExercise.exerciseOrder + 1;
+      }
+
+      // Append to context array
       setContextExercises([...contextExercises, referenceExercise]);
     }
     navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
