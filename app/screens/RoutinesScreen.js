@@ -111,15 +111,10 @@ function RoutinesScreen() {
         routineID: routineID,
         exerciseOrder: 1,
       });
-      const exer = new Exercise({
-        ...DEFAULT_EXERCISE,
-        routineID: routineID,
-        exerciseOrder: 1,
-      })
       const cooldown = new Exercise({
         ...DEFAULT_COOLDOWN,
         routineID: routineID,
-        exerciseOrder: 1
+        exerciseOrder: 2
       });
       const exercises = [warmup, cooldown];
 

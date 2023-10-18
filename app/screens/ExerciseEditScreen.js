@@ -19,10 +19,10 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import NumberWheelPicker from "../components/NumberWheelPicker";
 import TimeWheelPicker from "../components/TimeWheelPicker";
 import { formatMinutesSeconds } from "../utilities/formatDuration";
-
+import { Exercise, Tag } from "../classes/Exercise";
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
 import { confirmedNavigate } from "../alerts/discardExerciseEdits";
-import { Exercise } from "../classes/Exercise";
+import { useRoutineContext } from "../contexts/RoutineContext";
 
 const MODAL_HEIGHT = 350;
 
@@ -32,8 +32,11 @@ function ExerciseEditScreen({ route }) {
   const styles = getStyles(theme);
   const { isRoutineEditing, isExerciseEditing, referenceExercise: originalExercise } =
     route.params;
-
   const [state, dispatch] = useReducer(reducer, initialState);
+  const modalRef = useRef(null);
+  const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
+  const { contextExercises, setContextExercises } = useRoutineContext();
+
 
   useEffect(() => {
     dispatch({
@@ -41,11 +44,6 @@ function ExerciseEditScreen({ route }) {
       payload: { ...originalExercise },
     });
   }, []);
-
-  const modalRef = useRef(null);
-
-  const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
-
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
       // Opening modal; save value to which to possibly revert.
@@ -65,24 +63,6 @@ function ExerciseEditScreen({ route }) {
       }
     }
   };
-
-  const onSave = () => {
-    const exercise = new Exercise({
-      ...originalExercise,
-      workTime: state.workTime,
-      numberOfRounds: state.numberOfRounds,
-      restBetweenRounds: state.restBetweenRounds,
-      breakBeforeNext: state.breakBeforeNext,
-      title: state.title,
-    });
-
-    console.log(originalExercise);
-    console.log(exercise);
-
-    Object.assign(originalExercise, exercise);
-    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
-  };
-
   const InputModalButton = ({ text, contentKey, enabled = true }) => (
     <Text
       style={enabled ? styles.inputText : styles.disabled}
@@ -105,7 +85,30 @@ function ExerciseEditScreen({ route }) {
     </Text>
   );
 
-  const goBack = () => {
+  const goBack = () => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+
+  const onSave = () => {
+    const exercise = new Exercise({
+      ...originalExercise,
+      workTime: state.workTime,
+      numberOfRounds: state.numberOfRounds,
+      restBetweenRounds: state.restBetweenRounds,
+      breakBeforeNext: state.breakBeforeNext,
+      title: state.title,
+    });
+
+    Object.assign(originalExercise, exercise);
+
+    if (!isExerciseEditing) { // Only trigger on a new exercise
+      // Must update exerciseOrder of cooldown exercise to + 1
+      const cooldown = contextExercises.find(ex => ex.tag === Tag.POSTROUTINE);
+      if (cooldown && cooldown.exerciseOrder <= originalExercise.exerciseOrder) {
+        cooldown.exerciseOrder = originalExercise.exerciseOrder + 1;
+      }
+      // Append to context array
+      setContextExercises([...contextExercises, originalExercise]);
+    }
+
     navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
   };
 

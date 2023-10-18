@@ -9,17 +9,9 @@ import {
   PARAGRAPH_FONT_SIZE,
   PARAGRAPH_FONT_WEIGHT,
 } from "../config/appConstants";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import routes from "../navigation/routes";
 
-function ExerciseCard({
-  title,
-  subTitle,
-  accentColor,
-  clickDrag = false,
-  style,
-  ...rest
-}) {
+function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
   const navigation = useNavigation();
@@ -28,15 +20,15 @@ function ExerciseCard({
 
   const handlePress = () => {
     console.log("Delete Pressed");
+    console.log("Delete Pressed");
   };
 
   const handleExerciseEditNavigation = () => {
-    rest.exercise
+    rest.referenceExercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
         isRoutineEditing: rest.isRoutineEditing,
         isExerciseEditing: rest.isExerciseEditing,
         referenceExercise: rest.referenceExercise,
-        exercise: rest.exercise,
       })
       : null;
   };
@@ -48,7 +40,7 @@ function ExerciseCard({
         <EvilIcons name="close" size={35} color="white" />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableWithoutFeedback
+        <TouchableOpacity
           style={styles.touchable}
           onPress={() => handleExerciseEditNavigation()}
         >
@@ -60,15 +52,15 @@ function ExerciseCard({
               {subTitle}
             </Text>
           </View>
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
         <View style={[styles.dragContainer]}>
-          {clickDrag && (
+          <TouchableOpacity onPressIn={drag}>
             <MaterialIcons
               name="drag-indicator"
               size={32}
               color={theme.text60}
-            /> // Color needs to be changed
-          )}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -86,6 +78,7 @@ const getStyles = (theme) =>
     },
     touchable: {
       flexDirection: "row",
+      width: "60%",
     },
     container: {
       backgroundColor: theme.tileBackground,
@@ -116,7 +109,7 @@ const getStyles = (theme) =>
     },
     infoContainer: {
       justifyContent: "center",
-      width: "80%",
+      width: "100%",
     },
     title: {
       color: theme.text87,
