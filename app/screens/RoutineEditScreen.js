@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, StyleSheet, SectionList, Text, TouchableOpacity, TextInput } from "react-native";
+import {
+  View,
+  StyleSheet,
+  SectionList,
+  Text,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,11 +25,15 @@ import NavHeader from "../components/NavHeader";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
 import { useRoutineContext } from "../contexts/RoutineContext";
-import formatDuration from "../utilities/formatDuration";
 import { BlurView } from "expo-blur";
 import getExerciseLength from "../utilities/getExerciseLength";
 import formatDurationExact from "../utilities/formatDurationExact";
-import { createExercise, createRoutine, updateExercise, updateRoutine } from "../db/DBActions";
+import {
+  createExercise,
+  createRoutine,
+  updateExercise,
+  updateRoutine,
+} from "../db/DBActions";
 import { IconButton } from "../components/buttons";
 import TimePickerModal from "../components/TimePickerModal";
 
@@ -65,7 +76,7 @@ const formatDataForSectionList = (data) => {
     })),
     WarmupTime,
     ExerciseTime,
-    CooldownTime
+    CooldownTime,
   ];
 };
 const getNumExercises = (exerciseData) => {
@@ -78,20 +89,33 @@ const getNumExercises = (exerciseData) => {
 };
 
 function RoutineEditScreen({ route }) {
-
   // Setup Functionality
   const navigation = useNavigation();
   const { edit: isRoutineEditing } = route.params;
-  const { selectedTemplate, selectedTemplateID, setSelectedTemplateID, setSelectedTemplate } = useTemplateContext();
-  const { contextExercises: exercises, contextRoutine: routine, setContextRoutine, setContextExercises } = useRoutineContext();
+  const {
+    selectedTemplate,
+    selectedTemplateID,
+    setSelectedTemplateID,
+    setSelectedTemplate,
+  } = useTemplateContext();
+  const {
+    contextExercises: exercises,
+    contextRoutine: routine,
+    setContextRoutine,
+    setContextExercises,
+  } = useRoutineContext();
   const { theme } = useTheme();
   const styles = getStyles(theme);
   // const [maxExerciseOrder, setMaxExerciseOrder] = useState(0);
   // const [maxExerciseID, setMaxExerciseID] = useState(0);
 
-  const [formattedExercises, warmupTime, exerciseTime, cooldownTime] = formatDataForSectionList(exercises);
+  const [formattedExercises, warmupTime, exerciseTime, cooldownTime] =
+    formatDataForSectionList(exercises);
   const totalRoutineTime = warmupTime + exerciseTime + cooldownTime;
-  const numExercises = useMemo(() => getNumExercises(formattedExercises), [formattedExercises]);
+  const numExercises = useMemo(
+    () => getNumExercises(formattedExercises),
+    [formattedExercises],
+  );
 
   useEffect(() => {
     console.log(
@@ -203,19 +227,21 @@ function RoutineEditScreen({ route }) {
     });
   };
   const renderSectionHeader = (section) => {
-    if (section.title === 'Warmup') return renderAuxiliarySectionHeader(section);
-    if (section.title === "Exercises") return renderExerciseSectionHeader(section);
-    if (section.title === "Cooldown") return renderAuxiliarySectionHeader(section);
+    if (section.title === "Warmup")
+      return renderAuxiliarySectionHeader(section);
+    if (section.title === "Exercises")
+      return renderExerciseSectionHeader(section);
+    if (section.title === "Cooldown")
+      return renderAuxiliarySectionHeader(section);
   };
   const renderAuxiliarySectionHeader = (section) => {
-    return (<Text style={styles.sectionTitle}>{section.title}</Text>);
-  }
+    return <Text style={styles.sectionTitle}>{section.title}</Text>;
+  };
   const handleAddExerciseOnPress = () => {
-
     exer = new Exercise({
       ...DEFAULT_EXERCISE,
       routineID: routine.id,
-      exerciseOrder: numExercises // Bind exerciseOrder to number of exercises ATM
+      exerciseOrder: numExercises, // Bind exerciseOrder to number of exercises ATM
     });
 
     navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
@@ -224,25 +250,34 @@ function RoutineEditScreen({ route }) {
       referenceExercise: exer,
       exercise: exer,
     });
-  }
+  };
 
   const renderExerciseSectionHeader = (section) => {
     if (section.data.length === 0) {
       return (
         <>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Text style={styles.sectionTitle}>{section.title}</Text>
             <View style={{ marginBottom: 0 }}>
               <IconButton
                 iconName="plus"
                 IconFamily={Feather}
                 iconSize={45}
-                foregroundColor={'white'}
+                foregroundColor={"white"}
                 onPress={() => handleAddExerciseOnPress()}
               />
             </View>
           </View>
-          <TouchableOpacity activeOpacity={0.8} onPress={() => handleAddExerciseOnPress()}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => handleAddExerciseOnPress()}
+          >
             <AuxiliaryCard
               title={"Add Exercise"}
               Icon={() => (
@@ -250,35 +285,39 @@ function RoutineEditScreen({ route }) {
                   iconName="plus"
                   IconFamily={Feather}
                   iconSize={45}
-                  foregroundColor={'white'}
+                  foregroundColor={"white"}
                   onPress={() => handleAddExerciseOnPress()}
                 />
               )}
               editable={false}
-              InputComponent={() => (
-                <></>
-              )}
+              InputComponent={() => <></>}
             />
           </TouchableOpacity>
         </>
       );
     } else {
       return (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Text style={styles.sectionTitle}>{section.title}</Text>
           <View style={{ marginBottom: 0 }}>
             <IconButton
               iconName="plus"
               IconFamily={Feather}
               iconSize={45}
-              foregroundColor={'white'}
+              foregroundColor={"white"}
               onPress={() => handleAddExerciseOnPress()}
             />
           </View>
         </View>
       );
     }
-  }
+  };
 
   //  Clear up context variables (??)
   // const handleContextCleanup = async () => {
@@ -289,7 +328,6 @@ function RoutineEditScreen({ route }) {
   // }
 
   const handleSavePress = async () => {
-
     if (isRoutineEditing) {
       updateRoutine(routine);
       exercises.map((exercise) => updateExercise(exercise));
@@ -301,142 +339,148 @@ function RoutineEditScreen({ route }) {
 
     // How to cleanup Context?
 
-
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
   // Rendered Output
-  return (!(routine && exercises)) ? (<Screen />) :
-    (
-      <>
-        <Screen>
-          <NavHeader // Navigation Header
-            LeftComponent={
-              <AppTextButton
-                onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-                textStyle={{ fontWeight: "400", color: theme.foreground }}
-              >
-                {" "}
-                Cancel
-              </AppTextButton>
-            }
-            headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
-            RightComponent={
-              <AppTextButton
-                onPress={() => handleSavePress()}
-                textStyle={{ fontWeight: "500" }}
-              >
-                {isRoutineEditing ? "Save" : "Create"}
-              </AppTextButton>
-            }
-          />
-          <SectionList // SectionList
-            contentContainerStyle={styles.container}
-            ListHeaderComponent={ // Title and Header (added here so it does not "stick", i.e. scrolls along with List)
-              <>
-                <View style={styles.headingPanel}>
-                  <LinearGradient
-                    colors={["#ffffff", "#3397f3"]} //to be adjusted
-                    start={{ x: 0.5, y: 0 }}
-                    end={{ x: 0.5, y: 0.25 }}
-                    style={styles.emojiBox}
-                  />
-                  <TextInput
-                    style={styles.title}
-                    onChangeText={updateRoutineTitle}
-                    multiline={false}
-                    keyboardType="default"
-                    onpre
-                    placeholder={routine ? routine.title : "Loading"}
-                    placeholderTextColor={styles.title.color}
-                    spellCheck={false}
-                    enterKeyHint="done"
-                    onSubmitEditing={(item) => {
-                      updateRoutineTitle(item.nativeEvent.text);
-                    }}
-                  />
-                </View>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => {
-                    navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, { edit: isRoutineEditing })
+  return !(routine && exercises) ? (
+    <Screen />
+  ) : (
+    <>
+      <Screen>
+        <NavHeader // Navigation Header
+          LeftComponent={
+            <AppTextButton
+              onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
+              textStyle={{ fontWeight: "400", color: theme.foreground }}
+            >
+              {" "}
+              Cancel
+            </AppTextButton>
+          }
+          headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
+          RightComponent={
+            <AppTextButton
+              onPress={() => handleSavePress()}
+              textStyle={{ fontWeight: "500" }}
+            >
+              {isRoutineEditing ? "Save" : "Create"}
+            </AppTextButton>
+          }
+        />
+        <SectionList // SectionList
+          contentContainerStyle={styles.container}
+          ListHeaderComponent={
+            // Title and Header (added here so it does not "stick", i.e. scrolls along with List)
+            <>
+              <View style={styles.headingPanel}>
+                <LinearGradient
+                  colors={["#ffffff", "#3397f3"]} //to be adjusted
+                  start={{ x: 0.5, y: 0 }}
+                  end={{ x: 0.5, y: 0.25 }}
+                  style={styles.emojiBox}
+                />
+                <TextInput
+                  style={styles.title}
+                  onChangeText={updateRoutineTitle}
+                  multiline={false}
+                  keyboardType="default"
+                  onpre
+                  placeholder={routine ? routine.title : "Loading"}
+                  placeholderTextColor={styles.title.color}
+                  spellCheck={false}
+                  enterKeyHint="done"
+                  onSubmitEditing={(item) => {
+                    updateRoutineTitle(item.nativeEvent.text);
                   }}
-                  style={styles.templatePanel}
-                >
-                  <AuxiliaryCard
-                    title={"Template"}
-                    editable={false}
-                    InputComponent={() => (
-                      <DummyInputComponent text={selectedTemplate} />
-                    )}
-                  />
-                </TouchableOpacity>
-              </>
-            }
-            sections={formattedExercises}
-            keyExtractor={(item) => item.exerciseOrder}
-            renderItem={({ item, index }) => renderItem(item, index)}
-            renderSectionHeader={({ section }) => (renderSectionHeader(section)
-              //<Text style=//{styles.sectionTitle}>{section.title}</Text>
-            )}
-            stickySectionHeadersEnabled={false}
-            renderSectionFooter={() => <View style={{ height: 22 }} />}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  height: StyleSheet.hairlineWidth,
-                  backgroundColor: theme.text60,
+                />
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {
+                    edit: isRoutineEditing,
+                  });
                 }}
-              />
-            )}
-          />
-        </Screen>
-        <BlurView style={styles.timeTabContainer}
-          tint="dark"
-          intensity={60}
-        >
-          <View style={styles.timeTab}>
-            <Text style={{
-              color: 'white',
+                style={styles.templatePanel}
+              >
+                <AuxiliaryCard
+                  title={"Template"}
+                  editable={false}
+                  InputComponent={() => (
+                    <DummyInputComponent text={selectedTemplate} />
+                  )}
+                />
+              </TouchableOpacity>
+            </>
+          }
+          sections={formattedExercises}
+          keyExtractor={(item) => item.exerciseOrder}
+          renderItem={({ item, index }) => renderItem(item, index)}
+          renderSectionHeader={({ section }) =>
+            renderSectionHeader(section)
+            //<Text style=//{styles.sectionTitle}>{section.title}</Text>
+          }
+          stickySectionHeadersEnabled={false}
+          renderSectionFooter={() => <View style={{ height: 22 }} />}
+          ItemSeparatorComponent={() => (
+            <View
+              style={{
+                height: StyleSheet.hairlineWidth,
+                backgroundColor: theme.text60,
+              }}
+            />
+          )}
+        />
+      </Screen>
+      <BlurView style={styles.timeTabContainer} tint="dark" intensity={60}>
+        <View style={styles.timeTab}>
+          <Text
+            style={{
+              color: "white",
               fontSize: 16,
               marginBottom: 5,
-              fontWeight: '500'
-            }}> {`Total time: ${formatDurationExact(totalRoutineTime)}`} </Text>
-            <View style={styles.timeColorBar}>
-              <View style={[styles.timeWarmup, { flex: warmupTime }]} />
-              <View style={[styles.timeWorkout, { flex: exerciseTime }]} />
-              <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
-            </View>
+              fontWeight: "500",
+            }}
+          >
+            {" "}
+            {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
+          </Text>
+          <View style={styles.timeColorBar}>
+            <View style={[styles.timeWarmup, { flex: warmupTime }]} />
+            <View style={[styles.timeWorkout, { flex: exerciseTime }]} />
+            <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
           </View>
-        </BlurView>
-      </>
-    )
+        </View>
+      </BlurView>
+    </>
+  );
 }
 
 const getStyles = (theme) =>
   StyleSheet.create({
     timeColorBar: {
-      flexDirection: 'row',
-      backgroundColor: 'white',
+      flexDirection: "row",
+      backgroundColor: "white",
       borderRadius: 5,
-      overflow: 'hidden'
+      overflow: "hidden",
     },
     timeTabContainer: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
       height: TAB_BAR_HEIGHT,
       // paddingBottom: ,
       paddingTop: 15,
       backgroundColor: "transparent",
-      width: '100%',
-      justifyContent: 'flex-start',
-      alignItems: 'center'
+      width: "100%",
+      justifyContent: "flex-start",
+      alignItems: "center",
     },
     timeTab: {
       // position: 'absolute',
       // bottom: 15,
-      width: '90%',
-      alignItems: 'center'
+      width: "90%",
+      alignItems: "center",
     },
     timeWarmup: {
       // flex: { warmupTime },

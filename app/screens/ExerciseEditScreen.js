@@ -38,9 +38,6 @@ function ExerciseEditScreen({ route }) {
   const { isRoutineEditing, isExerciseEditing, originalExercise } =
     route.params;
 
-  const { contextExercises, setContextExercises } = useRoutineContext();
-  const [exercise, setExercise] = useState(originalExercise);
-
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const MODAL_CONTENT_ENUM = {
@@ -68,7 +65,10 @@ function ExerciseEditScreen({ route }) {
   };
 
   useEffect(() => {
-    dispatch({ type: exerciseEditActions.INIT, payload: originalExercise });
+    dispatch({
+      type: exerciseEditActions.INIT,
+      payload: { ...originalExercise },
+    });
   }, []);
 
   const modalRef = useRef(null);
@@ -95,6 +95,19 @@ function ExerciseEditScreen({ route }) {
     }
   };
 
+  onSave = () => {
+    const exercise = {
+      ...originalExercise,
+      workTime: state.workTime,
+      numberOfRounds: state.numberOfRounds,
+      restBetweenRounds: state.restBetweenRounds,
+      breakBeforeNext: state.breakBeforeNext,
+    };
+
+    Object.assign(originalExercise, exercise);
+    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+  };
+
   return (
     <Screen style={{ flex: 1 }}>
       <Navheader
@@ -115,16 +128,29 @@ function ExerciseEditScreen({ route }) {
         headerText={`Edit ${state.title}`}
         RightComponent={
           state.dirty ? (
-            <AppTextButton
-              onPress={() => handleSaveOnPress()}
-              textStyle={{ fontWeight: "500" }}
-            >
+            <AppTextButton onPress={onSave} textStyle={{ fontWeight: "500" }}>
               {isExerciseEditing ? "Save" : "Create"}
             </AppTextButton>
           ) : null
         }
       />
       <View style={{ gap: 10, paddingHorizontal: 11 }}>
+        <AuxilaryCard
+          editable={false}
+          bold={false}
+          title={"Name"}
+          InputComponent={() => (
+            <EditableText
+              placeholder={state.title}
+              onSubmit={(text) => {
+                dispatch({
+                  type: exerciseEditActions.SET_TITLE,
+                  payload: text,
+                });
+              }}
+            />
+          )}
+        />
         <AuxilaryCard
           editable={false}
           bold={false}
@@ -341,30 +367,25 @@ const reducer = (state, action) => {
       return { ...state, activeKey: action.payload };
 
     case exerciseEditActions.SET_WORK_TIME:
-      return { ...state, workTime: action.payload };
+      return { ...state, workTime: action.payload, dirty: true };
 
     case exerciseEditActions.SET_REST:
-      return { ...state, restBetweenRounds: action.payload };
+      return { ...state, restBetweenRounds: action.payload, dirty: true };
 
     case exerciseEditActions.SET_BREAK:
-      return { ...state, breakBeforeNext: action.payload };
+      return { ...state, breakBeforeNext: action.payload, dirty: true };
 
     case exerciseEditActions.SET_ROUNDS:
-      return { ...state, numberOfRounds: action.payload };
+      return { ...state, numberOfRounds: action.payload, dirty: true };
 
-    case exerciseEditActions.TITLE:
-      return { ...state, title: action.payload };
+    case exerciseEditActions.SET_TITLE:
+      return { ...state, title: action.payload, dirty: true };
 
     case exerciseEditActions.SET_PREVIOUS:
       return { ...state, previous: action.payload };
 
     case exerciseEditActions.REVERT_PREVIOUS:
-      console.log("activeKey", state.activeKey);
-      console.log("previous", state.previous);
       return { ...state, [state.activeKey]: state.previous };
-
-    case exerciseEditActions.FLAG_DIRTY:
-      return { ...state, dirty: true };
 
     case exerciseEditActions.TOGGLE_REFRESH_PICKER:
       return { ...state, shouldRefreshPicker: !state.shouldRefreshPicker };
