@@ -61,7 +61,7 @@ function ExerciseEditScreen({ route }) {
       subtitle: "Rest duration between consecutive rounds.",
     },
     BREAK_TIME: {
-      key: "breakBeforenext",
+      key: "breakBeforeNext",
       title: "Break",
       subtitle: "Break duration beforel next exercise.",
     },
@@ -76,18 +76,22 @@ function ExerciseEditScreen({ route }) {
   const [contentType, setContentType] = useState(MODAL_CONTENT_ENUM.NONE);
 
   onModalChange = (isOpen) => {
-    // If opening BottomSheet, save
-    // values to which to revert when
-    // cancelling.
     if (isOpen === 1) {
+      // Opening modal; save value to which to possibly revert.
       dispatch({
         type: exerciseEditActions.SET_PREVIOUS,
         payload: state[state.activeKey],
       });
-    } else if (state.apply) {
-      dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
     } else {
-      dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
+      // Closing modal
+      dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+
+      // Either persist the change or revert it.
+      if (state.apply) {
+        dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
+      } else {
+        dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
+      }
     }
   };
 
@@ -134,6 +138,7 @@ function ExerciseEditScreen({ route }) {
                   payload: MODAL_CONTENT_ENUM.WORK_TIME.key,
                 });
                 dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
                 setContentType(MODAL_CONTENT_ENUM.WORK_TIME);
                 modalRef.current?.expand();
               }}
@@ -155,6 +160,7 @@ function ExerciseEditScreen({ route }) {
                   payload: MODAL_CONTENT_ENUM.ROUNDS.key,
                 });
                 dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
                 setContentType(MODAL_CONTENT_ENUM.ROUNDS);
                 modalRef.current?.expand();
               }}
@@ -181,6 +187,9 @@ function ExerciseEditScreen({ route }) {
                         payload: MODAL_CONTENT_ENUM.REST_TIME.key,
                       });
                       dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                      dispatch({
+                        type: exerciseEditActions.TOGGLE_REFRESH_PICKER,
+                      });
                       setContentType(MODAL_CONTENT_ENUM.REST_TIME);
                       modalRef.current?.expand();
                     }
@@ -204,6 +213,7 @@ function ExerciseEditScreen({ route }) {
                   payload: MODAL_CONTENT_ENUM.BREAK_TIME.key,
                 });
                 dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
                 setContentType(MODAL_CONTENT_ENUM.BREAK_TIME);
                 modalRef.current?.expand();
               }}
@@ -248,7 +258,7 @@ function ExerciseEditScreen({ route }) {
         )}
         {contentType.key === MODAL_CONTENT_ENUM.WORK_TIME.key && (
           <TimeWheelPicker
-            key={state.workTime}
+            key={state.restBetweenRounds}
             startingTime={state.workTime}
             onValueChange={(data) =>
               dispatch({
@@ -260,7 +270,7 @@ function ExerciseEditScreen({ route }) {
         )}
         {contentType.key === MODAL_CONTENT_ENUM.REST_TIME.key && (
           <TimeWheelPicker
-            key={state.restBetweenRounds}
+            key={state.shouldRefreshPicker}
             startingTime={state.restBetweenRounds}
             onValueChange={(data) =>
               dispatch({
@@ -272,7 +282,7 @@ function ExerciseEditScreen({ route }) {
         )}
         {contentType.key === MODAL_CONTENT_ENUM.BREAK_TIME.key && (
           <TimeWheelPicker
-            key={state.breakBeforeNext}
+            key={state.shouldRefreshPicker}
             startingTime={state.breakBeforeNext}
             onValueChange={(data) =>
               dispatch({
@@ -318,6 +328,7 @@ const initialState = {
   restBetweenRounds: 0,
   breakBeforeNext: 0,
   previous: null,
+  shouldRefreshPicker: false,
   dirty: false,
 };
 
@@ -348,10 +359,15 @@ const reducer = (state, action) => {
       return { ...state, previous: action.payload };
 
     case exerciseEditActions.REVERT_PREVIOUS:
+      console.log("activeKey", state.activeKey);
+      console.log("previous", state.previous);
       return { ...state, [state.activeKey]: state.previous };
 
     case exerciseEditActions.FLAG_DIRTY:
       return { ...state, dirty: true };
+
+    case exerciseEditActions.TOGGLE_REFRESH_PICKER:
+      return { ...state, shouldRefreshPicker: !state.shouldRefreshPicker };
 
     case exerciseEditActions.TOGGLE_APPLY_FLAG:
       return { ...state, apply: !state.apply };

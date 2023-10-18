@@ -17,5 +17,6 @@ export function formatDuration(seconds) {
 export function formatMinutesSeconds(seconds) {
   const min = Math.floor(seconds / 60);
   const sec = seconds % 60;
-  return min > 0 ? `${min}min ${sec}sec` : `${sec}sec`;
+  if (sec === 0) return `${min} minutes`;
+  return min > 0 ? `${min}m ${sec}s` : `${sec} seconds`;
 }
