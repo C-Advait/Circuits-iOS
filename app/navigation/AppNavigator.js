@@ -6,6 +6,7 @@ import routes from "./routes";
 import SettingsScreen from "../screens/SettingsScreen";
 import RoutineNavigator from "./RoutineNavigator";
 import AppTabBar from "./AppTabBar";
+import DebugScreen from "../screens/DebugScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -17,24 +18,9 @@ function AppNavigator() {
         headerShown: false,
       }}
     >
-      <Tab.Screen
-        name={routes.ROUTINES}
-        component={RoutineNavigator}
-        options={{
-          tabBarIcon: ({ size, color }) => (
-            <Feather name="list" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name={routes.SETTINGS_SCREEN}
-        component={SettingsScreen}
-        options={{
-          tabBarIcon: ({ size, color }) => (
-            <Feather name="settings" size={size} color={color} />
-          ),
-        }}
-      />
+      <Tab.Screen name={routes.ROUTINES} component={RoutineNavigator} />
+      <Tab.Screen name={routes.SETTINGS_SCREEN} component={SettingsScreen} />
+      <Tab.Screen name={routes.DEBUG_SCREEN} component={DebugScreen} />
     </Tab.Navigator>
   );
 }

@@ -1,18 +1,17 @@
 import React from "react";
-import { View, StyleSheet, Text, ActionSheetIOS } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 
 import { useTheme } from "../contexts/ThemeContext";
 import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 function AuxiliaryCard({
-  accentcolor = 'transparent',
+  accentcolor = "transparent",
   bold = false,
-  editable = true,
-  disabled = false,
+  editable = false,
   title,
   Icon,
-  InputComponent,
+  children,
 }) {
   const { theme } = useTheme();
   const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
@@ -30,11 +29,16 @@ function AuxiliaryCard({
       ) : null}
       <View style={styles.contentContainer}>
         {editable ? (
-          <EditableText placeholder={title} style={[styles.textStyle, { fontWeight: fontWeight }]} />
+          <EditableText
+            placeholder={title}
+            style={[styles.textStyle, { fontWeight: fontWeight }]}
+          />
         ) : (
-          <Text style={[styles.textStyle, { fontWeight: fontWeight }]}>{title}</Text>
+          <Text style={[styles.textStyle, { fontWeight: fontWeight }]}>
+            {title}
+          </Text>
         )}
-        <InputComponent disabled={disabled} />
+        {children}
       </View>
     </View>
   );
@@ -65,7 +69,7 @@ const getStylesActive = (theme) =>
       flex: 1,
       justifyContent: "space-between",
       padding: 10,
-      paddingHorizontal: 16
+      paddingHorizontal: 16,
     },
     header: {
       color: theme.text87,
@@ -73,7 +77,6 @@ const getStylesActive = (theme) =>
     },
     iconContainer: {
       marginLeft: 10,
-      marginRight: -10,
     },
     subtitle: {
       fontSize: 18,
@@ -81,8 +84,8 @@ const getStylesActive = (theme) =>
     },
     textStyle: {
       color: theme.text87,
-      fontSize: 17,
-    }
+      fontSize: PARAGRAPH_FONT_SIZE,
+    },
   });
 
 const getStylesDisabled = (theme) =>
@@ -110,7 +113,7 @@ const getStylesDisabled = (theme) =>
       flex: 1,
       justifyContent: "space-between",
       padding: 10,
-      paddingHorizontal: 16
+      paddingHorizontal: 16,
     },
     header: {
       color: theme.text87,
@@ -127,8 +130,7 @@ const getStylesDisabled = (theme) =>
     textStyle: {
       color: theme.textDisabled,
       fontSize: PARAGRAPH_FONT_SIZE,
-    }
+    },
   });
 
-
-export default AuxiliaryCard
+export default AuxiliaryCard;

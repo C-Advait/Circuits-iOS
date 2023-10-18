@@ -1,42 +1,55 @@
-import React, { useState, useRef } from 'react';
-import { TextInput, View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from "react";
+import {
+  TextInput,
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from "react-native";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import { useTheme } from "../contexts/ThemeContext";
 
-const EditableText = ({ exercise, onSubmit, maxLength }) => {
-  const [text, setText] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const inputRef = useRef(null);
-
+const EditableText = ({ original, placeholder, onSubmit, maxLength }) => {
   const { theme } = useTheme();
   const styles = getStyles(theme);
 
+  const [text, setText] = useState(original);
+  const [isEditing, setIsEditing] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    setText(original);
+  }, [original]);
+
   const handleFocus = () => {
-    setText('');
-    inputRef.current.setNativeProps({ selection: { start: 0, end: 0 } });
+    if (text === placeholder) {
+      setText("");
+    }
   };
 
   const handleBlur = () => {
     setIsEditing(false);
-    if (text !== '') {
+    if (text !== "") {
       onSubmit(text);
+      setText(text);
     } else {
-      setText(exercise.title);
+      onSubmit(placeholder);
+      setText(placeholder);
     }
   };
 
-  const textStyle = text
-    ? styles.text
-    : [styles.text, styles.placeholderText];
+  const textStyle =
+    text && text.length ? styles.text : [styles.text, styles.placeholderText];
 
   return (
     <TouchableOpacity
       onPress={() => setIsEditing(true)}
-      style={styles.touchableArea}>
+      style={styles.touchableArea}
+    >
       {isEditing ? (
         <View style={styles.inputContainer}>
           <Text style={[styles.text, styles.fadedSuggestion]} numberOfLines={1}>
-            {text ? "" : exercise.title}
+            {text === "" ? placeholder : text}
           </Text>
           <TextInput
             ref={inputRef}
@@ -52,36 +65,40 @@ const EditableText = ({ exercise, onSubmit, maxLength }) => {
           />
         </View>
       ) : (
-        <Text style={textStyle} numberOfLines={1}>
-          {text || exercise.title}
-        </Text>
+        <View style={styles.inputContainer}>
+          <Text style={textStyle} numberOfLines={1}>
+            {text || placeholder}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );
-}
+};
 
-const getStyles = (theme) => StyleSheet.create({
-  touchableArea: {
-    width: 200,
-  },
-  inputContainer: {
-    position: 'relative',
-  },
-  text: {
-    fontSize: PARAGRAPH_FONT_SIZE,
-  },
-  placeholderText: {
-    color: theme.text60,
-  },
-  fadedSuggestion: {
-    position: 'absolute',
-    color: theme.text60,
-    zIndex: -1,
-  },
-  textInput: {
-    fontSize: PARAGRAPH_FONT_SIZE,
-    color: theme.foreground
-  },
-});
+const getStyles = (theme) =>
+  StyleSheet.create({
+    touchableArea: {
+      width: 200,
+    },
+    inputContainer: {
+      position: "relative",
+      flexDirection: "row",
+      justifyContent: "flex-end",
+    },
+    text: {
+      color: theme.primary,
+    },
+    placeholderText: {
+      color: theme.text60,
+    },
+    fadedSuggestion: {
+      position: "absolute",
+      color: theme.text60,
+      zIndex: -1,
+    },
+    textInput: {
+      color: theme.foreground,
+    },
+  });
 
 export default EditableText;

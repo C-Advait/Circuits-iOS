@@ -8,5 +8,6 @@ export default shouldShowTabBar = (route) => {
     routes.ROUTINES,
     routes.ROUTINES_SCREEN,
     routes.SETTINGS_SCREEN,
+    routes.DEBUG_SCREEN,
   ].includes(route);
 };

@@ -207,6 +207,7 @@ const getStyles = (theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      height: 45,
       marginLeft: 15,
       marginBottom: 34,
       marginHorizontal: 10,
