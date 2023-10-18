@@ -23,8 +23,12 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
     Math.floor(startingTime / 60),
   );
   const [selectedSecond, setSelectedSecond] = useState(startingTime % 60);
-  const [filteredSeconds, setFilteredSeconds] = useState(items.slice(5));
+  const [filteredSeconds, setFilteredSeconds] = useState(
+    startingTime > 60 ? items : items.slice(5),
+  );
   const key = filteredSeconds.length;
+
+  console.log(key);
 
   return (
     <View style={styles.container}>
@@ -35,16 +39,19 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           style={styles.minutesPicker}
           selectionColor={theme.tertiaryTranslucentBackground}
           onValueChange={(itemValue) => {
+            onValueChange(itemValue * 60 + selectedSecond);
             setSelectedMinute(itemValue);
+
             if (itemValue === 0) {
               setFilteredSeconds(items.slice(5)); // starts from ' 5'
+
               if (selectedSecond < 5) {
+                // Move to legal range
                 setSelectedSecond(5);
               }
             } else {
               setFilteredSeconds(items); // reset to the full range
             }
-            onValueChange(itemValue * 60 + selectedSecond);
           }}
           color={theme.primary}
           itemStyle={{
