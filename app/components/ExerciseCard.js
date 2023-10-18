@@ -24,12 +24,11 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
   };
 
   const handleExerciseEditNavigation = () => {
-    rest.exercise
+    rest.referenceExercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
         isRoutineEditing: rest.isRoutineEditing,
         isExerciseEditing: rest.isExerciseEditing,
         referenceExercise: rest.referenceExercise,
-        exercise: rest.exercise,
       })
       : null;
   };

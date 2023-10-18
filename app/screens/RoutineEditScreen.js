@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useReducer, useState } from "react";
+import React, { useEffect, useCallback, useRef, useReducer, useState } from "react";
 import {
   Button,
   View,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { useNavigation } from "@react-navigation/core";
+import { useNavigation, useFocusEffect } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
@@ -41,23 +41,27 @@ import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
 import TimeWheelPicker from "../components/TimeWheelPicker";
+import DraggableFlatList, {
+  NestableDraggableFlatList,
+  NestableScrollContainer,
+} from "react-native-draggable-flatlist";
 
 const MODAL_HEIGHT = 350;
 
-const formatDataForSectionList = (data) => {
-  // Initialize an object to hold data for each section
-  let WarmupTime = 0;
-  let ExerciseTime = 0;
-  let CooldownTime = 0;
-  const sections = {
-    Warmup: [],
-    Exercises: [],
-    Cooldown: [],
-  };
+const sortedExercises = (exercises) => {
+  return [...exercises].sort((a, b) => a.exerciseOrder - b.exerciseOrder);
+};
+const getExerciseInfo = (exercises) => {
+  let warmupTime = 0,
+    workingTime = 0,
+    cooldownTime = 0,
+    numExercises = 0,
+    greatestExerciseOrder = 0;
 
-  // Iterate through the data, adding items to the appropriate section
-  data.forEach((item) => {
-    switch (item.tag) {
+  exercises.forEach((exercise) => {
+    if (exercise.exerciseOrder > greatestExerciseOrder)
+      greatestExerciseOrder = exercise.exerciseOrder;
+    switch (exercise.tag) {
       case Tag.PREROUTINE:
         warmupTime += getExerciseLength(exercise);
         break;
@@ -74,22 +78,12 @@ const formatDataForSectionList = (data) => {
   });
 
   return [
-    Object.keys(sections).map((key) => ({
-      title: key,
-      data: sections[key],
-    })),
-    WarmupTime,
-    ExerciseTime,
-    CooldownTime,
+    warmupTime,
+    workingTime,
+    cooldownTime,
+    numExercises,
+    greatestExerciseOrder,
   ];
-};
-const getNumExercises = (exerciseData) => {
-  for (let i = 0; i < exerciseData.length; i++) {
-    if (exerciseData[i]["title"] === "Exercises") {
-      return exerciseData[i]["data"].length - 1;
-    }
-  }
-  return 0;
 };
 function RoutineEditScreen({ route }) {
   // Setup Functionality
@@ -109,16 +103,18 @@ function RoutineEditScreen({ route }) {
   } = useRoutineContext();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  // const [maxExerciseOrder, setMaxExerciseOrder] = useState(0);
-  // const [maxExerciseID, setMaxExerciseID] = useState(0);
 
-  const [formattedExercises, warmupTime, exerciseTime, cooldownTime] =
-    formatDataForSectionList(exercises);
-  const totalRoutineTime = warmupTime + exerciseTime + cooldownTime;
-  const numExercises = useMemo(
-    () => getNumExercises(formattedExercises),
-    [formattedExercises],
-  );
+  const [workingSet, setWorkingSet] = useState(
+    sortedExercises(exercises).slice(1, -1),
+  ); // The working set is everything between 1st & last elements
+  const [
+    warmupTime,
+    workingTime,
+    cooldownTime,
+    numExercises,
+    maxExerciseOrder,
+  ] = getExerciseInfo(exercises);
+  const totalRoutineTime = warmupTime + workingTime + cooldownTime;
 
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -139,13 +135,19 @@ function RoutineEditScreen({ route }) {
       });
     }
   }, [exercises]);
-
   useEffect(() => {
     console.log(
       `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
     );
   }, [selectedTemplate]);
-
+  useFocusEffect(
+    useCallback(() => {
+      setWorkingSet(sortedExercises(exercises).slice(1, -1));
+      return () => {
+        // You can add any cleanup logic here if necessary.
+      };
+    }, [exercises]), // Depend on exercises so the callback updates if exercises change
+  );
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
       // Opening modal; save value to which to possibly revert.
@@ -168,58 +170,15 @@ function RoutineEditScreen({ route }) {
   };
 
   // Helper Functions
-  const renderItem = ({ state, item, index }) => {
-    // console.log(item, index);
-    switch (item.tag) {
-      case Tag.PREROUTINE:
-        return (
-          <AuxiliaryCard accentcolor={theme.accentGreen} title={item.title}>
-            <Text
-              style={styles.inputText}
-              onPress={() => {
-                dispatch({
-                  type: routineEditActions.SET_ACTIVE_KEY,
-                  payload: ROUTINE_EDIT_MODAL.WARMUP.key,
-                });
-                dispatch({ type: routineEditActions.SET_PREVIOUS });
-                dispatch({ type: routineEditActions.TOGGLE_REFRESH });
-                setModalContent(ROUTINE_EDIT_MODAL.WARMUP);
-                modalRef.current?.expand();
-              }}
-            >
-              {formatMinutesSeconds(state.warmupDuration)}
-            </Text>
-          </AuxiliaryCard>
-        );
-      case Tag.POSTROUTINE:
-        return (
-          <AuxiliaryCard accentcolor={theme.accentDarkBlue} title={item.title}>
-            <Text
-              style={styles.inputText}
-              onPress={() => {
-                dispatch({
-                  type: routineEditActions.SET_ACTIVE_KEY,
-                  payload: ROUTINE_EDIT_MODAL.COOLDOWN.key,
-                });
-                dispatch({ type: routineEditActions.SET_PREVIOUS });
-                dispatch({ type: routineEditActions.TOGGLE_REFRESH });
-                setModalContent(ROUTINE_EDIT_MODAL.COOLDOWN);
-                modalRef.current?.expand();
-              }}
-            >
-              {formatMinutesSeconds(state.cooldownDuration)}
-            </Text>
-          </AuxiliaryCard>
-        );
-      case Tag.WORKING: {
-        return renderExerciseItem(item, index);
-      }
-      default:
-        null;
-    }
+  const updateRoutineTitle = (newTitle) => {
+    setContextRoutine({
+      ...routine,
+      title: newTitle,
+    });
   };
-  const renderExerciseItem = (item, index) => {
-    switch (index) {
+  const renderExerciseItem = (item, getIndex, drag, isActive) => {
+    // console.log(getIndex());
+    switch (getIndex()) {
       case 0:
         return (
           <ExerciseCard
@@ -264,113 +223,32 @@ function RoutineEditScreen({ route }) {
         );
     }
   };
-  const updateRoutineTitle = (newTitle) => {
-    setContextRoutine({
-      ...routine,
-      title: newTitle,
-    });
-  };
-  const renderSectionHeader = (section) => {
-    if (section.title === "Warmup")
-      return renderAuxiliarySectionHeader(section);
-    if (section.title === "Exercises")
-      return renderExerciseSectionHeader(section);
-    if (section.title === "Cooldown")
-      return renderAuxiliarySectionHeader(section);
-  };
-  const renderAuxiliarySectionHeader = (section) => {
-    return <Text style={styles.sectionTitle}>{section.title}</Text>;
-  };
   const handleAddExerciseOnPress = () => {
-    exer = new Exercise({
+    const newExercise = new Exercise({
       ...DEFAULT_EXERCISE,
       routineID: routine.id,
-      exerciseOrder: numExercises, // Bind exerciseOrder to number of exercises ATM
+      exerciseOrder: maxExerciseOrder,
     });
 
     navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
       isRoutineEditing: isRoutineEditing,
       isExerciseEditing: false,
-      referenceExercise: exer,
+      referenceExercise: newExercise,
     });
   };
-
-  const renderExerciseSectionHeader = (section) => {
-    if (section.data.length === 0) {
-      return (
-        <>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={{ marginBottom: 0 }}>
-              <IconButton
-                iconName="plus"
-                IconFamily={Feather}
-                iconSize={45}
-                foregroundColor={"white"}
-                onPress={() => handleAddExerciseOnPress()}
-              />
-            </View>
-          </View>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => handleAddExerciseOnPress()}
-          >
-            <AuxiliaryCard
-              title={"Add Exercise"}
-              Icon={() => (
-                <IconButton
-                  iconName="plus"
-                  IconFamily={Feather}
-                  iconSize={45}
-                  foregroundColor={"white"}
-                  onPress={() => handleAddExerciseOnPress()}
-                />
-              )}
-              editable={false}
-              InputComponent={() => <></>}
-            />
-          </TouchableOpacity>
-        </>
-      );
-    } else {
-      return (
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-          <View style={{ marginBottom: 0 }}>
-            <IconButton
-              iconName="plus"
-              IconFamily={Feather}
-              iconSize={45}
-              foregroundColor={"white"}
-              onPress={() => handleAddExerciseOnPress()}
-            />
-          </View>
-        </View>
-      );
-    }
-  };
-
-  //  Clear up context variables (??)
-  // const handleContextCleanup = async () => {
-  //   setContextRoutine(null);
-  //   setContextExercises([]);
-  //   setSelectedTemplate("Custom");
-  //   setSelectedTemplateID(1);
-  // }
-
   const handleSavePress = async () => {
+    const exerciseOrderSorted = sortedExercises(exercises);
+
+    const finalExercises = [
+      exerciseOrderSorted[0],
+      ...workingSet,
+      exerciseOrderSorted[exercises.length - 1],
+    ];
+    finalExercises.forEach((exercise, index) => {
+      // final fix
+      exercise.exerciseOrder = index;
+    });
+
     if (isRoutineEditing) {
       // need to know which exercises are created and which are updated (.id parameter)?
       updateRoutine(routine);
@@ -383,7 +261,6 @@ function RoutineEditScreen({ route }) {
     console.log(isRoutineEditing ? "Routine Updated" : " Routine Created");
 
     // How to cleanup Context?
-
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
@@ -413,70 +290,138 @@ function RoutineEditScreen({ route }) {
             </AppTextButton>
           }
         />
-        <SectionList // SectionList
-          contentContainerStyle={styles.container}
-          ListHeaderComponent={
-            // Title and Header (added here so it does not "stick", i.e. scrolls along with List)
-            <>
-              <View style={styles.headingPanel}>
-                <LinearGradient
-                  colors={["#ffffff", "#3397f3"]} //to be adjusted
-                  start={{ x: 0.5, y: 0 }}
-                  end={{ x: 0.5, y: 0.25 }}
-                  style={styles.emojiBox}
-                />
-                <TextInput
-                  style={styles.title}
-                  onChangeText={updateRoutineTitle}
-                  multiline={false}
-                  keyboardType="default"
-                  onpre
-                  placeholder={routine ? routine.title : "Loading"}
-                  placeholderTextColor={styles.title.color}
-                  spellCheck={false}
-                  enterKeyHint="done"
-                  onSubmitEditing={(item) => {
-                    updateRoutineTitle(item.nativeEvent.text);
-                  }}
-                />
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => {
-                  navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {
-                    edit: isRoutineEditing,
-                  });
-                }}
-                style={styles.templatePanel}
-              >
-                <AuxiliaryCard
-                  title={"Template"}
-                  editable={false}
-                  InputComponent={() => (
-                    <DummyInputComponent text={selectedTemplate} />
-                  )}
-                />
-              </TouchableOpacity>
-            </>
-          }
-          sections={formattedExercises}
-          keyExtractor={(item) => item.exerciseOrder}
-          renderItem={({ item, index }) => renderItem({ state, item, index })}
-          renderSectionHeader={({ section }) =>
-            renderSectionHeader(section)
-            //<Text style=//{styles.sectionTitle}>{section.title}</Text>
-          }
-          stickySectionHeadersEnabled={false}
-          renderSectionFooter={() => <View style={{ height: 22 }} />}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                height: StyleSheet.hairlineWidth,
-                backgroundColor: theme.text60,
-              }}
+        <View style={styles.headingPanel}>
+          <LinearGradient
+            colors={["#ffffff", "#3397f3"]} //to be adjusted
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 0.25 }}
+            style={styles.emojiBox}
+          />
+          <TextInput
+            style={styles.title}
+            onChangeText={updateRoutineTitle}
+            multiline={false}
+            keyboardType="default"
+            onpre
+            placeholder={routine ? routine.title : "Loading"}
+            placeholderTextColor={styles.title.color}
+            spellCheck={false}
+            enterKeyHint="done"
+            onSubmitEditing={(item) => {
+              updateRoutineTitle(item.nativeEvent.text);
+            }}
+          />
+        </View>
+        <NestableScrollContainer
+          contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 70 }}
+        >
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {
+                edit: isRoutineEditing,
+              });
+            }}
+            style={styles.templatePanel}
+          >
+            <AuxiliaryCard
+              title={"Template"}
+              editable={false}
+              InputComponent={() => (
+                <DummyInputComponent text={selectedTemplate} />
+              )}
             />
+          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Pre-routine</Text>
+          <View style={{ marginBottom: 22 }}>
+            <AuxiliaryCard
+              title={"Warmup"}
+              editable={false}
+              InputComponent={() => (
+                <DummyInputComponent
+                  text={`${formatDurationExact(exercises[0].workTime)}`}
+                />
+              )}
+              accentcolor={theme.accentGreen}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.sectionTitle}>Intervals</Text>
+            <View style={{ marginBottom: 0 }}>
+              <IconButton
+                iconName="plus"
+                IconFamily={Feather}
+                iconSize={45}
+                foregroundColor={"white"}
+                onPress={() => handleAddExerciseOnPress()}
+              />
+            </View>
+          </View>
+          {workingSet.length === 0 && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => handleAddExerciseOnPress()}
+            >
+              <AuxiliaryCard
+                title={"Add Exercise"}
+                Icon={() => (
+                  <IconButton
+                    iconName="plus"
+                    IconFamily={Feather}
+                    iconSize={45}
+                    foregroundColor={"white"}
+                    onPress={() => handleAddExerciseOnPress()}
+                  />
+                )}
+                editable={false}
+                InputComponent={() => <></>}
+              />
+            </TouchableOpacity>
           )}
-        />
+          <NestableDraggableFlatList
+            data={workingSet}
+            renderItem={({ item, getIndex, drag, isActive }) =>
+              renderExerciseItem(item, getIndex, drag, isActive)
+            }
+            scrollEnabled={false}
+            keyExtractor={(item) => item.exerciseOrder}
+            onDragEnd={({ data }) => {
+              setWorkingSet(data);
+            }}
+            containerStyle={{ marginBottom: 22 }}
+          />
+          <View style={{ marginBottom: 22 }}>
+            <AuxiliaryCard
+              editable={false}
+              bold={false}
+              title={"Loops"}
+              InputComponent={() => <DummyInputComponent text="Once" />}
+              Icon={() => (
+                <Feather name="repeat" size={24} color={theme.foreground} />
+              )}
+            />
+          </View>
+          <View style={{}}>
+            <AuxiliaryCard
+              title={"Cooldown"}
+              editable={false}
+              InputComponent={() => (
+                <DummyInputComponent
+                  text={`${formatDurationExact(
+                    exercises[exercises.length - 1].workTime,
+                  )}`}
+                />
+              )}
+              accentcolor={theme.accentDarkBlue}
+            />
+          </View>
+        </NestableScrollContainer>
         <BottomSheet
           ref={modalRef}
           index={-1}
@@ -568,7 +513,7 @@ function RoutineEditScreen({ route }) {
           </Text>
           <View style={styles.timeColorBar}>
             <View style={[styles.timeWarmup, { flex: warmupTime }]} />
-            <View style={[styles.timeWorkout, { flex: exerciseTime }]} />
+            <View style={[styles.timeWorkout, { flex: workingTime }]} />
             <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
           </View>
         </View>
@@ -619,6 +564,9 @@ const reducer = (state, action) => {
 
 const getStyles = (theme) =>
   StyleSheet.create({
+    activeItem: {
+      backgroundColor: "rgba(128,128,128,0.8)",
+    },
     buttonContainer: {
       marginHorizontal: 16,
       marginTop: 12,
