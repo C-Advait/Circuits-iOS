@@ -81,7 +81,7 @@ const getStylesActive = (theme) =>
     },
     textStyle: {
       color: theme.text87,
-      fontSize: PARAGRAPH_FONT_SIZE,
+      fontSize: 17,
     }
   });
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, StyleSheet, SectionList, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, StyleSheet, SectionList, Text, TouchableOpacity, TextInput, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,52 +24,10 @@ import formatDurationExact from "../utilities/formatDurationExact";
 import { createExercise, createRoutine, updateExercise, updateRoutine } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
 import TimePickerModal from "../components/TimePickerModal";
-import { FlatList } from "react-native-gesture-handler";
+import DraggableFlatList from "react-native-draggable-flatlist";
 
-const formatDataForSectionList = (data) => {
-  // Initialize an object to hold data for each section
-  let WarmupTime = 0;
-  let ExerciseTime = 0;
-  let CooldownTime = 0;
-  const sections = {
-    Warmup: [],
-    Exercises: [],
-    Cooldown: [],
-  };
-
-  // Iterate through the data, adding items to the appropriate section
-  data.forEach((item) => {
-    switch (item.tag) {
-      case Tag.PREROUTINE:
-        sections.Warmup.push(item);
-        WarmupTime += getExerciseLength(item);
-        break;
-      case Tag.WORKING:
-        sections.Exercises.push(item);
-        ExerciseTime += getExerciseLength(item);
-        break;
-      case Tag.POSTROUTINE:
-        sections.Cooldown.push(item);
-        CooldownTime += getExerciseLength(item);
-        break;
-      default:
-        null;
-    }
-  });
-
-  // Convert the sections object into an array of section objects for SectionList
-  return [
-    Object.keys(sections).map((key) => ({
-      title: key,
-      data: sections[key],
-    })),
-    WarmupTime,
-    ExerciseTime,
-    CooldownTime
-  ];
-};
-const sortExercises = (exercises) => {
-  return exercises.sort((a, b) => a.exerciseOrder - b.exerciseOrder);
+const sortedExercises = (exercises) => {
+  return [...exercises].sort((a, b) => a.exerciseOrder - b.exerciseOrder);
 }
 const getExerciseInfo = (exercises) => {
 
@@ -95,7 +53,6 @@ const getExerciseInfo = (exercises) => {
 
   return [warmupTime, workingTime, cooldownTime, numExercises, greatestExerciseOrder];
 }
-
 function RoutineEditScreen({ route }) {
 
   // Setup Functionality
@@ -105,14 +62,9 @@ function RoutineEditScreen({ route }) {
   const { contextExercises: exercises, contextRoutine: routine, setContextRoutine, setContextExercises } = useRoutineContext();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-
-  const ordered_exer_arr = sortExercises(exercises);
+  const [workingSet, setWorkingSet] = useState(sortedExercises(exercises).slice(1, -1)); // The working set is everything between 1st & last elements
   const [warmupTime, workingTime, cooldownTime, numExercises, maxExerciseOrder] = getExerciseInfo(exercises);
-  // console.log(ordered_exer_arr);
-  // console.log(warmupTime, workingTime, cooldownTime);
-
   const totalRoutineTime = warmupTime + workingTime + cooldownTime;
-  // const numExercises = useMemo(() => getNumExercises(formattedExercises), [formattedExercises]);
 
   useEffect(() => {
     console.log(
@@ -121,46 +73,7 @@ function RoutineEditScreen({ route }) {
   }, [selectedTemplate]);
 
   // Helper Functions
-  const renderItem = (item, index) => {
-    switch (item.tag) {
-      case Tag.PREROUTINE:
-        return (
-          <AuxiliaryCard
-            accentcolor={theme.accentGreen}
-            editable={false}
-            bold={false}
-            title={item.title}
-            InputComponent={() => (
-              <TimePickerModal
-                promptTitle="Warmup"
-                promptSubtitle="Duration of the warmup phase."
-              />
-            )}
-          />
-        );
-      case Tag.POSTROUTINE:
-        return (
-          <AuxiliaryCard
-            accentcolor={theme.accentDarkBlue}
-            editable={false}
-            bold={false}
-            title={item.title}
-            InputComponent={() => (
-              <TimePickerModal
-                promptTitle="Cooldown"
-                promptSubtitle="Duration of the cooldown phase."
-              />
-            )}
-          />
-        );
-      case Tag.WORKING: {
-        return renderExerciseItem(item, index);
-      }
-      default:
-        null;
-    }
-  };
-  const renderExerciseItem = (item, index) => {
+  const renderExerciseItem = (item, index, drag, isActive) => {
     switch (index) {
       case 0:
         return (
@@ -168,8 +81,8 @@ function RoutineEditScreen({ route }) {
             title={item.title}
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
-            clickDrag={true}
-            style={{ borderBottomStartRadius: 0 }}
+            drag={drag}
+            style={[{ borderBottomStartRadius: 0 }, isActive && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item} // pass reference
@@ -183,8 +96,8 @@ function RoutineEditScreen({ route }) {
               title={item.title}
               subTitle={formatExerciseInfo(item)}
               accentColor={theme.accentLightPurple}
-              clickDrag={true}
-              style={{ borderTopStartRadius: 0 }}
+              drag={drag}
+              style={[{ borderTopStartRadius: 0 }, isActive && styles.activeItem]}
               isRoutineEditing={isRoutineEditing}
               isExerciseEditing={true} // Is the exercise being edited?
               referenceExercise={item} // pass reference
@@ -207,8 +120,8 @@ function RoutineEditScreen({ route }) {
             title={item.title}
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
-            clickDrag={true}
-            style={{ borderRadius: 0 }}
+            drag={drag}
+            style={[{ borderRadius: 0 }, isActive && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -223,14 +136,6 @@ function RoutineEditScreen({ route }) {
       title: newTitle,
     });
   };
-  const renderSectionHeader = (section) => {
-    if (section.title === 'Warmup') return renderAuxiliarySectionHeader(section);
-    if (section.title === "Exercises") return renderExerciseSectionHeader(section);
-    if (section.title === "Cooldown") return renderAuxiliarySectionHeader(section);
-  };
-  const renderAuxiliarySectionHeader = (section) => {
-    return (<Text style={styles.sectionTitle}>{section.title}</Text>);
-  }
   const handleAddExerciseOnPress = () => {
 
     exer = new Exercise({
@@ -246,75 +151,24 @@ function RoutineEditScreen({ route }) {
       exercise: exer,
     });
   }
-
-  const renderExerciseSectionHeader = (section) => {
-    if (section.data.length === 0) {
-      return (
-        <>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            <View style={{ marginBottom: 0 }}>
-              <IconButton
-                iconName="plus"
-                IconFamily={Feather}
-                iconSize={45}
-                foregroundColor={'white'}
-                onPress={() => handleAddExerciseOnPress()}
-              />
-            </View>
-          </View>
-          <TouchableOpacity activeOpacity={0.8} onPress={() => handleAddExerciseOnPress()}>
-            <AuxiliaryCard
-              title={"Add Exercise"}
-              Icon={() => (
-                <IconButton
-                  iconName="plus"
-                  IconFamily={Feather}
-                  iconSize={45}
-                  foregroundColor={'white'}
-                  onPress={() => handleAddExerciseOnPress()}
-                />
-              )}
-              editable={false}
-              InputComponent={() => (
-                <></>
-              )}
-            />
-          </TouchableOpacity>
-        </>
-      );
-    } else {
-      return (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-          <View style={{ marginBottom: 0 }}>
-            <IconButton
-              iconName="plus"
-              IconFamily={Feather}
-              iconSize={45}
-              foregroundColor={'white'}
-              onPress={() => handleAddExerciseOnPress()}
-            />
-          </View>
-        </View>
-      );
-    }
-  }
-
   const handleSavePress = async () => {
 
-    if (isRoutineEditing) {
+    const finalExercises = [exercises[0], ...workingSet, exercises[exercises.length - 1]];
+    finalExercises.forEach((exercise, index) => {
+      exercise.exerciseOrder = index;
+    });
+
+    if (isRoutineEditing) { // need to know which exercises are created and which are updated (.id parameter)?
       updateRoutine(routine);
-      exercises.map((exercise) => updateExercise(exercise));
     } else {
       createRoutine(routine);
-      exercises.map((exercise) => createExercise(exercise));
     }
+    finalExercises.forEach((exercise) => {
+      exercise.id ? updateExercise(exercise) : createExercise(exercise);
+    });
     console.log(isRoutineEditing ? "Routine Updated" : " Routine Created");
 
     // How to cleanup Context?
-
-
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
@@ -365,57 +219,55 @@ function RoutineEditScreen({ route }) {
               }}
             />
           </View>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, { edit: isRoutineEditing })
-            }}
-            style={styles.templatePanel}
-          >
-            <AuxiliaryCard
-              title={"Template"}
-              editable={false}
-              InputComponent={() => (
-                <DummyInputComponent text={selectedTemplate} />
-              )}
-            />
-          </TouchableOpacity>
-          <AuxiliaryCard
-            title={"Warmup"}
-            editable={false}
-            InputComponent={() => (
-              <DummyInputComponent text={selectedTemplate} />
-            )}
-            accentcolor={theme.accentGreen}
-          />
-          <FlatList
-            data={ordered_exer_arr}
-            renderItem={({ item, index }) => renderExerciseItem(item, index)}
-          />
-          {/* <SectionList // SectionList
-            contentContainerStyle={styles.container}
-            ListHeaderComponent={ // Title and Header (added here so it does not "stick", i.e. scrolls along with List)
-              <>
-
-              </>
-            }
-            sections={formattedExercises}
-            keyExtractor={(item) => item.exerciseOrder}
-            renderItem={({ item, index }) => renderItem(item, index)}
-            renderSectionHeader={({ section }) => (renderSectionHeader(section)
-              //<Text style=//{styles.sectionTitle}>{section.title}</Text>
-            )}
-            stickySectionHeadersEnabled={false}
-            renderSectionFooter={() => <View style={{ height: 22 }} />}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  height: StyleSheet.hairlineWidth,
-                  backgroundColor: theme.text60,
-                }}
+          <ScrollView contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 70 }}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, { edit: isRoutineEditing })
+              }}
+              style={styles.templatePanel}
+            >
+              <AuxiliaryCard
+                title={"Template"}
+                editable={false}
+                InputComponent={() => (
+                  <DummyInputComponent text={selectedTemplate} />
+                )}
               />
-            )}
-          /> */}
+            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>Pre-routine</Text>
+            <View style={{ marginBottom: 22 }}>
+              <AuxiliaryCard
+                title={"Warmup"}
+                editable={false}
+                InputComponent={() => (
+                  <DummyInputComponent text={`${formatDurationExact(exercises[0].workTime)}`} />
+                )}
+                accentcolor={theme.accentGreen}
+              />
+            </View>
+            <Text style={styles.sectionTitle}>Intervals</Text>
+            <DraggableFlatList
+              data={workingSet}
+              renderItem={({ item, index, drag, isActive }) => renderExerciseItem(item, index, drag, isActive)}
+              scrollEnabled={false}
+              keyExtractor={(item) => item.exerciseOrder}
+              onDragEnd={({ data }) => {
+                setWorkingSet(data)
+              }}
+              containerStyle={{ marginBottom: 22 }}
+            />
+            <View style={{}}>
+              <AuxiliaryCard
+                title={"Cooldown"}
+                editable={false}
+                InputComponent={() => (
+                  <DummyInputComponent text={`${formatDurationExact(exercises[exercises.length - 1].workTime)}`} />
+                )}
+                accentcolor={theme.accentDarkBlue}
+              />
+            </View>
+          </ScrollView>
         </Screen>
         <BlurView style={styles.timeTabContainer}
           tint="dark"
@@ -503,12 +355,15 @@ const getStyles = (theme) =>
       fontWeight: 600,
     },
     templatePanel: {
-      marginBottom: 15,
+      marginBottom: 22,
     },
     sectionTitle: {
       color: theme.text60,
       fontSize: PARAGRAPH_FONT_SIZE,
       marginBottom: 8,
+    },
+    activeItem: {
+      backgroundColor: "rgba(128,128,128,0.8)",
     },
   });
 

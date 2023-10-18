@@ -5,14 +5,14 @@ import { useNavigation } from "@react-navigation/native";
 
 import { useTheme } from '../contexts/ThemeContext';
 import { INFO_FONT_SIZE, PARAGRAPH_FONT_SIZE, PARAGRAPH_FONT_WEIGHT } from '../config/appConstants';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+// import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import routes from '../navigation/routes';
 
 function ExerciseCard({
   title,
   subTitle,
   accentColor,
-  clickDrag = false,
+  drag,
   style,
   ...rest
 }) {
@@ -48,18 +48,18 @@ function ExerciseCard({
         />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableWithoutFeedback
-          style={styles.touchable}
+        <TouchableOpacity
+          style={[styles.touchable, { backgroundColor: 'red' }]}
           onPress={() => handleExerciseEditNavigation()}>
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subTitle}>{subTitle}</Text>
           </View>
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
         <View style={[styles.dragContainer]}>
-          {clickDrag && (
-            <MaterialIcons name="drag-indicator" size={32} color={theme.text60} /> // Color needs to be changed
-          )}
+          <TouchableOpacity style={{ backgroundColor: 'purple' }} onPressIn={drag}>
+            <MaterialIcons name="drag-indicator" size={32} color={theme.text60} />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -75,7 +75,8 @@ const getStyles = (theme) => StyleSheet.create({
     left: 0
   },
   touchable: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    width: '60%'
   },
   container: {
     backgroundColor: theme.tileBackground,
@@ -103,10 +104,12 @@ const getStyles = (theme) => StyleSheet.create({
   dragContainer: {
     width: 40,
     marginRight: 7,
+    backgroundColor: 'green'
   },
   infoContainer: {
     justifyContent: 'center',
-    width: '80%',
+    width: '100%',
+    backgroundColor: 'dodgerblue'
   },
   title: {
     color: theme.text87,

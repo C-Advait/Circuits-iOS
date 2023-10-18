@@ -46,7 +46,6 @@ function ExerciseEditScreen({ route }) {
       workTime: (parseInt(selectedMinute) * 60 + parseInt(selectedSecond))
     }));
     setInfoChanged(true);
-    console.log(exercise);
   };
 
   const handleNumberRoundsUpdate = ({ number }) => {

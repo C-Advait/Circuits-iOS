@@ -20,7 +20,6 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   const styles = getStyles(theme);
   const [description, setDescription] = useState();
   const { setContextExercises, setContextRoutine } = useRoutineContext(); // Manage Context Variables
-  // console.log(routine);
   const createDescription = async () => {
     const exercises = await getExercisesForRoutine(routine.id);
 
