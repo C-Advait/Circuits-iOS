@@ -6,4 +6,5 @@ export default Object.freeze({
   TEMPLATE_SELECTION_SCREEN: "TemplateSelectionScreen",
   SETTINGS_SCREEN: "Settings",
   EXERCISE_EDIT_SCREEN: "ExerciseEditScreen",
+  DEBUG_SCREEN: "Debug",
 });
