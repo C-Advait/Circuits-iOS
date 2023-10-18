@@ -26,6 +26,8 @@ export const darkTheme = {
   tabBarActiveTintColor: "#eee",
   tabBarInactiveTintColor: "#909090",
   dullIcon: "#ffffff",
+  successGreenBackground: "rgba(0, 213, 72, 0.13)",
+  successGreen: "#00d015",
 };
 
 export const lightTheme = {
