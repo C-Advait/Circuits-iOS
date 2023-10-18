@@ -172,7 +172,8 @@ function RoutineEditScreen({ route }) {
   };
 
   // Helper Functions
-  const renderItem = (state, item, index) => {
+  const renderItem = ({ state, item, index }) => {
+    // console.log(item, index);
     switch (item.tag) {
       case Tag.PREROUTINE:
         return (
@@ -473,7 +474,7 @@ function RoutineEditScreen({ route }) {
           }
           sections={formattedExercises}
           keyExtractor={(item) => item.exerciseOrder}
-          renderItem={({ item, index }) => renderItem(item, index)}
+          renderItem={({ item, index }) => renderItem({ state, item, index })}
           renderSectionHeader={({ section }) =>
             renderSectionHeader(section)
             //<Text style=//{styles.sectionTitle}>{section.title}</Text>
