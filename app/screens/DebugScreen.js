@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, Button } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
+import { Alert } from "react-native";
 
 import {
   dropTable,
