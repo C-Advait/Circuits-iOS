@@ -33,11 +33,11 @@ function ExerciseCard({
   const handleExerciseEditNavigation = () => {
     rest.exercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-          isRoutineEditing: rest.isRoutineEditing,
-          isExerciseEditing: rest.isExerciseEditing,
-          referenceExercise: rest.referenceExercise,
-          exercise: rest.exercise,
-        })
+        isRoutineEditing: rest.isRoutineEditing,
+        isExerciseEditing: rest.isExerciseEditing,
+        referenceExercise: rest.referenceExercise,
+        exercise: rest.exercise,
+      })
       : null;
   };
 
@@ -45,7 +45,7 @@ function ExerciseCard({
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
       <TouchableOpacity style={styles.closeButton} onPress={handlePress}>
-        <EvilIcons name="close" size={25} color="white" />
+        <EvilIcons name="close" size={35} color="white" />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
         <TouchableWithoutFeedback

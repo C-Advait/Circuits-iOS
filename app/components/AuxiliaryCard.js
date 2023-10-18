@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, ActionSheetIOS } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 
 import { useTheme } from "../contexts/ThemeContext";
 import EditableText from "./EditableText";
@@ -8,11 +8,10 @@ import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 function AuxiliaryCard({
   accentcolor = "transparent",
   bold = false,
-  editable = true,
-  disabled = false,
+  editable = false,
   title,
   Icon,
-  InputComponent,
+  children,
 }) {
   const { theme } = useTheme();
   const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
@@ -39,7 +38,7 @@ function AuxiliaryCard({
             {title}
           </Text>
         )}
-        <InputComponent disabled={disabled} />
+        {children}
       </View>
     </View>
   );

@@ -25,7 +25,6 @@ import NavHeader from "../components/NavHeader";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
 import { useRoutineContext } from "../contexts/RoutineContext";
-import formatDuration from "../utilities/formatDuration";
 import { BlurView } from "expo-blur";
 import getExerciseLength from "../utilities/getExerciseLength";
 import formatDurationExact from "../utilities/formatDurationExact";
@@ -36,7 +35,6 @@ import {
   updateRoutine,
 } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
-import TimePickerModal from "../components/TimePickerModal";
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -134,12 +132,7 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => (
-              <TimePickerModal
-                promptTitle="Warmup"
-                promptSubtitle="Duration of the warmup phase."
-              />
-            )}
+            InputComponent={() => <DummyInputComponent />}
           />
         );
       case Tag.POSTROUTINE:
@@ -149,12 +142,7 @@ function RoutineEditScreen({ route }) {
             editable={false}
             bold={false}
             title={item.title}
-            InputComponent={() => (
-              <TimePickerModal
-                promptTitle="Cooldown"
-                promptSubtitle="Duration of the cooldown phase."
-              />
-            )}
+            InputComponent={() => <DummyInputComponent />}
           />
         );
       case Tag.WORKING: {
@@ -249,7 +237,6 @@ function RoutineEditScreen({ route }) {
       isRoutineEditing: isRoutineEditing,
       isExerciseEditing: false,
       referenceExercise: exer,
-      exercise: exer,
     });
   };
 
@@ -285,7 +272,7 @@ function RoutineEditScreen({ route }) {
                 <IconButton
                   iconName="plus"
                   IconFamily={Feather}
-                  iconSize={35}
+                  iconSize={45}
                   foregroundColor={"white"}
                   onPress={() => handleAddExerciseOnPress()}
                 />

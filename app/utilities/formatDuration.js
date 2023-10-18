@@ -1,4 +1,4 @@
-export default function formatDuration(seconds) {
+export function formatDuration(seconds) {
   if (seconds < 60) {
     return `${seconds}s`;
   } else if (seconds < 3600) {
@@ -12,4 +12,11 @@ export default function formatDuration(seconds) {
     }
     return `${hours}h ${minutes}m`;
   }
+}
+
+export function formatMinutesSeconds(seconds) {
+  const min = Math.floor(seconds / 60);
+  const sec = seconds % 60;
+  if (sec === 0) return `${min} minutes`;
+  return min > 0 ? `${min}m ${sec}s` : `${sec} seconds`;
 }

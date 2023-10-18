@@ -32,6 +32,7 @@ function RoutineNavigator() {
           <Stack.Screen
             name={routes.EXERCISE_EDIT_SCREEN}
             component={ExerciseEditScreen}
+            options={{ gestureEnabled: false }}
           />
           <Stack.Screen
             name={routes.TEMPLATE_SELECTION_SCREEN}

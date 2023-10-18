@@ -7,7 +7,7 @@ import {
   ROUTINE_TITLE_FONT_SIZE,
 } from "../config/appConstants";
 import { IconButton, RoutineActionButton } from "./buttons";
-import formatDuration from "../utilities/formatDuration";
+import { formatDuration } from "../utilities/formatDuration";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
@@ -51,11 +51,10 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
       setContextRoutine(routine);
       setContextExercises(exercises);
       navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: true });
-
     } catch (error) {
-      console.log("Error in navigating to edit routine: ", error)
+      console.log("Error in navigating to edit routine: ", error);
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -66,7 +65,9 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
         <View style={styles.permanentInfoContainer}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.header}>{routine.title}</Text>
-            <Text style={styles.duration}>{formatDuration(routine.duration)}</Text>
+            <Text style={styles.duration}>
+              {formatDuration(routine.duration)}
+            </Text>
           </View>
           <IconButton
             iconName={isExpanded ? "chevron-up" : "chevron-down"}
