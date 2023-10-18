@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useReducer, useState } from "react";
 import {
+  Button,
   View,
   StyleSheet,
   SectionList,
@@ -10,6 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
@@ -28,6 +30,7 @@ import { useRoutineContext } from "../contexts/RoutineContext";
 import { BlurView } from "expo-blur";
 import getExerciseLength from "../utilities/getExerciseLength";
 import formatDurationExact from "../utilities/formatDurationExact";
+import { formatMinutesSeconds } from "../utilities/formatDuration";
 import {
   createExercise,
   createRoutine,
@@ -35,6 +38,11 @@ import {
   updateRoutine,
 } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
+import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
+import routineEditActions from "../actions/routineEditActions";
+import TimeWheelPicker from "../components/TimeWheelPicker";
+
+const MODAL_HEIGHT = 350;
 
 const formatDataForSectionList = (data) => {
   // Initialize an object to hold data for each section
@@ -116,34 +124,96 @@ function RoutineEditScreen({ route }) {
     [formattedExercises],
   );
 
+  const modalRef = useRef(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
+
+  // Initialize state
+  useEffect(() => {
+    if (exercises) {
+      const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE);
+      const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
+
+      dispatch({
+        type: routineEditActions.INIT,
+        payload: {
+          warmupDuration: warmup.workTime,
+          cooldownDuration: cooldown.workTime,
+        },
+      });
+    }
+  }, [exercises]);
+
   useEffect(() => {
     console.log(
       `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
     );
   }, [selectedTemplate]);
 
+  const onModalChange = (isOpen) => {
+    if (isOpen === 1) {
+      // Opening modal; save value to which to possibly revert.
+      dispatch({
+        type: routineEditActions.SET_PREVIOUS,
+        payload: state[state.activeKey],
+      });
+    } else {
+      // Closing modal
+      dispatch({ type: routineEditActions.TOGGLE_REFRESH });
+      setModalContent(ROUTINE_EDIT_MODAL.NONE);
+
+      // Either persist the change or revert it.
+      if (state.apply) {
+        dispatch({ type: routineEditActions.TOGGLE_APPLY });
+      } else {
+        dispatch({ type: routineEditActions.REVERT_PREVIOUS });
+      }
+    }
+  };
+
   // Helper Functions
-  const renderItem = (item, index) => {
+  const renderItem = ({ state, item, index }) => {
+    // console.log(item, index);
     switch (item.tag) {
       case Tag.PREROUTINE:
         return (
-          <AuxiliaryCard
-            accentcolor={theme.accentGreen}
-            editable={false}
-            bold={false}
-            title={item.title}
-            InputComponent={() => <DummyInputComponent />}
-          />
+          <AuxiliaryCard accentcolor={theme.accentGreen} title={item.title}>
+            <Text
+              style={styles.inputText}
+              onPress={() => {
+                dispatch({
+                  type: routineEditActions.SET_ACTIVE_KEY,
+                  payload: ROUTINE_EDIT_MODAL.WARMUP.key,
+                });
+                dispatch({ type: routineEditActions.SET_PREVIOUS });
+                dispatch({ type: routineEditActions.TOGGLE_REFRESH });
+                setModalContent(ROUTINE_EDIT_MODAL.WARMUP);
+                modalRef.current?.expand();
+              }}
+            >
+              {formatMinutesSeconds(state.warmupDuration)}
+            </Text>
+          </AuxiliaryCard>
         );
       case Tag.POSTROUTINE:
         return (
-          <AuxiliaryCard
-            accentcolor={theme.accentDarkBlue}
-            editable={false}
-            bold={false}
-            title={item.title}
-            InputComponent={() => <DummyInputComponent />}
-          />
+          <AuxiliaryCard accentcolor={theme.accentDarkBlue} title={item.title}>
+            <Text
+              style={styles.inputText}
+              onPress={() => {
+                dispatch({
+                  type: routineEditActions.SET_ACTIVE_KEY,
+                  payload: ROUTINE_EDIT_MODAL.COOLDOWN.key,
+                });
+                dispatch({ type: routineEditActions.SET_PREVIOUS });
+                dispatch({ type: routineEditActions.TOGGLE_REFRESH });
+                setModalContent(ROUTINE_EDIT_MODAL.COOLDOWN);
+                modalRef.current?.expand();
+              }}
+            >
+              {formatMinutesSeconds(state.cooldownDuration)}
+            </Text>
+          </AuxiliaryCard>
         );
       case Tag.WORKING: {
         return renderExerciseItem(item, index);
@@ -404,7 +474,7 @@ function RoutineEditScreen({ route }) {
           }
           sections={formattedExercises}
           keyExtractor={(item) => item.exerciseOrder}
-          renderItem={({ item, index }) => renderItem(item, index)}
+          renderItem={({ item, index }) => renderItem({ state, item, index })}
           renderSectionHeader={({ section }) =>
             renderSectionHeader(section)
             //<Text style=//{styles.sectionTitle}>{section.title}</Text>
@@ -420,8 +490,83 @@ function RoutineEditScreen({ route }) {
             />
           )}
         />
+        <BottomSheet
+          ref={modalRef}
+          index={-1}
+          snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
+          enablePanDownToClose={true}
+          backdropComponent={BottomSheetBackdrop}
+          backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
+          handleStyle={{
+            backgroundColor: theme.secondaryBackground,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          }}
+          handleIndicatorStyle={{
+            backgroundColor: "rgba(255, 255, 255, 0.25)",
+            width: 90,
+          }}
+          onChange={onModalChange}
+        >
+          <View style={styles.header}>
+            <Text style={styles.pickerTitle}>{modalContent.title}</Text>
+          </View>
+          {modalContent.key === ROUTINE_EDIT_MODAL.WARMUP.key && (
+            <TimeWheelPicker
+              key={state.refresh}
+              startingTime={state.warmupDuration}
+              onValueChange={(data) =>
+                dispatch({
+                  type: routineEditActions.SET_WARMUP,
+                  payload: data,
+                })
+              }
+            />
+          )}
+          {modalContent.key === ROUTINE_EDIT_MODAL.COOLDOWN.key && (
+            <TimeWheelPicker
+              key={state.refresh}
+              startingTime={state.cooldownDuration}
+              onValueChange={(data) =>
+                dispatch({
+                  type: routineEditActions.SET_COOLDOWN,
+                  payload: data,
+                })
+              }
+            />
+          )}
+          <View style={styles.footer}>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Cancel"
+                onPress={() => {
+                  dispatch({ type: routineEditActions.REVERT_PREVIOUS });
+                  modalRef.current?.close();
+                }}
+                color={theme.primary}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Apply"
+                onPress={() => {
+                  dispatch({ type: routineEditActions.TOGGLE_APPLY });
+                  modalRef.current?.close();
+                }}
+                color={theme.blue}
+              />
+            </View>
+          </View>
+        </BottomSheet>
       </Screen>
-      <BlurView style={styles.timeTabContainer} tint="dark" intensity={60}>
+      <BlurView
+        style={[
+          styles.timeTabContainer,
+          { display: modalContent.key !== "none" ? "none" : "flex" },
+        ]}
+        tint="dark"
+        intensity={60}
+      >
         <View style={styles.timeTab}>
           <Text
             style={{
@@ -445,8 +590,52 @@ function RoutineEditScreen({ route }) {
   );
 }
 
+const initialState = {
+  activeKey: "",
+  cooldownDuration: 300,
+  apply: false,
+  previous: "",
+  refresh: false,
+  warmupDuration: 300, // Should hook into the warmup from the exercise,
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case routineEditActions.INIT:
+      return { ...state, ...action.payload };
+
+    case routineEditActions.SET_ACTIVE_KEY:
+      return { ...state, activeKey: action.payload };
+
+    case routineEditActions.SET_PREVIOUS:
+      return { ...state, previous: action.payload };
+
+    case routineEditActions.REVERT_PREVIOUS:
+      return { ...state, [state.activeKey]: state.previous };
+
+    case routineEditActions.SET_WARMUP:
+      return { ...state, warmupDuration: action.payload };
+
+    case routineEditActions.SET_COOLDOWN:
+      return { ...state, cooldownDuration: action.payload };
+
+    case routineEditActions.TOGGLE_APPLY:
+      return { ...state, apply: !state.apply };
+
+    case routineEditActions.TOGGLE_REFRESH:
+      return { ...state, refresh: !state.refresh };
+
+    default:
+      console.log("Invalid action.type detected in RoutineEditScreen reducer.");
+  }
+};
+
 const getStyles = (theme) =>
   StyleSheet.create({
+    buttonContainer: {
+      marginHorizontal: 16,
+      marginTop: 12,
+    },
     timeColorBar: {
       flexDirection: "row",
       backgroundColor: "white",
@@ -497,11 +686,26 @@ const getStyles = (theme) =>
       borderRadius: 7,
       marginRight: 10,
     },
+    header: {
+      backgroundColor: theme.secondaryBackground,
+      paddingBottom: 18,
+      paddingHorizontal: 22,
+      paddingTop: 10,
+      gap: 2,
+    },
     headingPanel: {
       flexDirection: "row",
       height: 40,
       alignItems: "center",
       marginBottom: 15,
+    },
+    inputText: {
+      color: theme.primary,
+    },
+    pickerTitle: {
+      color: theme.primary,
+      fontSize: 17,
+      fontWeight: 500,
     },
     title: {
       color: theme.foreground,
@@ -515,6 +719,15 @@ const getStyles = (theme) =>
       color: theme.text60,
       fontSize: PARAGRAPH_FONT_SIZE,
       marginBottom: 8,
+    },
+    footer: {
+      backgroundColor: theme.secondaryBackground,
+      bottom: 0,
+      flexDirection: "row",
+      height: 65,
+      justifyContent: "space-between",
+      position: "absolute",
+      width: "100%",
     },
   });
 
