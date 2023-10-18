@@ -24,11 +24,9 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const [selectedSecond, setSelectedSecond] = useState(startingTime % 60);
   const [filteredSeconds, setFilteredSeconds] = useState(
-    startingTime > 60 ? items : items.slice(5),
+    startingTime >= 60 ? items : items.slice(5),
   );
   const key = filteredSeconds.length;
-
-  console.log(key);
 
   return (
     <View style={styles.container}>
