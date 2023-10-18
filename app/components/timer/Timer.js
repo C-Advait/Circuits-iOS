@@ -49,7 +49,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
   // Handle play / pause.
   useEffect(() => {
     // Can use exerciseSecondsRemaining?
-    const exerciseDuration = state.intervals[state.currentIndex]?.duration;
+    const exerciseDuration = state.exerciseSecondsRemaining;
 
     if (exerciseDuration && state.isPlaying) {
       progress.value = withTiming(0, {

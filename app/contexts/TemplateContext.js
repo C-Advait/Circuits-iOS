@@ -3,7 +3,7 @@ import { SortCriteria } from "../classes/SortCriteria";
 
 const TemplateContext = createContext();
 
-export const useTemplate = () => {
+export const useTemplateContext = () => {
   return useContext(TemplateContext);
 };
 

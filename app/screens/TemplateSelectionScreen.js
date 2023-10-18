@@ -9,7 +9,7 @@ import {
 import Screen from "../components/Screen";
 import { useTheme } from "../contexts/ThemeContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { useTemplate } from "../contexts/TemplateContext";
+import { useTemplateContext } from "../contexts/TemplateContext";
 import { useNavigation } from "@react-navigation/native";
 import NavHeader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
@@ -92,14 +92,14 @@ const TemplateSelectionScreen = ({ route }) => {
   const navigation = useNavigation();
   const { theme } = useTheme();
   const styles = getStyles(theme);
-  const isEditing = route.params.edit;
+  const isRoutineEditing = route.params.edit;
 
   const userCreatedData = data.filter((item) => item.userCreated);
   const systemCreatedData = data.filter((item) => !item.userCreated);
 
   // Default selectedId to 1
   const { selectedTemplateID, setSelectedTemplateID, setSelectedTemplate } =
-    useTemplate();
+    useTemplateContext();
 
   const renderItem = (item, isLast) => (
     <React.Fragment key={item.id}>
@@ -128,7 +128,7 @@ const TemplateSelectionScreen = ({ route }) => {
             iconName="chevron-left"
             IconFamily={Feather}
             foregroundColor={theme.blue}
-            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {edit: isEditing})}
+            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing })}
           />
         }
         headerText="Templates"

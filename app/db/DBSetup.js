@@ -82,7 +82,7 @@ export const createTables = async () => {
         category TEXT,
         color TEXT,
         FOREIGN KEY (routineID) REFERENCES Routine(id) ON DELETE CASCADE,
-        UNIQUE(routineID, exerciseOrder)
+        UNIQUE(routineID, exerciseOrder, tag)
       );`,
       [],
       (_tx, _resultSet) => {

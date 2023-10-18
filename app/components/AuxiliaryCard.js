@@ -6,7 +6,7 @@ import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 function AuxiliaryCard({
-  accentcolor,
+  accentcolor = "transparent",
   bold = false,
   editable = true,
   disabled = false,
@@ -15,7 +15,7 @@ function AuxiliaryCard({
   InputComponent,
 }) {
   const { theme } = useTheme();
-  const styles =  getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
+  const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
   accentcolor = accentcolor || theme.backgroundFaded;
 
   const fontWeight = bold ? 600 : 400;
@@ -30,11 +30,16 @@ function AuxiliaryCard({
       ) : null}
       <View style={styles.contentContainer}>
         {editable ? (
-          <EditableText placeholder={title} style={[styles.textStyle, {fontWeight: fontWeight}]} />
+          <EditableText
+            placeholder={title}
+            style={[styles.textStyle, { fontWeight: fontWeight }]}
+          />
         ) : (
-          <Text style={[styles.textStyle, {fontWeight: fontWeight}]}>{title}</Text>
+          <Text style={[styles.textStyle, { fontWeight: fontWeight }]}>
+            {title}
+          </Text>
         )}
-        <InputComponent disabled={true} />
+        <InputComponent disabled={disabled} />
       </View>
     </View>
   );
@@ -65,15 +70,14 @@ const getStylesActive = (theme) =>
       flex: 1,
       justifyContent: "space-between",
       padding: 10,
-      paddingHorizontal: 16
+      paddingHorizontal: 16,
     },
     header: {
       color: theme.text87,
       fontSize: PARAGRAPH_FONT_SIZE,
     },
     iconContainer: {
-      marginLeft: 16,
-      marginRight: 8,
+      marginLeft: 10,
     },
     subtitle: {
       fontSize: 18,
@@ -82,8 +86,8 @@ const getStylesActive = (theme) =>
     textStyle: {
       color: theme.text87,
       fontSize: PARAGRAPH_FONT_SIZE,
-    }
-});
+    },
+  });
 
 const getStylesDisabled = (theme) =>
   StyleSheet.create({
@@ -110,7 +114,7 @@ const getStylesDisabled = (theme) =>
       flex: 1,
       justifyContent: "space-between",
       padding: 10,
-      paddingHorizontal: 16
+      paddingHorizontal: 16,
     },
     header: {
       color: theme.text87,
@@ -127,8 +131,7 @@ const getStylesDisabled = (theme) =>
     textStyle: {
       color: theme.textDisabled,
       fontSize: PARAGRAPH_FONT_SIZE,
-    }
-});
+    },
+  });
 
-
-export default AuxiliaryCard
+export default AuxiliaryCard;
