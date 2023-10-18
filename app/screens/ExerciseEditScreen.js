@@ -10,7 +10,7 @@ import Navheader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
 import { useTheme } from "../contexts/ThemeContext";
 import routes from "../navigation/routes";
-import AuxilaryCard from "../components/AuxiliaryCard";
+import AuxiliaryCard from "../components/AuxiliaryCard";
 
 import AppTextButton from "../components/buttons/AppTextButton";
 import EditableText from "../components/EditableText";
@@ -19,6 +19,8 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import NumberWheelPicker from "../components/NumberWheelPicker";
 import TimeWheelPicker from "../components/TimeWheelPicker";
 import { formatMinutesSeconds } from "../utilities/formatDuration";
+
+import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
 
 const MODAL_HEIGHT = 350;
 
@@ -31,30 +33,6 @@ function ExerciseEditScreen({ route }) {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const MODAL_CONTENT_ENUM = {
-    NONE: "NONE",
-    ROUNDS: {
-      key: "numberOfRounds",
-      title: "Number of rounds",
-      subtitle: "Repetitions of the current exercise.",
-    },
-    WORK_TIME: {
-      key: "workTime",
-      title: "Work time",
-      subtitle: "Duration of the work round.",
-    },
-    REST_TIME: {
-      key: "restBetweenRounds",
-      title: "Rest",
-      subtitle: "Rest duration between consecutive rounds.",
-    },
-    BREAK_TIME: {
-      key: "breakBeforeNext",
-      title: "Break",
-      subtitle: "Break duration beforel next exercise.",
-    },
-  };
-
   useEffect(() => {
     dispatch({
       type: exerciseEditActions.INIT,
@@ -64,9 +42,9 @@ function ExerciseEditScreen({ route }) {
 
   const modalRef = useRef(null);
 
-  const [contentType, setContentType] = useState(MODAL_CONTENT_ENUM.NONE);
+  const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
 
-  onModalChange = (isOpen) => {
+  const onModalChange = (isOpen) => {
     if (isOpen === 1) {
       // Opening modal; save value to which to possibly revert.
       dispatch({
@@ -86,7 +64,7 @@ function ExerciseEditScreen({ route }) {
     }
   };
 
-  onSave = () => {
+  const onSave = () => {
     const exercise = {
       ...originalExercise,
       workTime: state.workTime,
@@ -99,6 +77,28 @@ function ExerciseEditScreen({ route }) {
     Object.assign(originalExercise, exercise);
     navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
   };
+
+  const InputModalButton = ({ text, contentKey, enabled = true }) => (
+    <Text
+      style={enabled ? styles.inputText : styles.disabled}
+      onPress={
+        enabled
+          ? () => {
+              dispatch({
+                type: exerciseEditActions.SET_ACTIVE_KEY,
+                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+              });
+              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+              modalRef.current?.expand();
+            }
+          : () => null
+      }
+    >
+      {text}
+    </Text>
+  );
 
   return (
     <Screen style={{ flex: 1 }}>
@@ -127,119 +127,39 @@ function ExerciseEditScreen({ route }) {
         }
       />
       <View style={{ gap: 10, paddingHorizontal: 11 }}>
-        <AuxilaryCard
-          editable={false}
-          bold={false}
-          title={"Name"}
-          InputComponent={() => (
-            <EditableText
-              placeholder={state.title}
-              onSubmit={(text) => {
-                dispatch({
-                  type: exerciseEditActions.SET_TITLE,
-                  payload: text,
-                });
-              }}
-            />
-          )}
-        />
-        <AuxilaryCard
-          editable={false}
-          bold={false}
-          title={"Work time"}
-          InputComponent={() => (
-            <Text
-              style={{ color: "white" }}
-              onPress={() => {
-                dispatch({
-                  type: exerciseEditActions.SET_ACTIVE_KEY,
-                  payload: MODAL_CONTENT_ENUM.WORK_TIME.key,
-                });
-                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-                setContentType(MODAL_CONTENT_ENUM.WORK_TIME);
-                modalRef.current?.expand();
-              }}
-            >
-              {formatMinutesSeconds(state.workTime)}
-            </Text>
-          )}
-        />
-        <AuxilaryCard
-          editable={false}
-          bold={false}
-          title={"Number of rounds"}
-          InputComponent={() => (
-            <Text
-              style={{ color: "white" }}
-              onPress={() => {
-                dispatch({
-                  type: exerciseEditActions.SET_ACTIVE_KEY,
-                  payload: MODAL_CONTENT_ENUM.ROUNDS.key,
-                });
-                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-                setContentType(MODAL_CONTENT_ENUM.ROUNDS);
-                modalRef.current?.expand();
-              }}
-            >
-              {state.numberOfRounds}
-            </Text>
-          )}
-        />
-        <AuxilaryCard
-          editable={false}
-          bold={false}
-          title={"Rest between rounds"}
-          InputComponent={() => (
-            <Text
-              style={{
-                color:
-                  state.numberOfRounds > 1 ? theme.primary : theme.textDisabled,
-              }}
-              onPress={
-                state.numberOfRounds > 1
-                  ? () => {
-                      dispatch({
-                        type: exerciseEditActions.SET_ACTIVE_KEY,
-                        payload: MODAL_CONTENT_ENUM.REST_TIME.key,
-                      });
-                      dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-                      dispatch({
-                        type: exerciseEditActions.TOGGLE_REFRESH_PICKER,
-                      });
-                      setContentType(MODAL_CONTENT_ENUM.REST_TIME);
-                      modalRef.current?.expand();
-                    }
-                  : () => null
-              }
-            >
-              {formatMinutesSeconds(state.restBetweenRounds)}
-            </Text>
-          )}
-        />
-        <AuxilaryCard
-          editable={false}
-          bold={false}
-          title={"Break before next exercise"}
-          InputComponent={() => (
-            <Text
-              style={{ color: "white" }}
-              onPress={() => {
-                dispatch({
-                  type: exerciseEditActions.SET_ACTIVE_KEY,
-                  payload: MODAL_CONTENT_ENUM.BREAK_TIME.key,
-                });
-                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-                setContentType(MODAL_CONTENT_ENUM.BREAK_TIME);
-                modalRef.current?.expand();
-              }}
-            >
-              {formatMinutesSeconds(state.breakBeforeNext)}
-            </Text>
-          )}
-        />
+        <AuxiliaryCard title="Name">
+          <EditableText
+            placeholder={state.title}
+            onSubmit={(text) => {
+              dispatch({
+                type: exerciseEditActions.SET_TITLE,
+                payload: text,
+              });
+            }}
+          />
+        </AuxiliaryCard>
+        <AuxiliaryCard title="Work time">
+          <InputModalButton
+            text={formatMinutesSeconds(state.workTime)}
+            contentKey="WORK_TIME"
+          />
+        </AuxiliaryCard>
+        <AuxiliaryCard title="Number of rounds">
+          <InputModalButton text={state.numberOfRounds} contentKey="ROUNDS" />
+        </AuxiliaryCard>
+        <AuxiliaryCard title="Rest between rounds">
+          <InputModalButton
+            text={formatMinutesSeconds(state.restBetweenRounds)}
+            contentKey="REST_TIME"
+            enabled={state.numberOfRounds > 1}
+          />
+        </AuxiliaryCard>
+        <AuxiliaryCard title="Break before next exercise">
+          <InputModalButton
+            text={formatMinutesSeconds(state.breakBeforeNext)}
+            contentKey="BREAK_TIME"
+          />
+        </AuxiliaryCard>
       </View>
       <BottomSheet
         ref={modalRef}
@@ -263,8 +183,9 @@ function ExerciseEditScreen({ route }) {
           <Text style={styles.title}>{contentType.title}</Text>
           <Text style={styles.subtitle}>{contentType.subtitle}</Text>
         </View>
-        {contentType.key === MODAL_CONTENT_ENUM.ROUNDS.key && (
+        {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
           <NumberWheelPicker
+            key={state.shouldRefreshPicker}
             number={state.numberOfRounds}
             onValueChange={(data) =>
               dispatch({
@@ -274,9 +195,9 @@ function ExerciseEditScreen({ route }) {
             }
           />
         )}
-        {contentType.key === MODAL_CONTENT_ENUM.WORK_TIME.key && (
+        {contentType.key === EXERCISE_EDIT_MODAL.WORK_TIME.key && (
           <TimeWheelPicker
-            key={state.restBetweenRounds}
+            key={state.shouldRefreshPicker}
             startingTime={state.workTime}
             onValueChange={(data) =>
               dispatch({
@@ -286,7 +207,7 @@ function ExerciseEditScreen({ route }) {
             }
           />
         )}
-        {contentType.key === MODAL_CONTENT_ENUM.REST_TIME.key && (
+        {contentType.key === EXERCISE_EDIT_MODAL.REST_TIME.key && (
           <TimeWheelPicker
             key={state.shouldRefreshPicker}
             startingTime={state.restBetweenRounds}
@@ -298,7 +219,7 @@ function ExerciseEditScreen({ route }) {
             }
           />
         )}
-        {contentType.key === MODAL_CONTENT_ENUM.BREAK_TIME.key && (
+        {contentType.key === EXERCISE_EDIT_MODAL.BREAK_TIME.key && (
           <TimeWheelPicker
             key={state.shouldRefreshPicker}
             startingTime={state.breakBeforeNext}
@@ -341,10 +262,10 @@ const initialState = {
   title: "",
   apply: false,
   activeKey: "",
-  workTime: 0,
+  workTime: 5,
   numberOfRounds: 1,
-  restBetweenRounds: 0,
-  breakBeforeNext: 0,
+  restBetweenRounds: 5,
+  breakBeforeNext: 5,
   previous: null,
   shouldRefreshPicker: false,
   dirty: false,
@@ -393,6 +314,9 @@ const getStyles = (theme) =>
       marginHorizontal: 16,
       marginTop: 12,
     },
+    disabled: {
+      color: theme.textDisabled,
+    },
     footer: {
       backgroundColor: theme.secondaryBackground,
       bottom: 0,
@@ -412,6 +336,9 @@ const getStyles = (theme) =>
     subtitle: {
       color: theme.text,
       fontSize: 17,
+    },
+    inputText: {
+      color: theme.primary,
     },
     tile: {
       backgroundColor: "#333",
