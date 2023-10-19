@@ -57,7 +57,7 @@ const getStylesActive = (theme) =>
     },
     container: {
       alignItems: "center",
-      backgroundColor: theme.tileBackground,
+      backgroundColor: theme.secondaryBackground,
       borderRadius: 8,
       flexDirection: "row",
       height: 42,
