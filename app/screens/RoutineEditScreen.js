@@ -129,6 +129,7 @@ function RoutineEditScreen({ route }) {
     maxExerciseOrder,
   ] = getExerciseInfo(exercises);
   const totalRoutineTime = warmupTime + workingTime + cooldownTime;
+  const [exerciseBeingDragged, setExerciseBeingDragged] = useState(false);
 
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -201,8 +202,8 @@ function RoutineEditScreen({ route }) {
             accentColor={theme.accentLightPurple}
             drag={drag}
             style={[
-              { borderBottomStartRadius: 0 },
-              isActive && styles.activeItem,
+              { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
+              (isActive && exerciseBeingDragged) && styles.activeItem,
             ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
@@ -216,7 +217,8 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderTopStartRadius: 0 }, isActive && styles.activeItem]}
+            style={[{ borderTopStartRadius: 0, borderTopEndRadius: 0 },
+            (isActive && exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -229,7 +231,8 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderRadius: 0 }, isActive && styles.activeItem]}
+            style={[{ borderRadius: 0 },
+            (isActive && exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -412,6 +415,7 @@ function RoutineEditScreen({ route }) {
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
             onDragBegin={optionalHapticFunction(haptics, async () => {
+              setExerciseBeingDragged(true);
               await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             })}
             onDragEnd={({ data }) => {
@@ -423,6 +427,7 @@ function RoutineEditScreen({ route }) {
                 await Haptics.selectionAsync();
               },
             )}
+            onRelease={() => setExerciseBeingDragged(false)}
             containerStyle={[
               styles.flatlist,
               workingSet.length > 0
@@ -431,10 +436,7 @@ function RoutineEditScreen({ route }) {
             ]}
             ItemSeparatorComponent={
               <View
-                style={{
-                  backgroundColor: "#38383A",
-                  height: StyleSheet.hairlineWidth,
-                }}
+                style={styles.listSeparator}
               />
             }
           />
@@ -622,6 +624,10 @@ const getStyles = (theme) =>
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: -5,
+    },
+    listSeparator: {
+      backgroundColor: "#38383A",
+      height: StyleSheet.hairlineWidth,
     },
     totalTimeTab: {
       position: "absolute",
