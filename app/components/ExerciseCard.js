@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { EvilIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import {
   INFO_FONT_SIZE,
   PARAGRAPH_FONT_SIZE,
@@ -12,7 +12,7 @@ import {
 import routes from "../navigation/routes";
 
 function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
   const navigation = useNavigation();
 
@@ -26,10 +26,10 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
   const handleExerciseEditNavigation = () => {
     rest.referenceExercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-        isRoutineEditing: rest.isRoutineEditing,
-        isExerciseEditing: rest.isExerciseEditing,
-        referenceExercise: rest.referenceExercise,
-      })
+          isRoutineEditing: rest.isRoutineEditing,
+          isExerciseEditing: rest.isExerciseEditing,
+          referenceExercise: rest.referenceExercise,
+        })
       : null;
   };
 

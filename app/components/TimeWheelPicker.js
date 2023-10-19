@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 const UNIT_OFFSET = 48;
 const GAP_REDUCTION = 50;
@@ -14,7 +14,7 @@ const ADJUSTMENT = 2;
 // in <Portal>. <Portal> is known to not work
 // with context.
 const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   const items = [...Array(60).keys()];

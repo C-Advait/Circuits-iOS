@@ -4,12 +4,12 @@ import { StyleSheet, Text, View } from "react-native";
 import { DatePicker } from "react-native-wheel-pick-2";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 const MODAL_HEIGHT = 390;
 
 function WheelPicker() {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   return (

@@ -12,7 +12,7 @@ import Constants from "expo-constants";
 
 import { IconButton } from "../components/buttons";
 
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { Feather } from "@expo/vector-icons";
 
 const appearance = [
@@ -46,7 +46,7 @@ const privacy = [
 
 // localize 'behaviour'?
 function SettingsScreen() {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   const renderItem = (item, isLast) => (

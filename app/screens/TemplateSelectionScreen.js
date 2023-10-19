@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import Screen from "../components/Screen";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import { useNavigation } from "@react-navigation/native";
@@ -90,7 +90,7 @@ const data = [
 
 const TemplateSelectionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
   const isRoutineEditing = route.params.edit;
 
@@ -128,7 +128,11 @@ const TemplateSelectionScreen = ({ route }) => {
             iconName="chevron-left"
             IconFamily={Feather}
             foregroundColor={theme.blue}
-            onPress={() => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing })}
+            onPress={() =>
+              navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
+                edit: isRoutineEditing,
+              })
+            }
           />
         }
         headerText="Templates"

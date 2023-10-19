@@ -8,7 +8,7 @@ import { Text, Button } from "react-native";
 import Screen from "../components/Screen";
 import Navheader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import routes from "../navigation/routes";
 import AuxiliaryCard from "../components/AuxiliaryCard";
 
@@ -28,15 +28,17 @@ const MODAL_HEIGHT = 350;
 
 function ExerciseEditScreen({ route }) {
   const navigation = useNavigation();
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
-  const { isRoutineEditing, isExerciseEditing, referenceExercise: originalExercise } =
-    route.params;
+  const {
+    isRoutineEditing,
+    isExerciseEditing,
+    referenceExercise: originalExercise,
+  } = route.params;
   const [state, dispatch] = useReducer(reducer, initialState);
   const modalRef = useRef(null);
   const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
   const { contextExercises, setContextExercises } = useRoutineContext();
-
 
   useEffect(() => {
     dispatch({
@@ -69,15 +71,15 @@ function ExerciseEditScreen({ route }) {
       onPress={
         enabled
           ? () => {
-            dispatch({
-              type: exerciseEditActions.SET_ACTIVE_KEY,
-              payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-            });
-            dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-            dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-            setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-            modalRef.current?.expand();
-          }
+              dispatch({
+                type: exerciseEditActions.SET_ACTIVE_KEY,
+                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+              });
+              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+              modalRef.current?.expand();
+            }
           : () => null
       }
     >
@@ -85,7 +87,8 @@ function ExerciseEditScreen({ route }) {
     </Text>
   );
 
-  const goBack = () => navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+  const goBack = () =>
+    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
 
   const onSave = () => {
     const exercise = new Exercise({
@@ -99,10 +102,16 @@ function ExerciseEditScreen({ route }) {
 
     Object.assign(originalExercise, exercise);
 
-    if (!isExerciseEditing) { // Only trigger on a new exercise
+    if (!isExerciseEditing) {
+      // Only trigger on a new exercise
       // Must update exerciseOrder of cooldown exercise to + 1
-      const cooldown = contextExercises.find(ex => ex.tag === Tag.POSTROUTINE);
-      if (cooldown && cooldown.exerciseOrder <= originalExercise.exerciseOrder) {
+      const cooldown = contextExercises.find(
+        (ex) => ex.tag === Tag.POSTROUTINE,
+      );
+      if (
+        cooldown &&
+        cooldown.exerciseOrder <= originalExercise.exerciseOrder
+      ) {
         cooldown.exerciseOrder = originalExercise.exerciseOrder + 1;
       }
       // Append to context array

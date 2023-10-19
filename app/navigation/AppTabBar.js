@@ -3,13 +3,13 @@ import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import navigationIcons from "./navigationIcons";
 
 import shouldShowTabBar from "./shouldShowTabBar";
 
 const AppTabBar = ({ state, descriptors, navigation }) => {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
 
   return shouldShowTabBar(getCurrentRoute(state)) ? (
     <BlurView

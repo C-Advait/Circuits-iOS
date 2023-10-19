@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   ROUTINE_PARAGRAPH_FONT_SIZE,
@@ -16,7 +16,7 @@ import { useRoutineContext } from "../contexts/RoutineContext";
 
 function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   const navigation = useNavigation();
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
   const [description, setDescription] = useState();
   const { setContextExercises, setContextRoutine } = useRoutineContext(); // Manage Context Variables

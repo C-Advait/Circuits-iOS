@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
@@ -13,7 +13,7 @@ function AuxiliaryCard({
   Icon,
   children,
 }) {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
   accentcolor = accentcolor || theme.backgroundFaded;
 
