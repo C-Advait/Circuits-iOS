@@ -26,10 +26,10 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
   const handleExerciseEditNavigation = () => {
     rest.referenceExercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-        isRoutineEditing: rest.isRoutineEditing,
-        isExerciseEditing: rest.isExerciseEditing,
-        referenceExercise: rest.referenceExercise,
-      })
+          isRoutineEditing: rest.isRoutineEditing,
+          isExerciseEditing: rest.isExerciseEditing,
+          referenceExercise: rest.referenceExercise,
+        })
       : null;
   };
 
@@ -53,8 +53,8 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
             </Text>
           </View>
         </TouchableOpacity>
-        <View style={[styles.dragContainer,]}>
-          <TouchableOpacity onPressIn={drag} style={{ backgroundColor: 'transparent', flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={[styles.dragContainer]}>
+          <TouchableOpacity onPressIn={drag} style={styles.draggableOpacity}>
             <MaterialIcons
               name="drag-handle"
               size={30}
@@ -75,6 +75,13 @@ const getStyles = (theme) =>
       top: 0,
       bottom: 0,
       left: 0,
+    },
+    draggableOpacity: {
+      backgroundColor: "transparent",
+      flex: 1,
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "center",
     },
     touchable: {
       flexDirection: "row",
@@ -107,8 +114,8 @@ const getStyles = (theme) =>
       width: 40,
       height: 40,
       marginRight: 20,
-      justifyContent: 'center',
-      alignItems: 'center'
+      justifyContent: "center",
+      alignItems: "center",
     },
     infoContainer: {
       justifyContent: "center",
