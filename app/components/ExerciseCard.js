@@ -26,10 +26,10 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
   const handleExerciseEditNavigation = () => {
     rest.referenceExercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-          isRoutineEditing: rest.isRoutineEditing,
-          isExerciseEditing: rest.isExerciseEditing,
-          referenceExercise: rest.referenceExercise,
-        })
+        isRoutineEditing: rest.isRoutineEditing,
+        isExerciseEditing: rest.isExerciseEditing,
+        referenceExercise: rest.referenceExercise,
+      })
       : null;
   };
 
@@ -81,7 +81,7 @@ const getStyles = (theme) =>
       width: "60%",
     },
     container: {
-      backgroundColor: theme.tileBackground,
+      backgroundColor: theme.secondaryBackground,
       borderRadius: 8,
       height: 69,
       width: "100%",

@@ -1,10 +1,8 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import routes from "../navigation/routes";
 import { useSettings } from "../contexts/SettingsContext";
 import Header from "./Header";
-import AppTextButton from "./buttons/AppTextButton";
 
 function NavHeader({
   LeftComponent,
@@ -45,12 +43,12 @@ const getStyles = (theme) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 30,
+      marginBottom: 22,
       marginTop: 5,
     },
     rightView: {
       position: "absolute",
-      right: 16,
+      right: 0,
     },
     text: {
       fontSize: 17,

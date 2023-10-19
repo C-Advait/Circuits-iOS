@@ -30,7 +30,7 @@ import {
 } from "../contexts/SettingsContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
-import { TAB_BAR_HEIGHT } from "../config/appConstants";
+import { INFO_FONT_SIZE, TAB_BAR_HEIGHT } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import { PARAGRAPH_FONT_SIZE, DEFAULT_EXERCISE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
@@ -51,7 +51,7 @@ import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
 import TimeWheelPicker from "../components/TimeWheelPicker";
-import DraggableFlatList, {
+import {
   NestableDraggableFlatList,
   NestableScrollContainer,
 } from "react-native-draggable-flatlist";
@@ -274,56 +274,56 @@ function RoutineEditScreen({ route }) {
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
-  // Rendered Output
   return !(routine && exercises) ? (
     <Screen />
   ) : (
     <>
       <Screen>
-        <NavHeader // Navigation Header
-          LeftComponent={
-            <AppTextButton
-              onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-              textStyle={{ fontWeight: "400", color: theme.foreground }}
-            >
-              {" "}
-              Cancel
-            </AppTextButton>
-          }
-          headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
-          RightComponent={
-            <AppTextButton
-              onPress={() => handleSavePress()}
-              textStyle={{ fontWeight: "500" }}
-            >
-              {isRoutineEditing ? "Save" : "Create"}
-            </AppTextButton>
-          }
-        />
-        <View style={styles.headingPanel}>
-          <LinearGradient
-            colors={["#ffffff", "#3397f3"]} //to be adjusted
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 0.25 }}
-            style={styles.emojiBox}
+        <View style={styles.container}>
+          <NavHeader // ------------------- Navigation Header
+            LeftComponent={
+              <AppTextButton
+                onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
+                textStyle={{ fontWeight: "400", color: theme.foreground }}
+              >
+                Cancel
+              </AppTextButton>
+            }
+            headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
+            RightComponent={
+              <AppTextButton
+                onPress={() => handleSavePress()}
+                textStyle={{ fontWeight: "500" }}
+              >
+                {isRoutineEditing ? "Save" : "Create"}
+              </AppTextButton>
+            }
           />
-          <TextInput
-            style={styles.title}
-            onChangeText={updateRoutineTitle}
-            multiline={false}
-            keyboardType="default"
-            onpre
-            placeholder={routine ? routine.title : "Loading"}
-            placeholderTextColor={styles.title.color}
-            spellCheck={false}
-            enterKeyHint="done"
-            onSubmitEditing={(item) => {
-              updateRoutineTitle(item.nativeEvent.text);
-            }}
-          />
+          <View style={styles.headingPanel}>
+            <LinearGradient
+              colors={["#ffffff", "#3397f3"]} //to be adjusted
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 0.25 }}
+              style={styles.emojiBox}
+            />
+            <TextInput
+              style={styles.title}
+              onChangeText={updateRoutineTitle}
+              multiline={false}
+              keyboardType="default"
+              onpre
+              placeholder={routine ? routine.title : "Loading"}
+              placeholderTextColor={styles.title.color}
+              spellCheck={false}
+              enterKeyHint="done"
+              onSubmitEditing={(item) => {
+                updateRoutineTitle(item.nativeEvent.text);
+              }}
+            />
+          </View>
         </View>
         <NestableScrollContainer
-          contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 70 }}
+          contentContainerStyle={styles.scrollContainer}
         >
           <TouchableOpacity
             activeOpacity={0.8}
@@ -332,7 +332,7 @@ function RoutineEditScreen({ route }) {
                 edit: isRoutineEditing,
               });
             }}
-            style={styles.templatePanel}
+            style={styles.sectionSeparator}
           >
             <AuxiliaryCard
               title={"Template"}
@@ -343,7 +343,7 @@ function RoutineEditScreen({ route }) {
             />
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Pre-routine</Text>
-          <View style={{ marginBottom: 22 }}>
+          <View style={styles.sectionSeparator}>
             <AuxiliaryCard accentcolor={theme.accentGreen} title="Warmup">
               <Text
                 style={styles.inputText}
@@ -363,14 +363,10 @@ function RoutineEditScreen({ route }) {
             </AuxiliaryCard>
           </View>
           <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
+            style={styles.intervalHeader}
           >
             <Text style={styles.sectionTitle}>Intervals</Text>
-            <View style={{ marginBottom: 0 }}>
+            <View>
               <IconButton
                 iconName="plus"
                 IconFamily={Feather}
@@ -420,20 +416,29 @@ function RoutineEditScreen({ route }) {
                 await Haptics.selectionAsync();
               },
             )}
-            containerStyle={{ marginBottom: 22 }}
+            containerStyle={[
+              styles.flatlist,
+              workingSet.length > 0 ? styles.flatlistMargin12 : styles.flatlistMargin22
+            ]}
+            ItemSeparatorComponent={
+              <View style={{ backgroundColor: "#38383A", height: StyleSheet.hairlineWidth }} />
+            }
           />
-          <View style={{ marginBottom: 22 }}>
-            <AuxiliaryCard
-              editable={false}
-              bold={false}
-              title={"Loops"}
-              InputComponent={() => <DummyInputComponent text="Once" />}
-              Icon={() => (
-                <Feather name="repeat" size={24} color={theme.foreground} />
-              )}
-            />
-          </View>
-          <View style={{}}>
+          {((workingSet.length > 0) && // Conditionally render "loops" component
+            <View style={styles.sectionSeparator}>
+              <AuxiliaryCard
+                editable={false}
+                bold={false}
+                title={"Loops"}
+                InputComponent={() => <DummyInputComponent text="Once" />}
+                Icon={() => (
+                  <Feather name="repeat" size={24} color={theme.foreground} />
+                )}
+              />
+            </View>
+          )}
+          <View>
+            <Text style={styles.sectionTitle}>Post-routine</Text>
             <AuxiliaryCard accentcolor={theme.accentDarkBlue} title="Cooldown">
               <Text
                 style={styles.inputText}
@@ -524,7 +529,7 @@ function RoutineEditScreen({ route }) {
       </Screen>
       <BlurView
         style={[
-          styles.timeTabContainer,
+          styles.totalTimeTab,
           { display: modalContent.key !== "none" ? "none" : "flex" },
         ]}
         tint="dark"
@@ -532,12 +537,7 @@ function RoutineEditScreen({ route }) {
       >
         <View style={styles.timeTab}>
           <Text
-            style={{
-              color: "white",
-              fontSize: 16,
-              marginBottom: 5,
-              fontWeight: "500",
-            }}
+            style={styles.totalTimeText}
           >
             {" "}
             {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
@@ -602,18 +602,35 @@ const getStyles = (theme) =>
       marginHorizontal: 16,
       marginTop: 12,
     },
+    container: {
+      paddingHorizontal: 15
+    },
     timeColorBar: {
       flexDirection: "row",
       backgroundColor: "white",
       borderRadius: 5,
       overflow: "hidden",
     },
-    timeTabContainer: {
+    flatlist: {
+    },
+    flatlistMargin12: {
+      marginBottom: 12
+    },
+    flatlistMargin22: {
+      marginBottom: 22
+    },
+    intervalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: -5
+    },
+    totalTimeTab: {
       position: "absolute",
       bottom: 0,
-      height: TAB_BAR_HEIGHT,
+      height: 109,
       // paddingBottom: ,
-      paddingTop: 15,
+      paddingTop: 25,
       backgroundColor: "transparent",
       width: "100%",
       justifyContent: "flex-start",
@@ -624,6 +641,12 @@ const getStyles = (theme) =>
       // bottom: 15,
       width: "90%",
       alignItems: "center",
+    },
+    totalTimeText: {
+      color: "white",
+      fontSize: 16,
+      marginBottom: 5,
+      fontWeight: "500",
     },
     timeWarmup: {
       // flex: { warmupTime },
@@ -640,11 +663,6 @@ const getStyles = (theme) =>
       height: 5,
       backgroundColor: theme.accentDarkBlue,
     },
-    container: {
-      backgroundColor: theme.background,
-      paddingHorizontal: 15, //consistency between screens important
-      paddingBottom: 45,
-    },
     emojiBox: {
       backgroundColor: theme.blue,
       height: 30,
@@ -660,10 +678,11 @@ const getStyles = (theme) =>
       gap: 2,
     },
     headingPanel: {
+      marginTop: 22,
       flexDirection: "row",
       height: 40,
       alignItems: "center",
-      marginBottom: 15,
+      marginBottom: 25,
     },
     inputText: {
       color: theme.primary,
@@ -678,12 +697,13 @@ const getStyles = (theme) =>
       fontSize: 30,
       fontWeight: 600,
     },
-    templatePanel: {
-      marginBottom: 22,
+    scrollContainer: {
+      paddingBottom: TAB_BAR_HEIGHT,
+      paddingHorizontal: 15
     },
     sectionTitle: {
       color: theme.text60,
-      fontSize: PARAGRAPH_FONT_SIZE,
+      fontSize: INFO_FONT_SIZE,
       marginBottom: 8,
     },
     footer: {
@@ -694,6 +714,9 @@ const getStyles = (theme) =>
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",
+    },
+    sectionSeparator: {
+      marginBottom: 22
     },
   });
 
