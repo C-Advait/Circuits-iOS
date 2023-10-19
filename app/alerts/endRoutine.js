@@ -2,15 +2,15 @@ import { Alert } from "react-native";
 
 export const confirmedNavigate = (onPress) => {
   Alert.alert(
-    "Discard changes?", // title
-    "If you go back now, you'll lose your changes.", // message
+    "End routine?", // title
+    "Are you sure you want to end this routine?", // message
     [
       {
         text: "Cancel",
         style: "cancel",
       },
       {
-        text: "Discard",
+        text: "Yes",
         onPress: onPress,
       },
     ],
