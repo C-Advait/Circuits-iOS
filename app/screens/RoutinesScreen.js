@@ -11,9 +11,15 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/ThemeContext";
 import { View } from "react-native";
-import { DEFAULT_COOLDOWN, DEFAULT_WARMUP, DEFAULT_EXERCISE, DEFAULT_ROUTINE, TAB_BAR_HEIGHT } from "../config/appConstants";
+import {
+  DEFAULT_COOLDOWN,
+  DEFAULT_WARMUP,
+  DEFAULT_EXERCISE,
+  DEFAULT_ROUTINE,
+  TAB_BAR_HEIGHT,
+} from "../config/appConstants";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
@@ -30,7 +36,7 @@ import { useTemplateContext } from "../contexts/TemplateContext";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   const sortModalRef = useRef(null);
@@ -103,7 +109,7 @@ function RoutinesScreen() {
       const routine = new Routine({
         ...DEFAULT_ROUTINE,
         id: routineID,
-        title: `My Routine #${routineID}`
+        title: `My Routine #${routineID}`,
       });
 
       const warmup = new Exercise({
@@ -114,7 +120,7 @@ function RoutinesScreen() {
       const cooldown = new Exercise({
         ...DEFAULT_COOLDOWN,
         routineID: routineID,
-        exerciseOrder: 2
+        exerciseOrder: 2,
       });
       const exercises = [warmup, cooldown];
 
@@ -137,9 +143,7 @@ function RoutinesScreen() {
           IconFamily={Feather}
           iconSize={55}
           foregroundColor={theme.blue}
-          onPress={() =>
-            handleNewRoutineOnpress()
-          }
+          onPress={() => handleNewRoutineOnpress()}
         />
       </View>
       <View style={styles.middlePanel}>

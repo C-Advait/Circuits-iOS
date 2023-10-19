@@ -5,7 +5,7 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Portal } from "react-native-portalize";
 
 import { SortCriteria } from "../classes/SortCriteria";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/ThemeContext";
 import { useTemplateContext } from "../contexts/TemplateContext";
 
 const MODAL_HEIGHT = 270;
@@ -14,7 +14,7 @@ const SortModal = forwardRef((props, ref) => {
   const { isSheetOpen, setIsSheetOpen } = props;
   const { sortOption, setSortOption } = useTemplateContext();
 
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   return (

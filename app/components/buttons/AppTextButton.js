@@ -1,30 +1,30 @@
-import React from 'react';
-import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from "react";
+import { Text, TouchableOpacity, StyleSheet } from "react-native";
 
-import { useTheme } from "../../contexts/ThemeContext";
+import { useSettings } from "../../contexts/ThemeContext";
 
-function AppTextButton({ children, onPress, buttonStyle, textStyle}) {
+function AppTextButton({ children, onPress, buttonStyle, textStyle }) {
+  const { theme } = useSettings();
+  const styles = getStyles(theme);
+  onPress = onPress ? onPress : () => null;
 
-    const { theme } = useTheme();
-    const styles = getStyles(theme);
-    onPress = onPress ? onPress : () => null;
-
-    return (
-        <TouchableOpacity onPress={onPress} style={[styles.button, buttonStyle]}>
-            <Text style={[styles.text, textStyle]}>  {children} </Text>
-        </TouchableOpacity>
-    );
+  return (
+    <TouchableOpacity onPress={onPress} style={[styles.button, buttonStyle]}>
+      <Text style={[styles.text, textStyle]}> {children} </Text>
+    </TouchableOpacity>
+  );
 }
 
-const getStyles = (theme) => StyleSheet.create({
+const getStyles = (theme) =>
+  StyleSheet.create({
     button: {
-        color: theme.blue
+      color: theme.blue,
     },
     text: {
-        fontSize: 18,
-        fontWeight: '400',
-        color: theme.blue
-    }
-})
+      fontSize: 18,
+      fontWeight: "400",
+      color: theme.blue,
+    },
+  });
 
 export default AppTextButton;

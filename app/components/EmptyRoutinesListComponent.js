@@ -1,9 +1,9 @@
 import React from "react";
 import { Text, View, StyleSheet } from "react-native";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/ThemeContext";
 
 function EmptyRoutinesListComponent() {
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
   return (
     <View style={styles.container}>

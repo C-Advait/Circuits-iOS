@@ -23,7 +23,7 @@ import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/ThemeContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
@@ -107,7 +107,7 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   const [workingSet, setWorkingSet] = useState(

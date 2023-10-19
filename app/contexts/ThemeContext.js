@@ -1,23 +1,24 @@
-import { createContext, useState, useContext } from 'react';
-import { lightTheme, darkTheme } from '../config/colors';
+import { createContext, useState, useContext } from "react";
+import { lightTheme, darkTheme } from "../config/colors";
 
-export const ThemeContext = createContext();
+export const SettingsContext = createContext();
 
-export const ThemeProvider = ({ children }) => {
+export const SettingsProvider = ({ children }) => {
   // default theme
-  const [theme, setTheme] = useState(darkTheme); 
+  const [theme, setTheme] = useState(darkTheme);
+  const [haptics, setHaptics] = useState(true);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <SettingsContext.Provider value={{ theme, toggleTheme }}>
       {children}
-    </ThemeContext.Provider>
+    </SettingsContext.Provider>
   );
 };
 
-export const useTheme = () => {
-  return useContext(ThemeContext);
+export const useSettings = () => {
+  return useContext(SettingsContext);
 };

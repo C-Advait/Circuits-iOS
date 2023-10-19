@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Text, View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 
 import LottieView from "lottie-react-native";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useSettings } from "../../contexts/ThemeContext";
 import Header from "../Header";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../../navigation/routes";
@@ -12,7 +12,7 @@ function SuccessModal({ routineTitle, visible, setVisible }) {
   const [animationCompleted, setAnimationCompleted] = useState(false);
   const animationRef = useRef(null);
 
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   return (

@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { ThemeProvider } from "./app/contexts/ThemeContext";
+import { SettingsProvider } from "./app/contexts/ThemeContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 
@@ -21,11 +21,11 @@ export default function App() {
   return ready ? (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Host>
-        <ThemeProvider>
+        <SettingsProvider>
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>
-        </ThemeProvider>
+        </SettingsProvider>
       </Host>
     </GestureHandlerRootView>
   ) : null;

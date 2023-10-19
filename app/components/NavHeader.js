@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 
 import routes from "../navigation/routes";
-import { useTheme } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/ThemeContext";
 import Header from "./Header";
 import AppTextButton from "./buttons/AppTextButton";
 
@@ -21,7 +21,7 @@ function NavHeader({
   ) : (
     <View style={{ width: 50, height: 50 }} />
   );
-  const { theme } = useTheme();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   return (
