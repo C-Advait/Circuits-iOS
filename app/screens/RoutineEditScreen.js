@@ -10,7 +10,6 @@ import {
   Button,
   View,
   StyleSheet,
-  SectionList,
   Text,
   TouchableOpacity,
   TextInput,
@@ -267,7 +266,6 @@ function RoutineEditScreen({ route }) {
     });
 
     if (isRoutineEditing) {
-      // need to know which exercises are created and which are updated (.id parameter)?
       updateRoutine(routine);
     } else {
       createRoutine(routine);
@@ -544,9 +542,9 @@ function RoutineEditScreen({ route }) {
             {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View style={[styles.timeWarmup, { flex: warmupTime }]} />
-            <View style={[styles.timeWorkout, { flex: workingTime }]} />
-            <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
+            <View style={[styles.timeWarmup]} />
+            <View style={[styles.timeWorkout]} />
+            <View style={[styles.timeCooldown]} />
           </View>
         </View>
       </BlurView>
@@ -653,17 +651,17 @@ const getStyles = (theme) =>
       fontWeight: "500",
     },
     timeWarmup: {
-      // flex: { warmupTime },
+      flex: { warmupTime },
       height: 5,
       backgroundColor: theme.accentGreen,
     },
     timeWorkout: {
-      // flex: { exerciseTime },
+      flex: { workingTime },
       height: 5,
       backgroundColor: theme.accentLightPurple,
     },
     timeCooldown: {
-      // flex: { cooldownTime },
+      flex: { cooldownTime },
       height: 5,
       backgroundColor: theme.accentDarkBlue,
     },
