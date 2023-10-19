@@ -15,8 +15,6 @@ import AppTextButton from "../components/buttons/AppTextButton";
 import EditableText from "../components/EditableText";
 import exerciseEditActions from "../actions/exerciseEditActions";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import NumberWheelPicker from "../components/NumberWheelPicker";
-import TimeWheelPicker from "../components/TimeWheelPicker";
 import { formatMinutesSeconds } from "../utilities/formatDuration";
 import { Exercise, Tag } from "../classes/Exercise";
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
@@ -26,7 +24,11 @@ import {
   PICKER_BUTTON_FONT_SIZE,
   PICKER_BUTTON_FONT_WEIGHT,
 } from "../config/appConstants";
-import BottomSheetHandle from "../components/BottomSheetHandle";
+import {
+  NumberWheelPicker,
+  TimeWheelPicker,
+  BottomSheetHandle,
+} from "../components/pickers/BottomSheetHandle";
 import Constants from "expo-constants";
 
 const MODAL_HEIGHT = 400;

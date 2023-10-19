@@ -54,8 +54,10 @@ import {
 import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
-import TimeWheelPicker from "../components/TimeWheelPicker";
-import BottomSheetHandle from "../components/BottomSheetHandle";
+import {
+  TimeWheelPicker,
+  BottomSheetHandle,
+} from "../components/pickers/TimeWheelPicker";
 import {
   NestableDraggableFlatList,
   NestableScrollContainer,
