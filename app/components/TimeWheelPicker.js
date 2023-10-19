@@ -8,6 +8,8 @@ const GAP_REDUCTION = 50;
 // Offsetting the seconds by GAP + UNIT is just a hair off.
 const ADJUSTMENT = 2;
 
+const MINIMUM_SECONDS = 5;
+
 // Theme must be passed in by consumer.
 // This is because the current component
 // is only ever consumed by components wrapped
@@ -28,8 +30,6 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const key = filteredSeconds.length;
 
-  const MINIMUM_SECONDS = 5;
-
   return (
     <View style={styles.container}>
       <View style={styles.pickersContainer}>
@@ -43,7 +43,6 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
             setSelectedMinute(itemValue);
 
             if (itemValue === 0) {
-              console.log(selectedSecond);
               setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
 
               if (selectedSecond < MINIMUM_SECONDS) {
@@ -70,7 +69,9 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           ))}
         </Picker>
         <View style={styles.unitContainer} pointerEvents="none">
-          <Text style={styles.unit}>min</Text>
+          <Text style={styles.unit} pointerEvents="none">
+            min
+          </Text>
         </View>
         <Picker
           key={key}
@@ -102,7 +103,9 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           ]}
           pointerEvents="none"
         >
-          <Text style={styles.unit}>sec</Text>
+          <Text style={styles.unit} pointerEvents="none">
+            sec
+          </Text>
         </View>
       </View>
     </View>
