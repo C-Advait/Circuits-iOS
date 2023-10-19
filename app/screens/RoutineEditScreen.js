@@ -5,6 +5,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
+import * as Haptics from "expo-haptics";
 import {
   Button,
   View,
@@ -23,7 +24,10 @@ import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
-import { useSettings } from "../contexts/ThemeContext";
+import {
+  optionalHapticFunction,
+  useSettings,
+} from "../contexts/SettingsContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
@@ -107,7 +111,7 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme } = useSettings();
+  const { theme, haptics } = useSettings();
   const styles = getStyles(theme);
 
   const [workingSet, setWorkingSet] = useState(
@@ -404,9 +408,18 @@ function RoutineEditScreen({ route }) {
             }
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
+            onDragBegin={optionalHapticFunction(haptics, async () => {
+              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            })}
             onDragEnd={({ data }) => {
               setWorkingSet(data);
             }}
+            onPlaceholderIndexChange={optionalHapticFunction(
+              haptics,
+              async () => {
+                await Haptics.selectionAsync();
+              },
+            )}
             containerStyle={{ marginBottom: 22 }}
           />
           <View style={{ marginBottom: 22 }}>
