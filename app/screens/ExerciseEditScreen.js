@@ -41,6 +41,7 @@ function ExerciseEditScreen({ route }) {
   } = route.params;
   const [state, dispatch] = useReducer(reducer, initialState);
   const modalRef = useRef(null);
+  const nameFieldRef = useRef(null);
   const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
   const { contextExercises, setContextExercises } = useRoutineContext();
 
@@ -150,8 +151,12 @@ function ExerciseEditScreen({ route }) {
         }
       />
       <View style={{ gap: 10, paddingHorizontal: 11 }}>
-        <AuxiliaryCard title="Name">
+        <AuxiliaryCard
+          title="Name"
+          onPress={() => nameFieldRef.current.activate()}
+        >
           <EditableText
+            ref={nameFieldRef}
             original={state.title}
             placeholder="Exercise Name"
             onSubmit={(text) => {
