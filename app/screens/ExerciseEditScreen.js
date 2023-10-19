@@ -62,13 +62,6 @@ function ExerciseEditScreen({ route }) {
     } else {
       // Closing modal
       dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-
-      // Either persist the change or revert it.
-      if (state.apply) {
-        dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
-      } else {
-        dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
-      }
     }
   };
   const InputModalButton = ({ title, text, contentKey, enabled = true }) => (
@@ -269,7 +262,6 @@ function ExerciseEditScreen({ route }) {
             <Button
               title="Apply"
               onPress={() => {
-                dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
                 modalRef.current?.close();
               }}
               color={theme.blue}
@@ -283,7 +275,6 @@ function ExerciseEditScreen({ route }) {
 
 const initialState = {
   title: "",
-  apply: false,
   activeKey: "",
   workTime: 5,
   numberOfRounds: 1,
@@ -325,9 +316,6 @@ const reducer = (state, action) => {
 
     case exerciseEditActions.TOGGLE_REFRESH_PICKER:
       return { ...state, shouldRefreshPicker: !state.shouldRefreshPicker };
-
-    case exerciseEditActions.TOGGLE_APPLY_FLAG:
-      return { ...state, apply: !state.apply };
   }
 };
 

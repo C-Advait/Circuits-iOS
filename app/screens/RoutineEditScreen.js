@@ -174,13 +174,6 @@ function RoutineEditScreen({ route }) {
       // Closing modal
       dispatch({ type: routineEditActions.TOGGLE_REFRESH });
       setModalContent(ROUTINE_EDIT_MODAL.NONE);
-
-      // Either persist the change or revert it.
-      if (state.apply) {
-        dispatch({ type: routineEditActions.TOGGLE_APPLY });
-      } else {
-        dispatch({ type: routineEditActions.REVERT_PREVIOUS });
-      }
     }
   };
 
@@ -463,9 +456,6 @@ function RoutineEditScreen({ route }) {
           )}
           onChange={onModalChange}
         >
-          <View style={styles.header}>
-            <Text style={styles.pickerTitle}>{modalContent.title}</Text>
-          </View>
           {modalContent.key === ROUTINE_EDIT_MODAL.WARMUP.key && (
             <TimeWheelPicker
               key={state.refresh}
@@ -505,7 +495,6 @@ function RoutineEditScreen({ route }) {
               <Button
                 title="Apply"
                 onPress={() => {
-                  dispatch({ type: routineEditActions.TOGGLE_APPLY });
                   modalRef.current?.close();
                 }}
                 color={theme.blue}
@@ -573,9 +562,6 @@ const reducer = (state, action) => {
 
     case routineEditActions.SET_COOLDOWN:
       return { ...state, cooldownDuration: action.payload };
-
-    case routineEditActions.TOGGLE_APPLY:
-      return { ...state, apply: !state.apply };
 
     case routineEditActions.TOGGLE_REFRESH:
       return { ...state, refresh: !state.refresh };
