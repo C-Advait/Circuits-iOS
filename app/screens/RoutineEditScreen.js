@@ -542,9 +542,9 @@ function RoutineEditScreen({ route }) {
             {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View style={[styles.timeWarmup]} />
-            <View style={[styles.timeWorkout]} />
-            <View style={[styles.timeCooldown]} />
+            <View style={[styles.timeWarmup, { flex: warmupTime }]} />
+            <View style={[styles.timeWorkout, { flex: workingTime }]} />
+            <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
           </View>
         </View>
       </BlurView>
@@ -651,17 +651,14 @@ const getStyles = (theme) =>
       fontWeight: "500",
     },
     timeWarmup: {
-      flex: { warmupTime },
       height: 5,
       backgroundColor: theme.accentGreen,
     },
     timeWorkout: {
-      flex: { workingTime },
       height: 5,
       backgroundColor: theme.accentLightPurple,
     },
     timeCooldown: {
-      flex: { cooldownTime },
       height: 5,
       backgroundColor: theme.accentDarkBlue,
     },
