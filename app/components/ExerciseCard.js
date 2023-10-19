@@ -81,7 +81,7 @@ const getStyles = (theme) =>
       width: "60%",
     },
     container: {
-      backgroundColor: theme.tileBackground,
+      backgroundColor: theme.secondaryBackground,
       borderRadius: 8,
       height: 69,
       width: "100%",

@@ -33,6 +33,7 @@ import SortModal from "../components/SortModal";
 import { SortCriteria } from "../classes/SortCriteria";
 import { naturalCompare } from "../utilities/naturalCompare";
 import { useTemplateContext } from "../contexts/TemplateContext";
+import Screen from "../components/Screen";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -135,7 +136,7 @@ function RoutinesScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <Screen>
       <View style={styles.topPanel}>
         <Header>My Routines</Header>
         <IconButton
@@ -195,18 +196,12 @@ function RoutinesScreen() {
         setIsSheetOpen={setIsSheetOpen}
         ref={sortModalRef}
       />
-    </View>
+    </Screen>
   );
 }
 
 const getStyles = (theme) =>
   StyleSheet.create({
-    container: {
-      backgroundColor: theme.background,
-      paddingTop: Constants.statusBarHeight,
-      flex: 1,
-      // height: "100%"
-    },
     topPanel: {
       flexDirection: "row",
       justifyContent: "space-between",
