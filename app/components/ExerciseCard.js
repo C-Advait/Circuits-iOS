@@ -26,10 +26,10 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
   const handleExerciseEditNavigation = () => {
     rest.referenceExercise
       ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-          isRoutineEditing: rest.isRoutineEditing,
-          isExerciseEditing: rest.isExerciseEditing,
-          referenceExercise: rest.referenceExercise,
-        })
+        isRoutineEditing: rest.isRoutineEditing,
+        isExerciseEditing: rest.isExerciseEditing,
+        referenceExercise: rest.referenceExercise,
+      })
       : null;
   };
 
@@ -37,7 +37,7 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
       <TouchableOpacity style={styles.closeButton} onPress={handlePress}>
-        <EvilIcons name="close" size={35} color="white" />
+        <EvilIcons name="close" size={35} color={theme.closeIcon} />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
         <TouchableOpacity
@@ -53,12 +53,12 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
             </Text>
           </View>
         </TouchableOpacity>
-        <View style={[styles.dragContainer]}>
-          <TouchableOpacity onPressIn={drag}>
+        <View style={[styles.dragContainer,]}>
+          <TouchableOpacity onPressIn={drag} style={{ backgroundColor: 'transparent', flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' }}>
             <MaterialIcons
-              name="drag-indicator"
-              size={32}
-              color={theme.text60}
+              name="drag-handle"
+              size={30}
+              color={theme.waffleIcon}
             />
           </TouchableOpacity>
         </View>
@@ -105,7 +105,10 @@ const getStyles = (theme) =>
     },
     dragContainer: {
       width: 40,
-      marginRight: 7,
+      height: 40,
+      marginRight: 20,
+      justifyContent: 'center',
+      alignItems: 'center'
     },
     infoContainer: {
       justifyContent: "center",

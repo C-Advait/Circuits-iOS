@@ -595,7 +595,7 @@ const reducer = (state, action) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     activeItem: {
-      backgroundColor: "rgba(128,128,128,0.8)",
+      backgroundColor: "rgba(28,28,30,0.8)",
     },
     buttonContainer: {
       marginHorizontal: 16,
