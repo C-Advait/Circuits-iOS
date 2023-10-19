@@ -4,24 +4,30 @@ import { View, StyleSheet, Text } from "react-native";
 import { useSettings } from "../contexts/SettingsContext";
 import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 function AuxiliaryCard({
-  accentcolor = "transparent",
+  accentColor = "transparent",
   bold = false,
   editable = false,
   title,
   Icon,
+  onPress,
   children,
 }) {
   const { theme } = useSettings();
   const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
-  accentcolor = accentcolor || theme.backgroundFaded;
+  accentColor = accentColor || theme.backgroundFaded;
 
   const fontWeight = bold ? 600 : 400;
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.accent, { backgroundColor: accentcolor }]} />
+    <TouchableOpacity
+      activeOpacity={0.8}
+      style={styles.container}
+      onPress={onPress}
+    >
+      <View style={[styles.accent, { backgroundColor: accentColor }]} />
       {Icon ? (
         <View style={styles.iconContainer}>
           <Icon />
@@ -40,7 +46,7 @@ function AuxiliaryCard({
         )}
         {children}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

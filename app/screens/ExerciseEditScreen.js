@@ -23,6 +23,10 @@ import { Exercise, Tag } from "../classes/Exercise";
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
 import { confirmedNavigate } from "../alerts/discardExerciseEdits";
 import { useRoutineContext } from "../contexts/RoutineContext";
+import {
+  PICKER_BUTTON_FONT_SIZE,
+  PICKER_BUTTON_FONT_WEIGHT,
+} from "../config/appConstants";
 
 const MODAL_HEIGHT = 350;
 
@@ -37,6 +41,7 @@ function ExerciseEditScreen({ route }) {
   } = route.params;
   const [state, dispatch] = useReducer(reducer, initialState);
   const modalRef = useRef(null);
+  const nameFieldRef = useRef(null);
   const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
   const { contextExercises, setContextExercises } = useRoutineContext();
 
@@ -65,9 +70,9 @@ function ExerciseEditScreen({ route }) {
       }
     }
   };
-  const InputModalButton = ({ text, contentKey, enabled = true }) => (
-    <Text
-      style={enabled ? styles.inputText : styles.disabled}
+  const InputModalButton = ({ title, text, contentKey, enabled = true }) => (
+    <AuxiliaryCard
+      title={title}
       onPress={
         enabled
           ? () => {
@@ -83,8 +88,8 @@ function ExerciseEditScreen({ route }) {
           : () => null
       }
     >
-      {text}
-    </Text>
+      <Text style={enabled ? styles.inputText : styles.disabled}>{text}</Text>
+    </AuxiliaryCard>
   );
 
   const goBack = () =>
@@ -146,8 +151,12 @@ function ExerciseEditScreen({ route }) {
         }
       />
       <View style={{ gap: 10, paddingHorizontal: 11 }}>
-        <AuxiliaryCard title="Name">
+        <AuxiliaryCard
+          title="Name"
+          onPress={() => nameFieldRef.current.activate()}
+        >
           <EditableText
+            ref={nameFieldRef}
             original={state.title}
             placeholder="Exercise Name"
             onSubmit={(text) => {
@@ -158,28 +167,27 @@ function ExerciseEditScreen({ route }) {
             }}
           />
         </AuxiliaryCard>
-        <AuxiliaryCard title="Work time">
-          <InputModalButton
-            text={formatMinutesSeconds(state.workTime)}
-            contentKey="WORK_TIME"
-          />
-        </AuxiliaryCard>
-        <AuxiliaryCard title="Number of rounds">
-          <InputModalButton text={state.numberOfRounds} contentKey="ROUNDS" />
-        </AuxiliaryCard>
-        <AuxiliaryCard title="Rest between rounds">
-          <InputModalButton
-            text={formatMinutesSeconds(state.restBetweenRounds)}
-            contentKey="REST_TIME"
-            enabled={state.numberOfRounds > 1}
-          />
-        </AuxiliaryCard>
-        <AuxiliaryCard title="Break before next exercise">
-          <InputModalButton
-            text={formatMinutesSeconds(state.breakBeforeNext)}
-            contentKey="BREAK_TIME"
-          />
-        </AuxiliaryCard>
+        <InputModalButton
+          title="Work time"
+          text={formatMinutesSeconds(state.workTime)}
+          contentKey="WORK_TIME"
+        />
+        <InputModalButton
+          title="Number of rounds"
+          text={state.numberOfRounds}
+          contentKey="ROUNDS"
+        />
+        <InputModalButton
+          title="Rest between rounds"
+          text={formatMinutesSeconds(state.restBetweenRounds)}
+          contentKey="REST_TIME"
+          enabled={state.numberOfRounds > 1}
+        />
+        <InputModalButton
+          title="Break before next exercise"
+          text={formatMinutesSeconds(state.breakBeforeNext)}
+          contentKey="BREAK_TIME"
+        />
       </View>
       <BottomSheet
         ref={modalRef}
@@ -358,7 +366,9 @@ const getStyles = (theme) =>
       fontSize: 17,
     },
     inputText: {
-      color: theme.primary,
+      fontSize: PICKER_BUTTON_FONT_SIZE,
+      fontWeight: PICKER_BUTTON_FONT_WEIGHT,
+      color: theme.text87,
     },
     tile: {
       backgroundColor: "#333",

@@ -30,9 +30,13 @@ import {
 } from "../contexts/SettingsContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
-import { INFO_FONT_SIZE, TAB_BAR_HEIGHT } from "../config/appConstants";
+import {
+  PICKER_BUTTON_FONT_SIZE,
+  TAB_BAR_HEIGHT,
+  INFO_FONT_SIZE,
+  DEFAULT_EXERCISE,
+} from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
-import { PARAGRAPH_FONT_SIZE, DEFAULT_EXERCISE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
@@ -274,6 +278,26 @@ function RoutineEditScreen({ route }) {
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
+  const InputModalButton = ({ accentColor, title, text, contentKey }) => (
+    <AuxiliaryCard
+      accentColor={accentColor}
+      title={title}
+      onPress={() => {
+        dispatch({
+          type: routineEditActions.SET_ACTIVE_KEY,
+          payload: ROUTINE_EDIT_MODAL[contentKey]?.key,
+        });
+        dispatch({ type: routineEditActions.SET_PREVIOUS });
+        dispatch({ type: routineEditActions.TOGGLE_REFRESH });
+        setModalContent(ROUTINE_EDIT_MODAL[contentKey]);
+        modalRef.current?.expand();
+      }}
+    >
+      <Text style={styles.inputText}>{text}</Text>
+    </AuxiliaryCard>
+  );
+
+  // Rendered Output
   return !(routine && exercises) ? (
     <Screen />
   ) : (
@@ -322,9 +346,7 @@ function RoutineEditScreen({ route }) {
             />
           </View>
         </View>
-        <NestableScrollContainer
-          contentContainerStyle={styles.scrollContainer}
-        >
+        <NestableScrollContainer contentContainerStyle={styles.scrollContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
@@ -336,7 +358,6 @@ function RoutineEditScreen({ route }) {
           >
             <AuxiliaryCard
               title={"Template"}
-              editable={false}
               InputComponent={() => (
                 <DummyInputComponent text={selectedTemplate} />
               )}
@@ -344,27 +365,14 @@ function RoutineEditScreen({ route }) {
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Pre-routine</Text>
           <View style={styles.sectionSeparator}>
-            <AuxiliaryCard accentcolor={theme.accentGreen} title="Warmup">
-              <Text
-                style={styles.inputText}
-                onPress={() => {
-                  dispatch({
-                    type: routineEditActions.SET_ACTIVE_KEY,
-                    payload: ROUTINE_EDIT_MODAL.WARMUP.key,
-                  });
-                  dispatch({ type: routineEditActions.SET_PREVIOUS });
-                  dispatch({ type: routineEditActions.TOGGLE_REFRESH });
-                  setModalContent(ROUTINE_EDIT_MODAL.WARMUP);
-                  modalRef.current?.expand();
-                }}
-              >
-                {formatMinutesSeconds(state.warmupDuration)}
-              </Text>
-            </AuxiliaryCard>
+            <InputModalButton
+              accentColor={theme.accentGreen}
+              title="Warmup"
+              text={formatMinutesSeconds(state.warmupDuration)}
+              contentKey="WARMUP"
+            />
           </View>
-          <View
-            style={styles.intervalHeader}
-          >
+          <View style={styles.intervalHeader}>
             <Text style={styles.sectionTitle}>Intervals</Text>
             <View>
               <IconButton
@@ -392,7 +400,6 @@ function RoutineEditScreen({ route }) {
                     onPress={() => handleAddExerciseOnPress()}
                   />
                 )}
-                editable={false}
                 InputComponent={() => <></>}
               />
             </TouchableOpacity>
@@ -418,17 +425,22 @@ function RoutineEditScreen({ route }) {
             )}
             containerStyle={[
               styles.flatlist,
-              workingSet.length > 0 ? styles.flatlistMargin12 : styles.flatlistMargin22
+              workingSet.length > 0
+                ? styles.flatlistMargin12
+                : styles.flatlistMargin22,
             ]}
             ItemSeparatorComponent={
-              <View style={{ backgroundColor: "#38383A", height: StyleSheet.hairlineWidth }} />
+              <View
+                style={{
+                  backgroundColor: "#38383A",
+                  height: StyleSheet.hairlineWidth,
+                }}
+              />
             }
           />
-          {((workingSet.length > 0) && // Conditionally render "loops" component
+          {workingSet.length > 0 && ( // Conditionally render "loops" component
             <View style={styles.sectionSeparator}>
               <AuxiliaryCard
-                editable={false}
-                bold={false}
                 title={"Loops"}
                 InputComponent={() => <DummyInputComponent text="Once" />}
                 Icon={() => (
@@ -437,25 +449,14 @@ function RoutineEditScreen({ route }) {
               />
             </View>
           )}
-          <View>
-            <Text style={styles.sectionTitle}>Post-routine</Text>
-            <AuxiliaryCard accentcolor={theme.accentDarkBlue} title="Cooldown">
-              <Text
-                style={styles.inputText}
-                onPress={() => {
-                  dispatch({
-                    type: routineEditActions.SET_ACTIVE_KEY,
-                    payload: ROUTINE_EDIT_MODAL.COOLDOWN.key,
-                  });
-                  dispatch({ type: routineEditActions.SET_PREVIOUS });
-                  dispatch({ type: routineEditActions.TOGGLE_REFRESH });
-                  setModalContent(ROUTINE_EDIT_MODAL.COOLDOWN);
-                  modalRef.current?.expand();
-                }}
-              >
-                {formatMinutesSeconds(state.cooldownDuration)}
-              </Text>
-            </AuxiliaryCard>
+          <Text style={styles.sectionTitle}>Post-routine</Text>
+          <View style={styles.sectionSeparator}>
+            <InputModalButton
+              accentColor={theme.accentDarkBlue}
+              title="Cooldown"
+              text={formatMinutesSeconds(state.cooldownDuration)}
+              contentKey="COOLDOWN"
+            />
           </View>
         </NestableScrollContainer>
         <BottomSheet
@@ -536,9 +537,7 @@ function RoutineEditScreen({ route }) {
         intensity={60}
       >
         <View style={styles.timeTab}>
-          <Text
-            style={styles.totalTimeText}
-          >
+          <Text style={styles.totalTimeText}>
             {" "}
             {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
           </Text>
@@ -603,7 +602,7 @@ const getStyles = (theme) =>
       marginTop: 12,
     },
     container: {
-      paddingHorizontal: 15
+      paddingHorizontal: 15,
     },
     timeColorBar: {
       flexDirection: "row",
@@ -611,19 +610,18 @@ const getStyles = (theme) =>
       borderRadius: 5,
       overflow: "hidden",
     },
-    flatlist: {
-    },
+    flatlist: {},
     flatlistMargin12: {
-      marginBottom: 12
+      marginBottom: 12,
     },
     flatlistMargin22: {
-      marginBottom: 22
+      marginBottom: 22,
     },
     intervalHeader: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: -5
+      marginBottom: -5,
     },
     totalTimeTab: {
       position: "absolute",
@@ -685,7 +683,9 @@ const getStyles = (theme) =>
       marginBottom: 25,
     },
     inputText: {
-      color: theme.primary,
+      fontSize: PICKER_BUTTON_FONT_SIZE,
+      fontWeight: 400,
+      color: theme.text87,
     },
     pickerTitle: {
       color: theme.primary,
@@ -699,7 +699,7 @@ const getStyles = (theme) =>
     },
     scrollContainer: {
       paddingBottom: TAB_BAR_HEIGHT,
-      paddingHorizontal: 15
+      paddingHorizontal: 15,
     },
     sectionTitle: {
       color: theme.text60,
@@ -716,7 +716,7 @@ const getStyles = (theme) =>
       width: "100%",
     },
     sectionSeparator: {
-      marginBottom: 22
+      marginBottom: 22,
     },
   });
 

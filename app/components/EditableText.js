@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import {
   TextInput,
   View,
@@ -6,11 +12,16 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
-import { useSettings } from "../contexts/SettingsContext";
 
-const EditableText = ({ original, placeholder, onSubmit, maxLength }) => {
+import { useSettings } from "../contexts/SettingsContext";
+import {
+  EDITABLE_TEXT_FONT_SIZE,
+  EDITABLE_TEXT_FONT_WEIGHT,
+} from "../config/appConstants";
+
+const EditableText = forwardRef((props, ref) => {
   const { theme } = useSettings();
+  const { original, placeholder, onSubmit, maxLength } = props;
   const styles = getStyles(theme);
 
   const [text, setText] = useState(original);
@@ -37,6 +48,11 @@ const EditableText = ({ original, placeholder, onSubmit, maxLength }) => {
       setText(placeholder);
     }
   };
+
+  // Expose 'editing' to wrapping AuxiliaryCard
+  useImperativeHandle(ref, () => ({
+    activate: () => setIsEditing(true),
+  }));
 
   const textStyle =
     text && text.length ? styles.text : [styles.text, styles.placeholderText];
@@ -73,7 +89,7 @@ const EditableText = ({ original, placeholder, onSubmit, maxLength }) => {
       )}
     </TouchableOpacity>
   );
-};
+});
 
 const getStyles = (theme) =>
   StyleSheet.create({
@@ -86,10 +102,14 @@ const getStyles = (theme) =>
       justifyContent: "flex-end",
     },
     text: {
-      color: theme.primary,
+      color: theme.text87,
+      fontSize: EDITABLE_TEXT_FONT_SIZE,
+      fontWeight: EDITABLE_TEXT_FONT_WEIGHT,
     },
     placeholderText: {
       color: theme.text60,
+      fontSize: EDITABLE_TEXT_FONT_SIZE,
+      fontWeight: EDITABLE_TEXT_FONT_WEIGHT,
     },
     fadedSuggestion: {
       position: "absolute",
