@@ -8,7 +8,7 @@ import { Text, Button } from "react-native";
 import Screen from "../components/Screen";
 import Navheader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import routes from "../navigation/routes";
 import AuxiliaryCard from "../components/AuxiliaryCard";
 

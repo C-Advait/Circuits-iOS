@@ -13,11 +13,21 @@ export const SettingsProvider = ({ children }) => {
   };
 
   return (
-    <SettingsContext.Provider value={{ theme, toggleTheme }}>
+    <SettingsContext.Provider
+      value={{ theme, toggleTheme, haptics, setHaptics }}
+    >
       {children}
     </SettingsContext.Provider>
   );
 };
+
+export function optionalHapticFunction(hasHaptics, asyncHapticFunction) {
+  if (hasHaptics) {
+    return asyncHapticFunction;
+  } else {
+    return () => null;
+  }
+}
 
 export const useSettings = () => {
   return useContext(SettingsContext);

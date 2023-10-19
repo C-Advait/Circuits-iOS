@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text } from "react-native";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 function Header({ children, style }) {
   const { theme } = useSettings();

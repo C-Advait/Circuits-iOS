@@ -5,7 +5,7 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Portal } from "react-native-portalize";
 
 import { SortCriteria } from "../classes/SortCriteria";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { useTemplateContext } from "../contexts/TemplateContext";
 
 const MODAL_HEIGHT = 270;

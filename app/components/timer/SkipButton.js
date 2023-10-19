@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { IconButton } from "../buttons";
 import timerActions from "../../actions/timerActions";
-import { useSettings } from "../../contexts/ThemeContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
 function SkipButton({ shouldSkipForward, dispatch, active = true }) {
   const { theme } = useSettings();

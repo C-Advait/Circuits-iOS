@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { EvilIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import {
   INFO_FONT_SIZE,
   PARAGRAPH_FONT_SIZE,

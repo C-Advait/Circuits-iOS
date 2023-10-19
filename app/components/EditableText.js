@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 const EditableText = ({ original, placeholder, onSubmit, maxLength }) => {
   const { theme } = useSettings();

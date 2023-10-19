@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { SettingsProvider } from "./app/contexts/ThemeContext";
+import { SettingsProvider } from "./app/contexts/SettingsContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 

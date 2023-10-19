@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Text, View, StyleSheet, Modal, TouchableOpacity } from "react-native";
 
 import LottieView from "lottie-react-native";
-import { useSettings } from "../../contexts/ThemeContext";
+import { useSettings } from "../../contexts/SettingsContext";
 import Header from "../Header";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../../navigation/routes";

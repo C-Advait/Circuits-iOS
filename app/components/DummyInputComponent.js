@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, StyleSheet } from "react-native";
 
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 function DummyInputComponent({ text = "10 minutes", disabled = false }) {

@@ -11,7 +11,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { View } from "react-native";
 import {
   DEFAULT_COOLDOWN,

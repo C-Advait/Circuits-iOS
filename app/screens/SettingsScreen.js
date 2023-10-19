@@ -12,7 +12,7 @@ import Constants from "expo-constants";
 
 import { IconButton } from "../components/buttons";
 
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { Feather } from "@expo/vector-icons";
 
 const appearance = [

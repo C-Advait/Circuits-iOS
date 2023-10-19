@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import navigationIcons from "./navigationIcons";
 
 import shouldShowTabBar from "./shouldShowTabBar";

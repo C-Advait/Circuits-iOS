@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 
 import routes from "../navigation/routes";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import Header from "./Header";
 import AppTextButton from "./buttons/AppTextButton";
 

@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import Screen from "../components/Screen";
-import { useSettings } from "../contexts/ThemeContext";
+import { useSettings } from "../contexts/SettingsContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import { useNavigation } from "@react-navigation/native";
