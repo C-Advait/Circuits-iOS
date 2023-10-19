@@ -76,15 +76,15 @@ function ExerciseEditScreen({ route }) {
       onPress={
         enabled
           ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              modalRef.current?.expand();
-            }
+            dispatch({
+              type: exerciseEditActions.SET_ACTIVE_KEY,
+              payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+            });
+            dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+            dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+            setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+            modalRef.current?.expand();
+          }
           : () => null
       }
     >
@@ -143,9 +143,9 @@ function ExerciseEditScreen({ route }) {
         }
         headerText={`Edit ${state.title}`}
         RightComponent={
-          state.dirty ? (
+          (state.dirty || !isExerciseEditing) ? (
             <AppTextButton onPress={onSave} textStyle={{ fontWeight: 300 }}>
-              {isExerciseEditing ? "Save" : "Create"}
+              {(isExerciseEditing) ? "Save" : "Create"}
             </AppTextButton>
           ) : null
         }
