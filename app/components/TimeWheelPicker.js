@@ -28,6 +28,8 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const key = filteredSeconds.length;
 
+  const MINIMUM_SECONDS = 5;
+
   return (
     <View style={styles.container}>
       <View style={styles.pickersContainer}>
@@ -41,11 +43,13 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
             setSelectedMinute(itemValue);
 
             if (itemValue === 0) {
-              setFilteredSeconds(items.slice(5)); // starts from ' 5'
+              console.log(selectedSecond);
+              setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
 
-              if (selectedSecond < 5) {
+              if (selectedSecond < MINIMUM_SECONDS) {
                 // Move to legal range
-                setSelectedSecond(5);
+                setSelectedSecond(MINIMUM_SECONDS);
+                onValueChange(itemValue * 60 + MINIMUM_SECONDS);
               }
             } else {
               setFilteredSeconds(items); // reset to the full range
