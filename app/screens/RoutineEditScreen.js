@@ -30,7 +30,11 @@ import {
 } from "../contexts/SettingsContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
-import { TAB_BAR_HEIGHT } from "../config/appConstants";
+import {
+  PICKER_BUTTON_FONT_SIZE,
+  PICKER_BUTTON_FONT_WEIGHT,
+  TAB_BAR_HEIGHT,
+} from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import { PARAGRAPH_FONT_SIZE, DEFAULT_EXERCISE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
@@ -274,6 +278,25 @@ function RoutineEditScreen({ route }) {
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
+  const InputModalButton = ({ accentColor, title, text, contentKey }) => (
+    <AuxiliaryCard
+      accentColor={accentColor}
+      title={title}
+      onPress={() => {
+        dispatch({
+          type: routineEditActions.SET_ACTIVE_KEY,
+          payload: ROUTINE_EDIT_MODAL[contentKey]?.key,
+        });
+        dispatch({ type: routineEditActions.SET_PREVIOUS });
+        dispatch({ type: routineEditActions.TOGGLE_REFRESH });
+        setModalContent(ROUTINE_EDIT_MODAL[contentKey]);
+        modalRef.current?.expand();
+      }}
+    >
+      <Text style={styles.inputText}>{text}</Text>
+    </AuxiliaryCard>
+  );
+
   // Rendered Output
   return !(routine && exercises) ? (
     <Screen />
@@ -336,7 +359,6 @@ function RoutineEditScreen({ route }) {
           >
             <AuxiliaryCard
               title={"Template"}
-              editable={false}
               InputComponent={() => (
                 <DummyInputComponent text={selectedTemplate} />
               )}
@@ -344,23 +366,12 @@ function RoutineEditScreen({ route }) {
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Pre-routine</Text>
           <View style={{ marginBottom: 22 }}>
-            <AuxiliaryCard accentcolor={theme.accentGreen} title="Warmup">
-              <Text
-                style={styles.inputText}
-                onPress={() => {
-                  dispatch({
-                    type: routineEditActions.SET_ACTIVE_KEY,
-                    payload: ROUTINE_EDIT_MODAL.WARMUP.key,
-                  });
-                  dispatch({ type: routineEditActions.SET_PREVIOUS });
-                  dispatch({ type: routineEditActions.TOGGLE_REFRESH });
-                  setModalContent(ROUTINE_EDIT_MODAL.WARMUP);
-                  modalRef.current?.expand();
-                }}
-              >
-                {formatMinutesSeconds(state.warmupDuration)}
-              </Text>
-            </AuxiliaryCard>
+            <InputModalButton
+              accentColor={theme.accentGreen}
+              title="Warmup"
+              text={formatMinutesSeconds(state.warmupDuration)}
+              contentKey="WARMUP"
+            />
           </View>
           <View
             style={{
@@ -396,7 +407,6 @@ function RoutineEditScreen({ route }) {
                     onPress={() => handleAddExerciseOnPress()}
                   />
                 )}
-                editable={false}
                 InputComponent={() => <></>}
               />
             </TouchableOpacity>
@@ -424,8 +434,6 @@ function RoutineEditScreen({ route }) {
           />
           <View style={{ marginBottom: 22 }}>
             <AuxiliaryCard
-              editable={false}
-              bold={false}
               title={"Loops"}
               InputComponent={() => <DummyInputComponent text="Once" />}
               Icon={() => (
@@ -434,23 +442,12 @@ function RoutineEditScreen({ route }) {
             />
           </View>
           <View style={{}}>
-            <AuxiliaryCard accentcolor={theme.accentDarkBlue} title="Cooldown">
-              <Text
-                style={styles.inputText}
-                onPress={() => {
-                  dispatch({
-                    type: routineEditActions.SET_ACTIVE_KEY,
-                    payload: ROUTINE_EDIT_MODAL.COOLDOWN.key,
-                  });
-                  dispatch({ type: routineEditActions.SET_PREVIOUS });
-                  dispatch({ type: routineEditActions.TOGGLE_REFRESH });
-                  setModalContent(ROUTINE_EDIT_MODAL.COOLDOWN);
-                  modalRef.current?.expand();
-                }}
-              >
-                {formatMinutesSeconds(state.cooldownDuration)}
-              </Text>
-            </AuxiliaryCard>
+            <InputModalButton
+              accentColor={theme.accentDarkBlue}
+              title="Cooldown"
+              text={formatMinutesSeconds(state.cooldownDuration)}
+              contentKey="COOLDOWN"
+            />
           </View>
         </NestableScrollContainer>
         <BottomSheet
@@ -666,7 +663,9 @@ const getStyles = (theme) =>
       marginBottom: 15,
     },
     inputText: {
-      color: theme.primary,
+      fontSize: PICKER_BUTTON_FONT_SIZE,
+      fontWeight: 400,
+      color: theme.text87,
     },
     pickerTitle: {
       color: theme.primary,
