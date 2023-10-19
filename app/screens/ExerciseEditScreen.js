@@ -5,7 +5,6 @@ import { Feather } from "@expo/vector-icons";
 
 import { Text, Button } from "react-native";
 
-import Screen from "../components/Screen";
 import Navheader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
 import { useSettings } from "../contexts/SettingsContext";
@@ -27,8 +26,10 @@ import {
   PICKER_BUTTON_FONT_SIZE,
   PICKER_BUTTON_FONT_WEIGHT,
 } from "../config/appConstants";
+import BottomSheetHandle from "../components/BottomSheetHandle";
+import Constants from "expo-constants";
 
-const MODAL_HEIGHT = 350;
+const MODAL_HEIGHT = 400;
 
 function ExerciseEditScreen({ route }) {
   const navigation = useNavigation();
@@ -129,7 +130,7 @@ function ExerciseEditScreen({ route }) {
   const confirmDiscard = () => confirmedNavigate(goBack);
 
   return (
-    <Screen style={{ flex: 1 }}>
+    <View style={styles.container}>
       <Navheader
         style={styles.navPanel}
         LeftComponent={
@@ -194,23 +195,17 @@ function ExerciseEditScreen({ route }) {
         index={-1}
         snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
         enablePanDownToClose={true}
+        enableContentPanningGesture={false}
         backdropComponent={BottomSheetBackdrop}
+        handleComponent={() => (
+          <BottomSheetHandle
+            title={contentType.title}
+            subtitle={contentType.subtitle}
+          />
+        )}
         backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
-        handleStyle={{
-          backgroundColor: theme.secondaryBackground,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-        }}
-        handleIndicatorStyle={{
-          backgroundColor: "rgba(255, 255, 255, 0.25)",
-          width: 90,
-        }}
         onChange={onModalChange}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>{contentType.title}</Text>
-          <Text style={styles.subtitle}>{contentType.subtitle}</Text>
-        </View>
         {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
           <NumberWheelPicker
             key={state.shouldRefreshPicker}
@@ -282,7 +277,7 @@ function ExerciseEditScreen({ route }) {
           </View>
         </View>
       </BottomSheet>
-    </Screen>
+    </View>
   );
 }
 
@@ -342,6 +337,12 @@ const getStyles = (theme) =>
       marginHorizontal: 16,
       marginTop: 12,
     },
+    container: {
+      backgroundColor: theme.background,
+      flex: 1,
+      height: "100%",
+      paddingTop: Constants.statusBarHeight,
+    },
     disabled: {
       color: theme.textDisabled,
     },
@@ -349,21 +350,10 @@ const getStyles = (theme) =>
       backgroundColor: theme.secondaryBackground,
       bottom: 0,
       flexDirection: "row",
-      height: 65,
+      height: 75,
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",
-    },
-    header: {
-      backgroundColor: theme.secondaryBackground,
-      paddingBottom: 18,
-      paddingHorizontal: 22,
-      paddingTop: 10,
-      gap: 2,
-    },
-    subtitle: {
-      color: theme.text,
-      fontSize: 17,
     },
     inputText: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
@@ -379,11 +369,6 @@ const getStyles = (theme) =>
       alignItems: "center",
       paddingHorizontal: 15,
       borderRadius: 10,
-    },
-    title: {
-      color: theme.primary,
-      fontSize: 17,
-      fontWeight: 500,
     },
   });
 

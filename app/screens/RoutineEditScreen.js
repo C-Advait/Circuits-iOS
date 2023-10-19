@@ -55,7 +55,8 @@ import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
 import TimeWheelPicker from "../components/TimeWheelPicker";
-import DraggableFlatList, {
+import BottomSheetHandle from "../components/BottomSheetHandle";
+import {
   NestableDraggableFlatList,
   NestableScrollContainer,
 } from "react-native-draggable-flatlist";
@@ -457,15 +458,9 @@ function RoutineEditScreen({ route }) {
           enablePanDownToClose={true}
           backdropComponent={BottomSheetBackdrop}
           backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
-          handleStyle={{
-            backgroundColor: theme.secondaryBackground,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          }}
-          handleIndicatorStyle={{
-            backgroundColor: "rgba(255, 255, 255, 0.25)",
-            width: 90,
-          }}
+          handleComponent={() => (
+            <BottomSheetHandle title={modalContent.title} />
+          )}
           onChange={onModalChange}
         >
           <View style={styles.header}>
@@ -664,7 +659,7 @@ const getStyles = (theme) =>
     },
     inputText: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
-      fontWeight: 400,
+      fontWeight: PICKER_BUTTON_FONT_WEIGHT,
       color: theme.text87,
     },
     pickerTitle: {

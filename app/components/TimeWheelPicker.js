@@ -30,14 +30,15 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const key = filteredSeconds.length;
 
+  // <View style={styles.overlay} />
+  // selectionColor={theme.tertiaryTranslucentBackground}
+
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="box-none">
       <View style={styles.pickersContainer}>
-        <View style={styles.overlay} />
         <Picker
           selectedValue={selectedMinute}
           style={styles.minutesPicker}
-          selectionColor={theme.tertiaryTranslucentBackground}
           onValueChange={(itemValue) => {
             onValueChange(itemValue * 60 + selectedSecond);
             setSelectedMinute(itemValue);
@@ -77,7 +78,6 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           key={key}
           selectedValue={selectedSecond}
           style={styles.secondsPicker}
-          selectionColor={theme.tertiaryTranslucentBackground}
           onValueChange={(itemValue) => {
             setSelectedSecond(itemValue);
             onValueChange(selectedMinute * 60 + itemValue);
@@ -115,6 +115,7 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     container: {
+      height: "100%",
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
