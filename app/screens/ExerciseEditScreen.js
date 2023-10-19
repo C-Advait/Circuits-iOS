@@ -137,7 +137,7 @@ function ExerciseEditScreen({ route }) {
         }
         headerText={`Edit ${state.title}`}
         RightComponent={
-          state.dirty ? (
+          state.dirty || !isExerciseEditing ? (
             <AppTextButton onPress={onSave} textStyle={{ fontWeight: 300 }}>
               {isExerciseEditing ? "Save" : "Create"}
             </AppTextButton>

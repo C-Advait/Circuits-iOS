@@ -37,7 +37,7 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
       <TouchableOpacity style={styles.closeButton} onPress={handlePress}>
-        <EvilIcons name="close" size={35} color="white" />
+        <EvilIcons name="close" size={35} color={theme.closeIcon} />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
         <TouchableOpacity
@@ -54,11 +54,11 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
           </View>
         </TouchableOpacity>
         <View style={[styles.dragContainer]}>
-          <TouchableOpacity onPressIn={drag}>
+          <TouchableOpacity onPressIn={drag} style={styles.draggableOpacity}>
             <MaterialIcons
-              name="drag-indicator"
-              size={32}
-              color={theme.text60}
+              name="drag-handle"
+              size={30}
+              color={theme.waffleIcon}
             />
           </TouchableOpacity>
         </View>
@@ -76,12 +76,19 @@ const getStyles = (theme) =>
       bottom: 0,
       left: 0,
     },
+    draggableOpacity: {
+      backgroundColor: "transparent",
+      flex: 1,
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+    },
     touchable: {
       flexDirection: "row",
       width: "60%",
     },
     container: {
-      backgroundColor: theme.tileBackground,
+      backgroundColor: theme.secondaryBackground,
       borderRadius: 8,
       height: 69,
       width: "100%",
@@ -105,7 +112,10 @@ const getStyles = (theme) =>
     },
     dragContainer: {
       width: 40,
-      marginRight: 7,
+      height: 40,
+      marginRight: 20,
+      justifyContent: "center",
+      alignItems: "center",
     },
     infoContainer: {
       justifyContent: "center",

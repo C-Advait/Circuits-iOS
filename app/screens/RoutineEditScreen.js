@@ -10,7 +10,6 @@ import {
   Button,
   View,
   StyleSheet,
-  SectionList,
   Text,
   TouchableOpacity,
   TextInput,
@@ -32,11 +31,11 @@ import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import {
   PICKER_BUTTON_FONT_SIZE,
-  PICKER_BUTTON_FONT_WEIGHT,
   TAB_BAR_HEIGHT,
+  INFO_FONT_SIZE,
+  DEFAULT_EXERCISE,
 } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
-import { PARAGRAPH_FONT_SIZE, DEFAULT_EXERCISE } from "../config/appConstants";
 import NavHeader from "../components/NavHeader";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
@@ -129,6 +128,7 @@ function RoutineEditScreen({ route }) {
     maxExerciseOrder,
   ] = getExerciseInfo(exercises);
   const totalRoutineTime = warmupTime + workingTime + cooldownTime;
+  const [exerciseBeingDragged, setExerciseBeingDragged] = useState(false);
 
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -194,8 +194,8 @@ function RoutineEditScreen({ route }) {
             accentColor={theme.accentLightPurple}
             drag={drag}
             style={[
-              { borderBottomStartRadius: 0 },
-              isActive && styles.activeItem,
+              { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
+              isActive && exerciseBeingDragged && styles.activeItem,
             ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
@@ -209,7 +209,10 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderTopStartRadius: 0 }, isActive && styles.activeItem]}
+            style={[
+              { borderTopStartRadius: 0, borderTopEndRadius: 0 },
+              isActive && exerciseBeingDragged && styles.activeItem,
+            ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -222,7 +225,10 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderRadius: 0 }, isActive && styles.activeItem]}
+            style={[
+              { borderRadius: 0 },
+              isActive && exerciseBeingDragged && styles.activeItem,
+            ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -257,7 +263,6 @@ function RoutineEditScreen({ route }) {
     });
 
     if (isRoutineEditing) {
-      // need to know which exercises are created and which are updated (.id parameter)?
       updateRoutine(routine);
     } else {
       createRoutine(routine);
@@ -296,51 +301,50 @@ function RoutineEditScreen({ route }) {
   ) : (
     <>
       <Screen>
-        <NavHeader // Navigation Header
-          LeftComponent={
-            <AppTextButton
-              onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
-              textStyle={{ fontWeight: "400", color: theme.foreground }}
-            >
-              {" "}
-              Cancel
-            </AppTextButton>
-          }
-          headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
-          RightComponent={
-            <AppTextButton
-              onPress={() => handleSavePress()}
-              textStyle={{ fontWeight: "500" }}
-            >
-              {isRoutineEditing ? "Save" : "Create"}
-            </AppTextButton>
-          }
-        />
-        <View style={styles.headingPanel}>
-          <LinearGradient
-            colors={["#ffffff", "#3397f3"]} //to be adjusted
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 0.25 }}
-            style={styles.emojiBox}
+        <View style={styles.container}>
+          <NavHeader // ------------------- Navigation Header
+            LeftComponent={
+              <AppTextButton
+                onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
+                textStyle={{ fontWeight: "400", color: theme.foreground }}
+              >
+                Cancel
+              </AppTextButton>
+            }
+            headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
+            RightComponent={
+              <AppTextButton
+                onPress={() => handleSavePress()}
+                textStyle={{ fontWeight: "500" }}
+              >
+                {isRoutineEditing ? "Save" : "Create"}
+              </AppTextButton>
+            }
           />
-          <TextInput
-            style={styles.title}
-            onChangeText={updateRoutineTitle}
-            multiline={false}
-            keyboardType="default"
-            onpre
-            placeholder={routine ? routine.title : "Loading"}
-            placeholderTextColor={styles.title.color}
-            spellCheck={false}
-            enterKeyHint="done"
-            onSubmitEditing={(item) => {
-              updateRoutineTitle(item.nativeEvent.text);
-            }}
-          />
+          <View style={styles.headingPanel}>
+            <LinearGradient
+              colors={["#ffffff", "#3397f3"]} //to be adjusted
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 0.25 }}
+              style={styles.emojiBox}
+            />
+            <TextInput
+              style={styles.title}
+              onChangeText={updateRoutineTitle}
+              multiline={false}
+              keyboardType="default"
+              onpre
+              placeholder={routine ? routine.title : "Loading"}
+              placeholderTextColor={styles.title.color}
+              spellCheck={false}
+              enterKeyHint="done"
+              onSubmitEditing={(item) => {
+                updateRoutineTitle(item.nativeEvent.text);
+              }}
+            />
+          </View>
         </View>
-        <NestableScrollContainer
-          contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 70 }}
-        >
+        <NestableScrollContainer contentContainerStyle={styles.scrollContainer}>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
@@ -348,7 +352,7 @@ function RoutineEditScreen({ route }) {
                 edit: isRoutineEditing,
               });
             }}
-            style={styles.templatePanel}
+            style={styles.sectionSeparator}
           >
             <AuxiliaryCard
               title={"Template"}
@@ -358,7 +362,7 @@ function RoutineEditScreen({ route }) {
             />
           </TouchableOpacity>
           <Text style={styles.sectionTitle}>Pre-routine</Text>
-          <View style={{ marginBottom: 22 }}>
+          <View style={styles.sectionSeparator}>
             <InputModalButton
               accentColor={theme.accentGreen}
               title="Warmup"
@@ -366,15 +370,9 @@ function RoutineEditScreen({ route }) {
               contentKey="WARMUP"
             />
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <View style={styles.intervalHeader}>
             <Text style={styles.sectionTitle}>Intervals</Text>
-            <View style={{ marginBottom: 0 }}>
+            <View>
               <IconButton
                 iconName="plus"
                 IconFamily={Feather}
@@ -412,6 +410,7 @@ function RoutineEditScreen({ route }) {
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
             onDragBegin={optionalHapticFunction(haptics, async () => {
+              setExerciseBeingDragged(true);
               await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             })}
             onDragEnd={({ data }) => {
@@ -423,18 +422,28 @@ function RoutineEditScreen({ route }) {
                 await Haptics.selectionAsync();
               },
             )}
-            containerStyle={{ marginBottom: 22 }}
+            onRelease={() => setExerciseBeingDragged(false)}
+            containerStyle={[
+              styles.flatlist,
+              workingSet.length > 0
+                ? styles.flatlistMargin12
+                : styles.flatlistMargin22,
+            ]}
+            ItemSeparatorComponent={<View style={styles.listSeparator} />}
           />
-          <View style={{ marginBottom: 22 }}>
-            <AuxiliaryCard
-              title={"Loops"}
-              InputComponent={() => <DummyInputComponent text="Once" />}
-              Icon={() => (
-                <Feather name="repeat" size={24} color={theme.foreground} />
-              )}
-            />
-          </View>
-          <View style={{}}>
+          {workingSet.length > 0 && ( // Conditionally render "loops" component
+            <View style={styles.sectionSeparator}>
+              <AuxiliaryCard
+                title={"Loops"}
+                InputComponent={() => <DummyInputComponent text="Once" />}
+                Icon={() => (
+                  <Feather name="repeat" size={24} color={theme.foreground} />
+                )}
+              />
+            </View>
+          )}
+          <Text style={styles.sectionTitle}>Post-routine</Text>
+          <View style={styles.sectionSeparator}>
             <InputModalButton
               accentColor={theme.accentDarkBlue}
               title="Cooldown"
@@ -505,28 +514,21 @@ function RoutineEditScreen({ route }) {
       </Screen>
       <BlurView
         style={[
-          styles.timeTabContainer,
+          styles.totalTimeTab,
           { display: modalContent.key !== "none" ? "none" : "flex" },
         ]}
         tint="dark"
         intensity={60}
       >
         <View style={styles.timeTab}>
-          <Text
-            style={{
-              color: "white",
-              fontSize: 16,
-              marginBottom: 5,
-              fontWeight: "500",
-            }}
-          >
+          <Text style={styles.totalTimeText}>
             {" "}
             {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View style={[styles.timeWarmup, { flex: warmupTime }]} />
-            <View style={[styles.timeWorkout, { flex: workingTime }]} />
-            <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
+            <View style={[styles.timeWarmup]} />
+            <View style={[styles.timeWorkout]} />
+            <View style={[styles.timeCooldown]} />
           </View>
         </View>
       </BlurView>
@@ -574,11 +576,14 @@ const reducer = (state, action) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     activeItem: {
-      backgroundColor: "rgba(128,128,128,0.8)",
+      backgroundColor: "rgba(28,28,30,0.8)",
     },
     buttonContainer: {
       marginHorizontal: 16,
       marginTop: 12,
+    },
+    container: {
+      paddingHorizontal: 15,
     },
     timeColorBar: {
       flexDirection: "row",
@@ -586,12 +591,29 @@ const getStyles = (theme) =>
       borderRadius: 5,
       overflow: "hidden",
     },
-    timeTabContainer: {
+    flatlist: {},
+    flatlistMargin12: {
+      marginBottom: 12,
+    },
+    flatlistMargin22: {
+      marginBottom: 22,
+    },
+    intervalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: -5,
+    },
+    listSeparator: {
+      backgroundColor: "#38383A",
+      height: StyleSheet.hairlineWidth,
+    },
+    totalTimeTab: {
       position: "absolute",
       bottom: 0,
-      height: TAB_BAR_HEIGHT,
+      height: 109,
       // paddingBottom: ,
-      paddingTop: 15,
+      paddingTop: 25,
       backgroundColor: "transparent",
       width: "100%",
       justifyContent: "flex-start",
@@ -603,25 +625,26 @@ const getStyles = (theme) =>
       width: "90%",
       alignItems: "center",
     },
+    totalTimeText: {
+      color: "white",
+      fontSize: 16,
+      marginBottom: 5,
+      fontWeight: "500",
+    },
     timeWarmup: {
-      // flex: { warmupTime },
+      flex: { warmupTime },
       height: 5,
       backgroundColor: theme.accentGreen,
     },
     timeWorkout: {
-      // flex: { exerciseTime },
+      flex: { workingTime },
       height: 5,
       backgroundColor: theme.accentLightPurple,
     },
     timeCooldown: {
-      // flex: { cooldownTime },
+      flex: { cooldownTime },
       height: 5,
       backgroundColor: theme.accentDarkBlue,
-    },
-    container: {
-      backgroundColor: theme.background,
-      paddingHorizontal: 15, //consistency between screens important
-      paddingBottom: 45,
     },
     emojiBox: {
       backgroundColor: theme.blue,
@@ -638,10 +661,11 @@ const getStyles = (theme) =>
       gap: 2,
     },
     headingPanel: {
+      marginTop: 22,
       flexDirection: "row",
       height: 40,
       alignItems: "center",
-      marginBottom: 15,
+      marginBottom: 25,
     },
     inputText: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
@@ -658,12 +682,13 @@ const getStyles = (theme) =>
       fontSize: 30,
       fontWeight: 600,
     },
-    templatePanel: {
-      marginBottom: 22,
+    scrollContainer: {
+      paddingBottom: TAB_BAR_HEIGHT,
+      paddingHorizontal: 15,
     },
     sectionTitle: {
       color: theme.text60,
-      fontSize: PARAGRAPH_FONT_SIZE,
+      fontSize: INFO_FONT_SIZE,
       marginBottom: 8,
     },
     footer: {
@@ -674,6 +699,9 @@ const getStyles = (theme) =>
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",
+    },
+    sectionSeparator: {
+      marginBottom: 22,
     },
   });
 
