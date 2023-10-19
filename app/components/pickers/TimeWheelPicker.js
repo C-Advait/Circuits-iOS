@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useSettings } from "../contexts/SettingsContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
-const UNIT_OFFSET = 48;
-const GAP_REDUCTION = 50;
-// Offsetting the seconds by GAP + UNIT is just a hair off.
-const ADJUSTMENT = 2;
+const { width } = Dimensions.get("window");
+
+const UNIT_OFFSET = width * 0.21;
+const GAP_REDUCTION = width * 0.2;
+const ADJUSTMENT = -6;
 
 const MINIMUM_SECONDS = 5;
 
@@ -30,14 +31,13 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const key = filteredSeconds.length;
 
-  // <View style={styles.overlay} />
-  // selectionColor={theme.tertiaryTranslucentBackground}
-
   return (
     <View style={styles.container} pointerEvents="box-none">
       <View style={styles.pickersContainer}>
+        <View style={styles.overlay} />
         <Picker
           selectedValue={selectedMinute}
+          selectionColor={theme.tertiaryTranslucentBackground}
           style={styles.minutesPicker}
           onValueChange={(itemValue) => {
             onValueChange(itemValue * 60 + selectedSecond);
@@ -78,6 +78,7 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           key={key}
           selectedValue={selectedSecond}
           style={styles.secondsPicker}
+          selectionColor={theme.tertiaryTranslucentBackground}
           onValueChange={(itemValue) => {
             setSelectedSecond(itemValue);
             onValueChange(selectedMinute * 60 + itemValue);
@@ -125,29 +126,27 @@ const getStyles = (theme) =>
       borderRadius: 8,
       backgroundColor: "rgba(255, 255, 255, 0.1)",
       height: 32,
-      width: "80%",
-      top: "77%",
-      left: "18%",
+      top: "35%",
+      width: "100%",
       zIndex: 3,
     },
     minutesPicker: {
       color: "white",
-      width: 130,
+      width: "60%",
       height: 120,
     },
     pickersContainer: {
       flexDirection: "row",
-      width: "60%",
+      width: "85%",
       height: "100%",
-      marginRight: "8%",
     },
     secondsPicker: {
-      width: 130,
+      width: "55%",
       height: 120,
       transform: [{ translateX: -GAP_REDUCTION }],
     },
     unitContainer: {
-      backgroundColor: theme.tertiaryBackground,
+      // backgroundColor: theme.tertiaryBackground,
       height: 80,
       justifyContent: "center",
       top: 68,

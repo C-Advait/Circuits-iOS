@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useReducer, useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text, Button } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
-
-import { Text, Button } from "react-native";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import Navheader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
@@ -14,7 +13,6 @@ import AuxiliaryCard from "../components/AuxiliaryCard";
 import AppTextButton from "../components/buttons/AppTextButton";
 import EditableText from "../components/EditableText";
 import exerciseEditActions from "../actions/exerciseEditActions";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { formatMinutesSeconds } from "../utilities/formatDuration";
 import { Exercise, Tag } from "../classes/Exercise";
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
@@ -28,10 +26,10 @@ import {
   NumberWheelPicker,
   TimeWheelPicker,
   BottomSheetHandle,
-} from "../components/pickers/BottomSheetHandle";
+} from "../components/pickers";
 import Constants from "expo-constants";
 
-const MODAL_HEIGHT = 400;
+const MODAL_HEIGHT = 350;
 
 function ExerciseEditScreen({ route }) {
   const navigation = useNavigation();

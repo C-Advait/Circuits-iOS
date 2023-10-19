@@ -54,10 +54,7 @@ import {
 import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
-import {
-  TimeWheelPicker,
-  BottomSheetHandle,
-} from "../components/pickers/TimeWheelPicker";
+import { TimeWheelPicker, BottomSheetHandle } from "../components/pickers";
 import {
   NestableDraggableFlatList,
   NestableScrollContainer,
@@ -451,6 +448,7 @@ function RoutineEditScreen({ route }) {
           index={-1}
           snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
           enablePanDownToClose={true}
+          enableContentPanningGesture={false}
           backdropComponent={BottomSheetBackdrop}
           backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
           handleComponent={() => (

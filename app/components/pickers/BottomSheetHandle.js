@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { useSettings } from "../contexts/SettingsContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
 const BottomSheetHandle = ({ title, subtitle }) => {
   const { theme } = useSettings();
