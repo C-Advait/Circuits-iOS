@@ -4,6 +4,12 @@ import { Tag } from "../classes/Exercise";
 // decompresses into a Timer-friendly format.
 const decompress = (arr) => {
   return arr.flatMap((item, idx, originalArr) => {
+    // Handle pre-routine and post-routine specially:
+    // They should have no break and no rest after.
+    if (item.tag === Tag.PREROUTINE || item.tag === Tag.POSTROUTINE) {
+      return { ...item, numberOfRounds: 1 };
+    }
+
     // Generate round objects
     const roundObjects = Array.from(
       { length: item.numberOfRounds },
