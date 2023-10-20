@@ -633,7 +633,6 @@ const getStyles = (theme) =>
       fontWeight: "500",
     },
     timeWarmup: {
-
       height: 5,
       backgroundColor: theme.accentGreen,
     },
