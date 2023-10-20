@@ -1,11 +1,16 @@
 import React, { useEffect, useState, useReducer, useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import {
+  Keyboard,
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  ScrollView,
+} from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
-import { Text, Button } from "react-native";
-
-import Screen from "../components/Screen";
 import Navheader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
 import { useSettings } from "../contexts/SettingsContext";
@@ -15,9 +20,6 @@ import AuxiliaryCard from "../components/AuxiliaryCard";
 import AppTextButton from "../components/buttons/AppTextButton";
 import EditableText from "../components/EditableText";
 import exerciseEditActions from "../actions/exerciseEditActions";
-import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
-import NumberWheelPicker from "../components/NumberWheelPicker";
-import TimeWheelPicker from "../components/TimeWheelPicker";
 import { formatMinutesSeconds } from "../utilities/formatDuration";
 import { Exercise, Tag } from "../classes/Exercise";
 import { EXERCISE_EDIT_MODAL } from "../config/ExerciseModalConfig";
@@ -27,6 +29,12 @@ import {
   PICKER_BUTTON_FONT_SIZE,
   PICKER_BUTTON_FONT_WEIGHT,
 } from "../config/appConstants";
+import {
+  NumberWheelPicker,
+  TimeWheelPicker,
+  BottomSheetHandle,
+} from "../components/pickers";
+import Constants from "expo-constants";
 
 const MODAL_HEIGHT = 350;
 
@@ -61,35 +69,31 @@ function ExerciseEditScreen({ route }) {
     } else {
       // Closing modal
       dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-
-      // Either persist the change or revert it.
-      if (state.apply) {
-        dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
-      } else {
-        dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
-      }
     }
   };
   const InputModalButton = ({ title, text, contentKey, enabled = true }) => (
-    <AuxiliaryCard
-      title={title}
-      onPress={
-        enabled
-          ? () => {
-            dispatch({
-              type: exerciseEditActions.SET_ACTIVE_KEY,
-              payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-            });
-            dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-            dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-            setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-            modalRef.current?.expand();
-          }
-          : () => null
-      }
-    >
-      <Text style={enabled ? styles.inputText : styles.disabled}>{text}</Text>
-    </AuxiliaryCard>
+    <View style={{ marginTop: 10 }}>
+      <AuxiliaryCard
+        title={title}
+        onPress={
+          enabled
+            ? () => {
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+                Keyboard.dismiss();
+                modalRef.current?.expand();
+              }
+            : () => null
+        }
+      >
+        <Text style={enabled ? styles.inputText : styles.disabled}>{text}</Text>
+      </AuxiliaryCard>
+    </View>
   );
 
   const goBack = () =>
@@ -129,7 +133,7 @@ function ExerciseEditScreen({ route }) {
   const confirmDiscard = () => confirmedNavigate(goBack);
 
   return (
-    <Screen style={{ flex: 1 }}>
+    <View style={styles.container}>
       <Navheader
         style={styles.navPanel}
         LeftComponent={
@@ -143,30 +147,32 @@ function ExerciseEditScreen({ route }) {
         }
         headerText={`Edit ${state.title}`}
         RightComponent={
-          (state.dirty || !isExerciseEditing) ? (
+          state.dirty || !isExerciseEditing ? (
             <AppTextButton onPress={onSave} textStyle={{ fontWeight: 300 }}>
-              {(isExerciseEditing) ? "Save" : "Create"}
+              {isExerciseEditing ? "Save" : "Create"}
             </AppTextButton>
           ) : null
         }
       />
-      <View style={{ gap: 10, paddingHorizontal: 11 }}>
-        <AuxiliaryCard
-          title="Name"
-          onPress={() => nameFieldRef.current.activate()}
-        >
-          <EditableText
-            ref={nameFieldRef}
-            original={state.title}
-            placeholder="Exercise Name"
-            onSubmit={(text) => {
-              dispatch({
-                type: exerciseEditActions.SET_TITLE,
-                payload: text,
-              });
-            }}
-          />
-        </AuxiliaryCard>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 11 }}>
+        <View style={{ marginTop: 10 }}>
+          <AuxiliaryCard
+            title="Name"
+            onPress={() => nameFieldRef.current.activate()}
+          >
+            <EditableText
+              ref={nameFieldRef}
+              original={state.title}
+              placeholder="Exercise Name"
+              onSubmit={(text) => {
+                dispatch({
+                  type: exerciseEditActions.SET_TITLE,
+                  payload: text,
+                });
+              }}
+            />
+          </AuxiliaryCard>
+        </View>
         <InputModalButton
           title="Work time"
           text={formatMinutesSeconds(state.workTime)}
@@ -188,29 +194,23 @@ function ExerciseEditScreen({ route }) {
           text={formatMinutesSeconds(state.breakBeforeNext)}
           contentKey="BREAK_TIME"
         />
-      </View>
+      </ScrollView>
       <BottomSheet
         ref={modalRef}
         index={-1}
         snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
         enablePanDownToClose={true}
+        enableContentPanningGesture={false}
         backdropComponent={BottomSheetBackdrop}
+        handleComponent={() => (
+          <BottomSheetHandle
+            title={contentType.title}
+            subtitle={contentType.subtitle}
+          />
+        )}
         backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
-        handleStyle={{
-          backgroundColor: theme.secondaryBackground,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-        }}
-        handleIndicatorStyle={{
-          backgroundColor: "rgba(255, 255, 255, 0.25)",
-          width: 90,
-        }}
         onChange={onModalChange}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>{contentType.title}</Text>
-          <Text style={styles.subtitle}>{contentType.subtitle}</Text>
-        </View>
         {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
           <NumberWheelPicker
             key={state.shouldRefreshPicker}
@@ -274,7 +274,6 @@ function ExerciseEditScreen({ route }) {
             <Button
               title="Apply"
               onPress={() => {
-                dispatch({ type: exerciseEditActions.TOGGLE_APPLY_FLAG });
                 modalRef.current?.close();
               }}
               color={theme.blue}
@@ -282,13 +281,12 @@ function ExerciseEditScreen({ route }) {
           </View>
         </View>
       </BottomSheet>
-    </Screen>
+    </View>
   );
 }
 
 const initialState = {
   title: "",
-  apply: false,
   activeKey: "",
   workTime: 5,
   numberOfRounds: 1,
@@ -330,9 +328,6 @@ const reducer = (state, action) => {
 
     case exerciseEditActions.TOGGLE_REFRESH_PICKER:
       return { ...state, shouldRefreshPicker: !state.shouldRefreshPicker };
-
-    case exerciseEditActions.TOGGLE_APPLY_FLAG:
-      return { ...state, apply: !state.apply };
   }
 };
 
@@ -342,6 +337,12 @@ const getStyles = (theme) =>
       marginHorizontal: 16,
       marginTop: 12,
     },
+    container: {
+      backgroundColor: theme.background,
+      flex: 1,
+      height: "100%",
+      paddingTop: Constants.statusBarHeight,
+    },
     disabled: {
       color: theme.textDisabled,
     },
@@ -349,21 +350,10 @@ const getStyles = (theme) =>
       backgroundColor: theme.secondaryBackground,
       bottom: 0,
       flexDirection: "row",
-      height: 65,
+      height: 75,
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",
-    },
-    header: {
-      backgroundColor: theme.secondaryBackground,
-      paddingBottom: 18,
-      paddingHorizontal: 22,
-      paddingTop: 10,
-      gap: 2,
-    },
-    subtitle: {
-      color: theme.text,
-      fontSize: 17,
     },
     inputText: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
@@ -379,11 +369,6 @@ const getStyles = (theme) =>
       alignItems: "center",
       paddingHorizontal: 15,
       borderRadius: 10,
-    },
-    title: {
-      color: theme.primary,
-      fontSize: 17,
-      fontWeight: 500,
     },
   });
 

@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useSettings } from "../contexts/SettingsContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
-const UNIT_OFFSET = 48;
-const GAP_REDUCTION = 50;
-// Offsetting the seconds by GAP + UNIT is just a hair off.
-const ADJUSTMENT = 2;
+const { width } = Dimensions.get("window");
+
+const UNIT_OFFSET = width * 0.21;
+const GAP_REDUCTION = width * 0.2;
+const ADJUSTMENT = -6;
+
+const MINIMUM_SECONDS = 5;
 
 // Theme must be passed in by consumer.
 // This is because the current component
@@ -28,22 +31,19 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const key = filteredSeconds.length;
 
-  const MINIMUM_SECONDS = 5;
-
   return (
-    <View style={styles.container}>
+    <View style={styles.container} pointerEvents="box-none">
       <View style={styles.pickersContainer}>
         <View style={styles.overlay} />
         <Picker
           selectedValue={selectedMinute}
-          style={styles.minutesPicker}
           selectionColor={theme.tertiaryTranslucentBackground}
+          style={styles.minutesPicker}
           onValueChange={(itemValue) => {
             onValueChange(itemValue * 60 + selectedSecond);
             setSelectedMinute(itemValue);
 
             if (itemValue === 0) {
-              console.log(selectedSecond);
               setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
 
               if (selectedSecond < MINIMUM_SECONDS) {
@@ -70,7 +70,9 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           ))}
         </Picker>
         <View style={styles.unitContainer} pointerEvents="none">
-          <Text style={styles.unit}>min</Text>
+          <Text style={styles.unit} pointerEvents="none">
+            min
+          </Text>
         </View>
         <Picker
           key={key}
@@ -102,7 +104,9 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
           ]}
           pointerEvents="none"
         >
-          <Text style={styles.unit}>sec</Text>
+          <Text style={styles.unit} pointerEvents="none">
+            sec
+          </Text>
         </View>
       </View>
     </View>
@@ -112,6 +116,7 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     container: {
+      height: "100%",
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
@@ -121,29 +126,27 @@ const getStyles = (theme) =>
       borderRadius: 8,
       backgroundColor: "rgba(255, 255, 255, 0.1)",
       height: 32,
-      width: "80%",
-      top: "77%",
-      left: "18%",
+      top: "35%",
+      width: "100%",
       zIndex: 3,
     },
     minutesPicker: {
       color: "white",
-      width: 130,
+      width: "60%",
       height: 120,
     },
     pickersContainer: {
       flexDirection: "row",
-      width: "60%",
+      width: "85%",
       height: "100%",
-      marginRight: "8%",
     },
     secondsPicker: {
-      width: 130,
+      width: "55%",
       height: 120,
       transform: [{ translateX: -GAP_REDUCTION }],
     },
     unitContainer: {
-      backgroundColor: theme.tertiaryBackground,
+      // backgroundColor: theme.tertiaryBackground,
       height: 80,
       justifyContent: "center",
       top: 68,
