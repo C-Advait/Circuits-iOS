@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useReducer, useRef } from "react";
-import { View, StyleSheet, Text, Button } from "react-native";
+import {
+  Keyboard,
+  View,
+  StyleSheet,
+  Text,
+  Button,
+  ScrollView,
+} from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
@@ -65,25 +72,28 @@ function ExerciseEditScreen({ route }) {
     }
   };
   const InputModalButton = ({ title, text, contentKey, enabled = true }) => (
-    <AuxiliaryCard
-      title={title}
-      onPress={
-        enabled
-          ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              modalRef.current?.expand();
-            }
-          : () => null
-      }
-    >
-      <Text style={enabled ? styles.inputText : styles.disabled}>{text}</Text>
-    </AuxiliaryCard>
+    <View style={{ marginTop: 10 }}>
+      <AuxiliaryCard
+        title={title}
+        onPress={
+          enabled
+            ? () => {
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+                Keyboard.dismiss();
+                modalRef.current?.expand();
+              }
+            : () => null
+        }
+      >
+        <Text style={enabled ? styles.inputText : styles.disabled}>{text}</Text>
+      </AuxiliaryCard>
+    </View>
   );
 
   const goBack = () =>
@@ -144,23 +154,25 @@ function ExerciseEditScreen({ route }) {
           ) : null
         }
       />
-      <View style={{ gap: 10, paddingHorizontal: 11 }}>
-        <AuxiliaryCard
-          title="Name"
-          onPress={() => nameFieldRef.current.activate()}
-        >
-          <EditableText
-            ref={nameFieldRef}
-            original={state.title}
-            placeholder="Exercise Name"
-            onSubmit={(text) => {
-              dispatch({
-                type: exerciseEditActions.SET_TITLE,
-                payload: text,
-              });
-            }}
-          />
-        </AuxiliaryCard>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 11 }}>
+        <View style={{ marginTop: 10 }}>
+          <AuxiliaryCard
+            title="Name"
+            onPress={() => nameFieldRef.current.activate()}
+          >
+            <EditableText
+              ref={nameFieldRef}
+              original={state.title}
+              placeholder="Exercise Name"
+              onSubmit={(text) => {
+                dispatch({
+                  type: exerciseEditActions.SET_TITLE,
+                  payload: text,
+                });
+              }}
+            />
+          </AuxiliaryCard>
+        </View>
         <InputModalButton
           title="Work time"
           text={formatMinutesSeconds(state.workTime)}
@@ -182,7 +194,7 @@ function ExerciseEditScreen({ route }) {
           text={formatMinutesSeconds(state.breakBeforeNext)}
           contentKey="BREAK_TIME"
         />
-      </View>
+      </ScrollView>
       <BottomSheet
         ref={modalRef}
         index={-1}
