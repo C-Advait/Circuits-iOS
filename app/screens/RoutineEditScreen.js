@@ -35,7 +35,6 @@ import {
   TAB_BAR_HEIGHT,
   INFO_FONT_SIZE,
   DEFAULT_EXERCISE,
-  PICKER_BUTTON_FONT_WEIGHT
 } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import NavHeader from "../components/NavHeader";
@@ -67,25 +66,20 @@ const sortedExercises = (exercises) => {
   return [...exercises].sort((a, b) => a.exerciseOrder - b.exerciseOrder);
 };
 const getExerciseInfo = (exercises) => {
-  let warmupTime = 0,
-    workingTime = 0,
-    cooldownTime = 0,
+  let workTime = 0,
     numExercises = 0,
     greatestExerciseOrder = 0;
 
   exercises.forEach((exercise) => {
-    if (exercise.exerciseOrder > greatestExerciseOrder)
-      greatestExerciseOrder = exercise.exerciseOrder;
     switch (exercise.tag) {
       case Tag.PREROUTINE:
-        warmupTime += getExerciseLength(exercise);
         break;
       case Tag.WORKING:
-        workingTime += getExerciseLength(exercise);
+        workTime += getExerciseLength(exercise);
         numExercises += 1;
         break;
       case Tag.POSTROUTINE:
-        cooldownTime += getExerciseLength(exercise);
+        greatestExerciseOrder = exercise.exerciseOrder;
         break;
       default:
         null;
@@ -93,9 +87,7 @@ const getExerciseInfo = (exercises) => {
   });
 
   return [
-    warmupTime,
-    workingTime,
-    cooldownTime,
+    workTime,
     numExercises,
     greatestExerciseOrder,
   ];
@@ -118,52 +110,53 @@ function RoutineEditScreen({ route }) {
   } = useRoutineContext();
   const { theme, haptics } = useSettings();
   const styles = getStyles(theme);
-
-  const [workingSet, setWorkingSet] = useState(
-    sortedExercises(exercises).slice(1, -1),
-  ); // The working set is everything between 1st & last elements
-  const [
-    warmupTime,
-    workingTime,
-    cooldownTime,
-    numExercises,
-    maxExerciseOrder,
-  ] = getExerciseInfo(exercises);
-  const totalRoutineTime = warmupTime + workingTime + cooldownTime;
-  const [exerciseBeingDragged, setExerciseBeingDragged] = useState(false);
+  // const [exerciseBeingDragged, setExerciseBeingDragged] = useState(false);
 
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
 
   // Initialize state
-  useEffect(() => {
-    if (exercises) {
-      const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE);
-      const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
+  useFocusEffect(
+    useCallback(() => {
 
-      dispatch({
-        type: routineEditActions.INIT,
-        payload: {
-          warmupDuration: warmup.workTime,
-          cooldownDuration: cooldown.workTime,
-        },
-      });
-    }
-  }, [exercises]);
+      if (exercises) {
+        const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE); // could be optimized
+        const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
+
+        const workingSet = sortedExercises(exercises).slice(1, -1); // The working set is everything between [1, N-1] elements
+        const [
+          workTime,
+          numExercises,
+          maxExerciseOrder,
+        ] = getExerciseInfo(exercises);
+
+        dispatch({
+          type: routineEditActions.INIT,
+          payload: {
+            warmup: warmup,
+            cooldown: cooldown,
+            workingSet: workingSet,
+            workTime: workTime,
+            numExercises: numExercises,
+            maxExerciseOrder: maxExerciseOrder,
+          },
+        });
+      } else {
+        null; // What to do if exercises is not loaded from context yet?
+      }
+
+      return () => { // Is there any TEARDOWN NECessary here?
+      };
+    }, [exercises]), // Depend on exercises so the callback updates if exercises change
+  );
+
   useEffect(() => {
     console.log(
       `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
     );
   }, [selectedTemplate]);
-  useFocusEffect(
-    useCallback(() => {
-      setWorkingSet(sortedExercises(exercises).slice(1, -1));
-      return () => {
-        // You can add any cleanup logic here if necessary.
-      };
-    }, [exercises]), // Depend on exercises so the callback updates if exercises change
-  );
+
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
       // Opening modal; save value to which to possibly revert.
@@ -186,7 +179,7 @@ function RoutineEditScreen({ route }) {
     });
   };
   const renderExerciseItem = (item, getIndex, drag, isActive) => {
-    // console.log(getIndex());
+
     switch (getIndex()) {
       case 0:
         return (
@@ -197,27 +190,24 @@ function RoutineEditScreen({ route }) {
             drag={drag}
             style={[
               { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
-              isActive && exerciseBeingDragged && styles.activeItem,
+              (isActive && state.exerciseBeingDragged) && styles.activeItem,
             ]}
-            isRoutineEditing={isRoutineEditing}
-            isExerciseEditing={true}
-            referenceExercise={item} // pass reference
+            onPress={() => handleExerciseEditOnPress(item)}
           />
         );
-      case numExercises - 1:
+      case (state.numExercises - 1):
         return (
           <ExerciseCard
             title={item.title}
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[
-              { borderTopStartRadius: 0, borderTopEndRadius: 0 },
-              isActive && exerciseBeingDragged && styles.activeItem,
-            ]}
+            style={[{ borderTopStartRadius: 0, borderTopEndRadius: 0 },
+            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
-            isExerciseEditing={true} // Is the exercise being edited?
-            referenceExercise={item} // pass reference
+            isExerciseEditing={true}
+            referenceExercise={item}
+            onPress={() => handleExerciseEditOnPress(item)}
           />
         );
       default:
@@ -227,22 +217,25 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[
-              { borderRadius: 0 },
-              isActive && exerciseBeingDragged && styles.activeItem,
-            ]}
+            style={[{ borderRadius: 0 },
+            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
-            isExerciseEditing={true} // Is the exercise being edited?
-            referenceExercise={item} // pass reference
+            isExerciseEditing={true}
+            referenceExercise={item}
+            onPress={() => handleExerciseEditOnPress(item)}
           />
         );
     }
   };
   const handleAddExerciseOnPress = () => {
+
+    // Save current state to context so that it can be loaded when navigating back
+    setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
+
     const newExercise = new Exercise({
       ...DEFAULT_EXERCISE,
       routineID: routine.id,
-      exerciseOrder: maxExerciseOrder,
+      exerciseOrder: state.maxExerciseOrder,
     });
 
     navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
@@ -251,16 +244,28 @@ function RoutineEditScreen({ route }) {
       referenceExercise: newExercise,
     });
   };
+
+  const handleExerciseEditOnPress = (exerciseItem) => {
+
+    // save state to context
+    setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
+
+    navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
+      isRoutineEditing: isRoutineEditing,
+      isExerciseEditing: true,
+      referenceExercise: exerciseItem,
+    });
+  };
+
   const handleSavePress = async () => {
-    const exerciseOrderSorted = sortedExercises(exercises);
 
     const finalExercises = [
-      exerciseOrderSorted[0],
-      ...workingSet,
-      exerciseOrderSorted[exercises.length - 1],
+      state.warmup,
+      ...state.workingSet,
+      state.cooldown
     ];
-    finalExercises.forEach((exercise, index) => {
-      // final fix
+
+    finalExercises.forEach((exercise, index) => { // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
 
@@ -269,6 +274,7 @@ function RoutineEditScreen({ route }) {
     } else {
       createRoutine(routine);
     }
+
     finalExercises.forEach((exercise) => {
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
     });
@@ -297,14 +303,17 @@ function RoutineEditScreen({ route }) {
     </AuxiliaryCard>
   );
 
-  // Rendered Output
-  return !(routine && exercises) ? (
+
+
+
+
+  return !(Object.keys(state.warmup).length > 0 && Object.keys(state.cooldown).length > 0) ? (
     <Screen />
   ) : (
     <>
       <Screen>
         <View style={styles.container}>
-          <NavHeader // ------------------- Navigation Header
+          <NavHeader
             LeftComponent={
               <AppTextButton
                 onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
@@ -325,7 +334,7 @@ function RoutineEditScreen({ route }) {
           />
           <View style={styles.headingPanel}>
             <LinearGradient
-              colors={["#ffffff", "#3397f3"]} //to be adjusted
+              colors={["#ffffff", "#3397f3"]}
               start={{ x: 0.5, y: 0 }}
               end={{ x: 0.5, y: 0.25 }}
               style={styles.emojiBox}
@@ -368,7 +377,7 @@ function RoutineEditScreen({ route }) {
             <InputModalButton
               accentColor={theme.accentGreen}
               title="Warmup"
-              text={formatMinutesSeconds(state.warmupDuration)}
+              text={formatMinutesSeconds(state.warmup.workTime)}
               contentKey="WARMUP"
             />
           </View>
@@ -384,7 +393,7 @@ function RoutineEditScreen({ route }) {
               />
             </View>
           </View>
-          {workingSet.length === 0 && (
+          {state.workingSet?.length === 0 && (
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={() => handleAddExerciseOnPress()}
@@ -405,18 +414,27 @@ function RoutineEditScreen({ route }) {
             </TouchableOpacity>
           )}
           <NestableDraggableFlatList
-            data={workingSet}
+            data={state?.workingSet}
             renderItem={({ item, getIndex, drag, isActive }) =>
+
               renderExerciseItem(item, getIndex, drag, isActive)
             }
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
             onDragBegin={optionalHapticFunction(haptics, async () => {
-              setExerciseBeingDragged(true);
+              // null
+              dispatch({
+                type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
+                payload: true
+              })
               await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             })}
             onDragEnd={({ data }) => {
-              setWorkingSet(data);
+              // null
+              dispatch({
+                type: routineEditActions.SET_WORKING_SET,
+                payload: data
+              })
             }}
             onPlaceholderIndexChange={optionalHapticFunction(
               haptics,
@@ -424,16 +442,22 @@ function RoutineEditScreen({ route }) {
                 await Haptics.selectionAsync();
               },
             )}
-            onRelease={() => setExerciseBeingDragged(false)}
+            onRelease={() => {
+              // null;
+              dispatch({
+                type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
+                payload: false
+              })
+            }}
             containerStyle={[
               styles.flatlist,
-              workingSet.length > 0
+              state.workingSet?.length > 0
                 ? styles.flatlistMargin12
                 : styles.flatlistMargin22,
             ]}
-            ItemSeparatorComponent={<View style={styles.listSeparator} />}
+            ItemSeparatorComponent={() => <View style={styles.listSeparator} />}
           />
-          {workingSet.length > 0 && ( // Conditionally render "loops" component
+          {state.workingSet?.length > 0 && (
             <View style={styles.sectionSeparator}>
               <AuxiliaryCard
                 title={"Loops"}
@@ -449,7 +473,7 @@ function RoutineEditScreen({ route }) {
             <InputModalButton
               accentColor={theme.accentDarkBlue}
               title="Cooldown"
-              text={formatMinutesSeconds(state.cooldownDuration)}
+              text={formatMinutesSeconds(state.cooldown.workTime)}
               contentKey="COOLDOWN"
             />
           </View>
@@ -470,7 +494,7 @@ function RoutineEditScreen({ route }) {
           {modalContent.key === ROUTINE_EDIT_MODAL.WARMUP.key && (
             <TimeWheelPicker
               key={state.refresh}
-              startingTime={state.warmupDuration}
+              startingTime={state.warmup.workTime}
               onValueChange={(data) =>
                 dispatch({
                   type: routineEditActions.SET_WARMUP,
@@ -482,7 +506,7 @@ function RoutineEditScreen({ route }) {
           {modalContent.key === ROUTINE_EDIT_MODAL.COOLDOWN.key && (
             <TimeWheelPicker
               key={state.refresh}
-              startingTime={state.cooldownDuration}
+              startingTime={state.cooldown.workTime}
               onValueChange={(data) =>
                 dispatch({
                   type: routineEditActions.SET_COOLDOWN,
@@ -525,12 +549,12 @@ function RoutineEditScreen({ route }) {
         <View style={styles.timeTab}>
           <Text style={styles.totalTimeText}>
             {" "}
-            {`Total time: ${formatDurationExact(totalRoutineTime)}`}{" "}
+            {`Total time: ${formatDurationExact(state.warmup.workTime + state.cooldown.workTime + state.workTime)}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View style={[styles.timeWarmup, { flex: warmupTime }]} />
-            <View style={[styles.timeWorkout, { flex: workingTime }]} />
-            <View style={[styles.timeCooldown, { flex: cooldownTime }]} />
+            <View style={[styles.timeWarmup, { flex: state.warmup.workTime }]} />
+            <View style={[styles.timeWorkout, { flex: state.workTime }]} />
+            <View style={[styles.timeCooldown, { flex: state.cooldown.workTime }]} />
           </View>
         </View>
       </BlurView>
@@ -540,11 +564,16 @@ function RoutineEditScreen({ route }) {
 
 const initialState = {
   activeKey: "",
-  cooldownDuration: 300,
   apply: false,
   previous: "",
   refresh: false,
-  warmupDuration: 300, // Should hook into the warmup from the exercise,
+  warmup: {},
+  workingSet: [],
+  cooldown: {},
+  workTime: 0,
+  numExercises: 0,
+  maxExerciseOrder: 0,
+  exerciseBeingDragged: false,
 };
 
 const reducer = (state, action) => {
@@ -562,13 +591,22 @@ const reducer = (state, action) => {
       return { ...state, [state.activeKey]: state.previous };
 
     case routineEditActions.SET_WARMUP:
-      return { ...state, warmupDuration: action.payload };
+      return { ...state, warmup: { ...state.warmup, workTime: action.payload } };
 
     case routineEditActions.SET_COOLDOWN:
-      return { ...state, cooldownDuration: action.payload };
+      return { ...state, cooldown: { ...state.cooldown, workTime: action.payload } };
+
+    case routineEditActions.TOGGLE_APPLY:
+      return { ...state, apply: !state.apply };
 
     case routineEditActions.TOGGLE_REFRESH:
       return { ...state, refresh: !state.refresh };
+
+    case routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG:
+      return { ...state, exerciseBeingDragged: action.payload };
+
+    case routineEditActions.SET_WORKING_SET:
+      return { ...state, workingSet: action.payload }
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");
@@ -614,7 +652,6 @@ const getStyles = (theme) =>
       position: "absolute",
       bottom: 0,
       height: 109,
-      // paddingBottom: ,
       paddingTop: 25,
       backgroundColor: "transparent",
       width: "100%",
@@ -622,8 +659,6 @@ const getStyles = (theme) =>
       alignItems: "center",
     },
     timeTab: {
-      // position: 'absolute',
-      // bottom: 15,
       width: "90%",
       alignItems: "center",
     },
@@ -670,11 +705,6 @@ const getStyles = (theme) =>
       fontSize: PICKER_BUTTON_FONT_SIZE,
       fontWeight: PICKER_BUTTON_FONT_WEIGHT,
       color: theme.text87,
-    },
-    pickerTitle: {
-      color: theme.primary,
-      fontSize: 17,
-      fontWeight: 500,
     },
     title: {
       color: theme.foreground,
