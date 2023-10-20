@@ -21,6 +21,7 @@ import {
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
 import CountdownModal from "./CountdownModal";
+import { KEYBOARD_STATE } from "@gorhom/bottom-sheet";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -107,28 +108,42 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
           dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
         }}
       />
-      <View
-        style={[
-          styles.overlay,
-          { display: isAnimationVisible ? "none" : "flex" },
-        ]}
-      >
-        <Text style={styles.title}>{state.routineComplete ? "" : title}</Text>
-        <View>
+      {!isAnimationVisible ? (
+        <View style={styles.overlay}>
+          <Text
+            style={[styles.title, styleExerciseTitle(title)]}
+            numberOfLines={2}
+          >
+            {state.routineComplete ? "" : title}
+          </Text>
           <NumericalTimer
             state={state}
             dispatch={dispatch}
             nextExerciseTag={nextExerciseTag}
           />
+          {state.routineComplete ? null : (
+            <View>
+              <ResetButton
+                onPress={() => dispatch({ type: timerActions.RESET_TIMER })}
+              />
+            </View>
+          )}
         </View>
-        {state.routineComplete ? null : (
-          <ResetButton
-            onPress={() => dispatch({ type: timerActions.RESET_TIMER })}
-          />
-        )}
-      </View>
+      ) : null}
     </View>
   );
+};
+
+const EXERCISE_TITLE_RESIZE_THRESHOLD = 10;
+
+const styleExerciseTitle = (title) => {
+  let ret = { fontSize: 27 };
+
+  if (title?.length > EXERCISE_TITLE_RESIZE_THRESHOLD) {
+    ret.fontSize = 24;
+  }
+
+  return ret;
 };
 
 const styles = StyleSheet.create({
@@ -138,17 +153,21 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   overlay: {
+    // backgroundColor: "red",
+    alignSelf: "center",
     width: 0.5 * CIRCLE_SIZE,
-    height: 0.5 * CIRCLE_SIZE,
+    height: 0.65 * CIRCLE_SIZE,
     position: "absolute",
-    top: CIRCLE_SIZE / 3 - 10,
+    gap: 10,
+    top: CIRCLE_SIZE / 3 - 30,
     alignItems: "center",
+    justifyContent: "center",
   },
   title: {
+    color: "white",
     fontSize: 27,
     fontWeight: 500,
-    color: "white",
-    marginBottom: 10,
+    textAlign: "center",
   },
   timer: {
     fontSize: 20,

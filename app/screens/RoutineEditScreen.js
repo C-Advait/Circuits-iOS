@@ -31,6 +31,7 @@ import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import {
   PICKER_BUTTON_FONT_SIZE,
+  PICKER_BUTTON_FONT_WEIGHT,
   TAB_BAR_HEIGHT,
   INFO_FONT_SIZE,
   DEFAULT_EXERCISE,

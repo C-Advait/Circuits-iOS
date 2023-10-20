@@ -79,7 +79,6 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.timerText, styles.placeholder]}>88:88</Text>
       <Text style={styles.timerText}>
         {state.routineComplete ? "" : formatTime(exerciseSecondsRemaining)}
       </Text>
@@ -110,25 +109,17 @@ const formatTime = (time) => {
   }${seconds}`;
 };
 
-const { width } = Dimensions.get("window");
-
 const styles = StyleSheet.create({
   container: {
-    height: 60,
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
+    width: "100%",
   },
   timerText: {
-    position: "absolute",
-    fontSize: 60,
-    right: -(width - 60) * 0.25,
-    left: 4 - (width - 60) * 0.25,
+    textAlign: "center",
     color: "white",
-  },
-  placeholder: {
-    color: "transparent",
+    fontSize: 55,
+    fontVariant: ["tabular-nums"],
   },
 });
 
