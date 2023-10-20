@@ -34,6 +34,7 @@ import {
   TAB_BAR_HEIGHT,
   INFO_FONT_SIZE,
   DEFAULT_EXERCISE,
+  PICKER_BUTTON_FONT_WEIGHT
 } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import NavHeader from "../components/NavHeader";
@@ -53,7 +54,7 @@ import {
 import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
-import TimeWheelPicker from "../components/TimeWheelPicker";
+import { TimeWheelPicker, BottomSheetHandle } from "../components/pickers";
 import {
   NestableDraggableFlatList,
   NestableScrollContainer,
@@ -173,13 +174,6 @@ function RoutineEditScreen({ route }) {
       // Closing modal
       dispatch({ type: routineEditActions.TOGGLE_REFRESH });
       setModalContent(ROUTINE_EDIT_MODAL.NONE);
-
-      // Either persist the change or revert it.
-      if (state.apply) {
-        dispatch({ type: routineEditActions.TOGGLE_APPLY });
-      } else {
-        dispatch({ type: routineEditActions.REVERT_PREVIOUS });
-      }
     }
   };
 
@@ -202,7 +196,7 @@ function RoutineEditScreen({ route }) {
             drag={drag}
             style={[
               { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
-              (isActive && exerciseBeingDragged) && styles.activeItem,
+              isActive && exerciseBeingDragged && styles.activeItem,
             ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
@@ -216,8 +210,10 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderTopStartRadius: 0, borderTopEndRadius: 0 },
-            (isActive && exerciseBeingDragged) && styles.activeItem]}
+            style={[
+              { borderTopStartRadius: 0, borderTopEndRadius: 0 },
+              isActive && exerciseBeingDragged && styles.activeItem,
+            ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -230,8 +226,10 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderRadius: 0 },
-            (isActive && exerciseBeingDragged) && styles.activeItem]}
+            style={[
+              { borderRadius: 0 },
+              isActive && exerciseBeingDragged && styles.activeItem,
+            ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true} // Is the exercise being edited?
             referenceExercise={item} // pass reference
@@ -432,11 +430,7 @@ function RoutineEditScreen({ route }) {
                 ? styles.flatlistMargin12
                 : styles.flatlistMargin22,
             ]}
-            ItemSeparatorComponent={
-              <View
-                style={styles.listSeparator}
-              />
-            }
+            ItemSeparatorComponent={<View style={styles.listSeparator} />}
           />
           {workingSet.length > 0 && ( // Conditionally render "loops" component
             <View style={styles.sectionSeparator}>
@@ -464,22 +458,14 @@ function RoutineEditScreen({ route }) {
           index={-1}
           snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
           enablePanDownToClose={true}
+          enableContentPanningGesture={false}
           backdropComponent={BottomSheetBackdrop}
           backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
-          handleStyle={{
-            backgroundColor: theme.secondaryBackground,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-          }}
-          handleIndicatorStyle={{
-            backgroundColor: "rgba(255, 255, 255, 0.25)",
-            width: 90,
-          }}
+          handleComponent={() => (
+            <BottomSheetHandle title={modalContent.title} />
+          )}
           onChange={onModalChange}
         >
-          <View style={styles.header}>
-            <Text style={styles.pickerTitle}>{modalContent.title}</Text>
-          </View>
           {modalContent.key === ROUTINE_EDIT_MODAL.WARMUP.key && (
             <TimeWheelPicker
               key={state.refresh}
@@ -519,7 +505,6 @@ function RoutineEditScreen({ route }) {
               <Button
                 title="Apply"
                 onPress={() => {
-                  dispatch({ type: routineEditActions.TOGGLE_APPLY });
                   modalRef.current?.close();
                 }}
                 color={theme.blue}
@@ -580,9 +565,6 @@ const reducer = (state, action) => {
 
     case routineEditActions.SET_COOLDOWN:
       return { ...state, cooldownDuration: action.payload };
-
-    case routineEditActions.TOGGLE_APPLY:
-      return { ...state, apply: !state.apply };
 
     case routineEditActions.TOGGLE_REFRESH:
       return { ...state, refresh: !state.refresh };
@@ -685,7 +667,7 @@ const getStyles = (theme) =>
     },
     inputText: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
-      fontWeight: 400,
+      fontWeight: PICKER_BUTTON_FONT_WEIGHT,
       color: theme.text87,
     },
     pickerTitle: {

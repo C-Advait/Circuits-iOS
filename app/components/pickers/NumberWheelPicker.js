@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useSettings } from "../contexts/SettingsContext";
+import { useSettings } from "../../contexts/SettingsContext";
 
 const items = [...Array(99).keys()].map((i) => i + 1);
 
@@ -10,6 +10,7 @@ function NumberWheelPicker({ number, onValueChange }) {
 
   return (
     <View style={styles.pickerContainer}>
+      <View style={styles.overlay} />
       <Picker
         selectedValue={number}
         style={styles.picker}
@@ -34,12 +35,21 @@ function NumberWheelPicker({ number, onValueChange }) {
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    position: "absolute",
+    borderRadius: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    height: 32,
+    top: "75%",
+    width: "90%",
+    zIndex: 3,
+  },
   pickerContainer: {
     alignItems: "center",
   },
   picker: {
     color: "white",
-    width: 300,
+    width: "90%",
     height: 120,
   },
 });

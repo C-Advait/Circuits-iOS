@@ -29,7 +29,7 @@ export const darkTheme = {
   successGreenBackground: "rgba(0, 213, 72, 0.13)",
   successGreen: "#00d015",
   closeIcon: "#ebebf599",
-  waffleIcon: "#ffffff61"
+  waffleIcon: "#ffffff61",
 };
 
 export const lightTheme = {
