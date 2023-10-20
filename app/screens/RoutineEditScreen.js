@@ -56,6 +56,7 @@ import {
   NestableDraggableFlatList,
   NestableScrollContainer,
 } from "react-native-draggable-flatlist";
+import { Routine } from "../classes/Routine";
 
 const MODAL_HEIGHT = 350;
 
@@ -107,7 +108,6 @@ function RoutineEditScreen({ route }) {
   } = useRoutineContext();
   const { theme, haptics, optionalHapticFunction } = useSettings();
   const styles = getStyles(theme);
-  // const [exerciseBeingDragged, setExerciseBeingDragged] = useState(false);
 
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -117,7 +117,7 @@ function RoutineEditScreen({ route }) {
   useFocusEffect(
     useCallback(() => {
 
-      if (exercises) {
+      if (exercises && routine) {
         const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE); // could be optimized
         const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
 
@@ -137,6 +137,7 @@ function RoutineEditScreen({ route }) {
             workTime: workTime,
             numExercises: numExercises,
             maxExerciseOrder: maxExerciseOrder,
+            routine: routine
           },
         });
       } else {
@@ -170,9 +171,9 @@ function RoutineEditScreen({ route }) {
 
   // Helper Functions
   const updateRoutineTitle = (newTitle) => {
-    setContextRoutine({
-      ...routine,
-      title: newTitle,
+    dispatch({
+      type: routineEditActions.UPDATE_ROUTINE_TITLE,
+      payload: newTitle
     });
   };
   const renderExerciseItem = (item, getIndex, drag, isActive) => {
@@ -228,6 +229,7 @@ function RoutineEditScreen({ route }) {
 
     // Save current state to context so that it can be loaded when navigating back
     setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
+    setContextRoutine({ ...state.routine });
 
     const newExercise = new Exercise({
       ...DEFAULT_EXERCISE,
@@ -244,8 +246,9 @@ function RoutineEditScreen({ route }) {
 
   const handleExerciseEditOnPress = (exerciseItem) => {
 
-    // save state to context
+    // Save current state to context so that it can be loaded when navigating back
     setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
+    setContextRoutine({ ...state.routine });
 
     navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
       isRoutineEditing: isRoutineEditing,
@@ -261,15 +264,22 @@ function RoutineEditScreen({ route }) {
       ...state.workingSet,
       state.cooldown
     ];
-
     finalExercises.forEach((exercise, index) => { // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
+    const finalTime = finalExercises.reduce((sum, exercise) => sum += getExerciseLength(exercise), 0);
+
+    // Done manually instead of in dispatch because of issues encountered with async.
+    // Update/Create was being called without the state being re-rendered
+    const updatedRoutine = {
+      ...state.routine,
+      duration: finalTime  // or however you need to structure the updated routine object
+    };
 
     if (isRoutineEditing) {
-      updateRoutine(routine);
+      updateRoutine(updatedRoutine);
     } else {
-      createRoutine(routine);
+      createRoutine(updatedRoutine);
     }
 
     finalExercises.forEach((exercise) => {
@@ -568,6 +578,7 @@ const initialState = {
   numExercises: 0,
   maxExerciseOrder: 0,
   exerciseBeingDragged: false,
+  routine: new Routine({}),
 };
 
 const reducer = (state, action) => {
@@ -601,6 +612,9 @@ const reducer = (state, action) => {
 
     case routineEditActions.SET_WORKING_SET:
       return { ...state, workingSet: action.payload }
+
+    case routineEditActions.UPDATE_ROUTINE_TITLE:
+      return { ...state, routine: { ...state.routine, title: action.payload } }
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");
