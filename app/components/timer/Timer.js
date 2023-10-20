@@ -153,7 +153,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   overlay: {
-    // backgroundColor: "red",
     alignSelf: "center",
     width: 0.5 * CIRCLE_SIZE,
     height: 0.65 * CIRCLE_SIZE,

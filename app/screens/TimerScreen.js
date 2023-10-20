@@ -95,7 +95,8 @@ function TimerScreen({ route }) {
         />
         <InfoWidget
           title="Exercise"
-          current={state.intervals[state.currentIndex]?.exerciseOrder}
+          // exerciseOrder is 0-indexed
+          current={state.intervals[state.currentIndex]?.exerciseOrder + 1}
           total={state?.numberOfExercises}
         />
         <InfoWidget

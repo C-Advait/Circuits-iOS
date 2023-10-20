@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import timerActions from "../../actions/timerActions";
-import { TIMER_UPDATE_INTERVAL } from "./timerConstants";
 
 import playSound from "../../utilities/playSound";
 import {
