@@ -64,7 +64,9 @@ function TimerScreen({ route }) {
       />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
-        <Text style={styles.nextExercise}>{nextExerciseTitle}</Text>
+        <Text style={styles.nextExercise} numberOfLines={1}>
+          {nextExerciseTitle}
+        </Text>
       </View>
       <View style={styles.controlRow}>
         <SkipButton
