@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Audio } from "expo-av";
 import { SOUNDS } from "../config/sounds";
+import { useSettings } from "./SettingsContext";
 
 const SoundContext = createContext();
 
@@ -11,6 +12,8 @@ export const useSoundContext = () => {
 export const SoundProvider = ({ children }) => {
   const [sounds, setSounds] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const { soundOn } = useSettings();
 
   const soundFiles = SOUNDS;
 
@@ -47,7 +50,7 @@ export const SoundProvider = ({ children }) => {
   const playSound = async (key) => {
     if (isPlaying) return;
 
-    if (sounds[key]) {
+    if (sounds[key] && soundOn) {
       try {
         setIsPlaying(true);
         await sounds[key].playAsync();

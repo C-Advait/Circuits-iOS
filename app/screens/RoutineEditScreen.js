@@ -23,10 +23,7 @@ import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
-import {
-  optionalHapticFunction,
-  useSettings,
-} from "../contexts/SettingsContext";
+import { useSettings } from "../contexts/SettingsContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import {
@@ -115,7 +112,7 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme, haptics } = useSettings();
+  const { theme, optionalHapticFunction } = useSettings();
   const styles = getStyles(theme);
 
   const [workingSet, setWorkingSet] = useState(
@@ -410,19 +407,16 @@ function RoutineEditScreen({ route }) {
             }
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
-            onDragBegin={optionalHapticFunction(haptics, async () => {
+            onDragBegin={optionalHapticFunction(async () => {
               setExerciseBeingDragged(true);
               await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             })}
             onDragEnd={({ data }) => {
               setWorkingSet(data);
             }}
-            onPlaceholderIndexChange={optionalHapticFunction(
-              haptics,
-              async () => {
-                await Haptics.selectionAsync();
-              },
-            )}
+            onPlaceholderIndexChange={optionalHapticFunction(async () => {
+              await Haptics.selectionAsync();
+            })}
             onRelease={() => setExerciseBeingDragged(false)}
             containerStyle={[
               styles.flatlist,
