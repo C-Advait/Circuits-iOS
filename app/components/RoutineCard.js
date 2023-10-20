@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useSettings } from "../contexts/SettingsContext";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -8,11 +8,12 @@ import {
 } from "../config/appConstants";
 import { IconButton, RoutineActionButton } from "./buttons";
 import { formatDuration } from "../utilities/formatDuration";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import routes from "../navigation/routes";
 import Collapsible from "react-native-collapsible";
 import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 import { useRoutineContext } from "../contexts/RoutineContext";
+import { Tag } from "../classes/Exercise";
 
 function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   const navigation = useNavigation();
@@ -25,12 +26,16 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
 
     const formattedExerciseString =
       exercises
-        .map(
-          (exercise) =>
-            `${exercise.title} (${exercise.numberOfRounds} x ${formatDuration(
-              exercise.workTime,
-            )})`,
-        )
+        .map((exercise) => {
+          if (exercise.tag === Tag.WORKING) {
+            return `${exercise.title} (${
+              exercise.numberOfRounds
+            } x ${formatDuration(exercise.workTime)})`;
+          } else {
+            // Warmup / cooldown shouldnt't display number of rounds
+            return `${exercise.title} (${formatDuration(exercise.workTime)})`;
+          }
+        })
         .join("\n") + "\n";
 
     const formattedLoopString =
@@ -39,9 +44,11 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
     setDescription(formattedExerciseString + formattedLoopString);
   };
 
-  useEffect(() => {
-    createDescription();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      createDescription();
+    }, []),
+  );
 
   const handleEditRoutineOnpress = async () => {
     try {
