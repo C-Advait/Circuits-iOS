@@ -11,7 +11,7 @@ import {
 } from "../config/appConstants";
 import routes from "../navigation/routes";
 
-function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
+function ExerciseCard({ title, subTitle, accentColor, drag, style, onPress }) {
   const { theme } = useSettings();
   const styles = getStyles(theme);
   const navigation = useNavigation();
@@ -23,16 +23,6 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
     console.log("Delete Pressed");
   };
 
-  const handleExerciseEditNavigation = () => {
-    rest.referenceExercise
-      ? navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
-          isRoutineEditing: rest.isRoutineEditing,
-          isExerciseEditing: rest.isExerciseEditing,
-          referenceExercise: rest.referenceExercise,
-        })
-      : null;
-  };
-
   return (
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
@@ -42,7 +32,7 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, ...rest }) {
       <View style={styles.contentContainer}>
         <TouchableOpacity
           style={styles.touchable}
-          onPress={() => handleExerciseEditNavigation()}
+          onPress={onPress}
         >
           <View style={styles.infoContainer}>
             <Text style={styles.title} numberOfLines={1}>
