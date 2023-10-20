@@ -21,16 +21,24 @@ import {
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
 import CountdownModal from "./CountdownModal";
-import { KEYBOARD_STATE } from "@gorhom/bottom-sheet";
+import { SOUNDS } from "../../config/sounds";
+import { useSoundContext } from "../../contexts/SoundContext";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const Timer = ({ state, dispatch, nextExerciseTag }) => {
+  const { playSound, pauseSound } = useSoundContext();
   const [isAnimationVisible, setIsAnimationVisible] = useState(true);
 
   const progress = useSharedValue(1);
   // Consider moving into state directly.
   const { title, tag } = state.intervals[state.currentIndex] || {};
+
+  useEffect(() => {
+    if (isAnimationVisible) {
+      playSound(SOUNDS.BEGIN_REST.key);
+    }
+  }, [isAnimationVisible]);
 
   // Reload timer when flag set, then unset flag.
   useEffect(() => {
@@ -102,6 +110,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
         </G>
       </Svg>
       <CountdownModal
+        playSound={playSound}
         isAnimationVisible={isAnimationVisible}
         setIsAnimationVisible={setIsAnimationVisible}
         onClose={() => {

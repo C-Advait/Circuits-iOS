@@ -61,8 +61,3 @@ export const DEFAULT_COOLDOWN = new Exercise({
   breakBeforeNext: 0,
   category: "Uncategorized",
 });
-
-// Sound
-export const COUNTDOWN_BEEP_SOUND = require("../assets/sounds/short_beep.mp3");
-export const BEGIN_EXERCISE_SOUND = require("../assets/sounds/begin_exercise_beep.mp3");
-export const REST_SOUND = require("../assets/sounds/triangle_rest.mp3");
