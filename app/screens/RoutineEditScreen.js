@@ -35,7 +35,6 @@ import {
   TAB_BAR_HEIGHT,
   INFO_FONT_SIZE,
   DEFAULT_EXERCISE,
-  PICKER_BUTTON_FONT_WEIGHT
 } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import NavHeader from "../components/NavHeader";
@@ -181,9 +180,6 @@ function RoutineEditScreen({ route }) {
   };
   const renderExerciseItem = (item, getIndex, drag, isActive) => {
 
-    // return <View style={{ width: 100, height: 50, backgroundColor: 'red' }} />
-
-    // console.log(getIndex());
     switch (getIndex()) {
       case 0:
         return (
@@ -269,22 +265,15 @@ function RoutineEditScreen({ route }) {
       state.cooldown
     ];
 
-    console.log(JSON.stringify(finalExercises, null, 2));
-
-    finalExercises.forEach((exercise, index) => {
-      // final fix
+    finalExercises.forEach((exercise, index) => { // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
-
-    console.log(JSON.stringify(finalExercises, null, 2));
 
     if (isRoutineEditing) {
       updateRoutine(routine);
     } else {
       createRoutine(routine);
     }
-
-    console.log(JSON.stringify(finalExercises, null, 2));
 
     finalExercises.forEach((exercise) => {
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
@@ -315,10 +304,9 @@ function RoutineEditScreen({ route }) {
   );
 
 
-  // console.log(JSON.stringify(state, null, 2));
-  // console.log(state.warmup.workTime + state.cooldown.workTime + state.workTime)
-  // return (<Screen />);
-  // Rendered Output
+
+
+
   return !(Object.keys(state.warmup).length > 0 && Object.keys(state.cooldown).length > 0) ? (
     <Screen />
   ) : (
@@ -606,7 +594,7 @@ const reducer = (state, action) => {
       return { ...state, warmup: { ...state.warmup, workTime: action.payload } };
 
     case routineEditActions.SET_COOLDOWN:
-      return { ...state, cooldownDuration: action.payload };
+      return { ...state, cooldown: { ...state.cooldown, workTime: action.payload } };
 
     case routineEditActions.TOGGLE_APPLY:
       return { ...state, apply: !state.apply };
@@ -619,9 +607,6 @@ const reducer = (state, action) => {
 
     case routineEditActions.SET_WORKING_SET:
       return { ...state, workingSet: action.payload }
-
-    // case routineEditActions.UPDATE_WARMUP_COOLDOWN_TIME:
-    //   return {...state, }
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");
@@ -667,7 +652,6 @@ const getStyles = (theme) =>
       position: "absolute",
       bottom: 0,
       height: 109,
-      // paddingBottom: ,
       paddingTop: 25,
       backgroundColor: "transparent",
       width: "100%",
@@ -675,8 +659,6 @@ const getStyles = (theme) =>
       alignItems: "center",
     },
     timeTab: {
-      // position: 'absolute',
-      // bottom: 15,
       width: "90%",
       alignItems: "center",
     },
@@ -723,11 +705,6 @@ const getStyles = (theme) =>
       fontSize: PICKER_BUTTON_FONT_SIZE,
       fontWeight: PICKER_BUTTON_FONT_WEIGHT,
       color: theme.text87,
-    },
-    pickerTitle: {
-      color: theme.primary,
-      fontSize: 17,
-      fontWeight: 500,
     },
     title: {
       color: theme.foreground,
