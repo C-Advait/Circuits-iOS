@@ -84,11 +84,7 @@ const getExerciseInfo = (exercises) => {
     }
   });
 
-  return [
-    workTime,
-    numExercises,
-    greatestExerciseOrder,
-  ];
+  return [workTime, numExercises, greatestExerciseOrder];
 };
 function RoutineEditScreen({ route }) {
   // Setup Functionality
@@ -106,7 +102,7 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme, haptics, optionalHapticFunction } = useSettings();
+  const { theme, optionalHapticFunction } = useSettings();
   const styles = getStyles(theme);
 
   const modalRef = useRef(null);
@@ -116,17 +112,13 @@ function RoutineEditScreen({ route }) {
   // Initialize state
   useFocusEffect(
     useCallback(() => {
-
       if (exercises && routine) {
         const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE); // could be optimized
         const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
 
         const workingSet = sortedExercises(exercises).slice(1, -1); // The working set is everything between [1, N-1] elements
-        const [
-          workTime,
-          numExercises,
-          maxExerciseOrder,
-        ] = getExerciseInfo(exercises);
+        const [workTime, numExercises, maxExerciseOrder] =
+          getExerciseInfo(exercises);
 
         dispatch({
           type: routineEditActions.INIT,
@@ -137,14 +129,15 @@ function RoutineEditScreen({ route }) {
             workTime: workTime,
             numExercises: numExercises,
             maxExerciseOrder: maxExerciseOrder,
-            routine: routine
+            routine: routine,
           },
         });
       } else {
         null; // What to do if exercises is not loaded from context yet?
       }
 
-      return () => { // Is there any TEARDOWN NECessary here?
+      return () => {
+        // Is there any TEARDOWN NECessary here?
       };
     }, [exercises]), // Depend on exercises so the callback updates if exercises change
   );
@@ -173,11 +166,10 @@ function RoutineEditScreen({ route }) {
   const updateRoutineTitle = (newTitle) => {
     dispatch({
       type: routineEditActions.UPDATE_ROUTINE_TITLE,
-      payload: newTitle
+      payload: newTitle,
     });
   };
   const renderExerciseItem = (item, getIndex, drag, isActive) => {
-
     switch (getIndex()) {
       case 0:
         return (
@@ -188,20 +180,22 @@ function RoutineEditScreen({ route }) {
             drag={drag}
             style={[
               { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
-              (isActive && state.exerciseBeingDragged) && styles.activeItem,
+              isActive && state.exerciseBeingDragged && styles.activeItem,
             ]}
             onPress={() => handleExerciseEditOnPress(item)}
           />
         );
-      case (state.numExercises - 1):
+      case state.numExercises - 1:
         return (
           <ExerciseCard
             title={item.title}
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderTopStartRadius: 0, borderTopEndRadius: 0 },
-            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
+            style={[
+              { borderTopStartRadius: 0, borderTopEndRadius: 0 },
+              isActive && state.exerciseBeingDragged && styles.activeItem,
+            ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
@@ -215,8 +209,10 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[{ borderRadius: 0 },
-            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
+            style={[
+              { borderRadius: 0 },
+              isActive && state.exerciseBeingDragged && styles.activeItem,
+            ]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
@@ -226,7 +222,6 @@ function RoutineEditScreen({ route }) {
     }
   };
   const handleAddExerciseOnPress = () => {
-
     // Save current state to context so that it can be loaded when navigating back
     setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
     setContextRoutine({ ...state.routine });
@@ -245,7 +240,6 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleExerciseEditOnPress = (exerciseItem) => {
-
     // Save current state to context so that it can be loaded when navigating back
     setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
     setContextRoutine({ ...state.routine });
@@ -258,22 +252,21 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleSavePress = async () => {
-
-    const finalExercises = [
-      state.warmup,
-      ...state.workingSet,
-      state.cooldown
-    ];
-    finalExercises.forEach((exercise, index) => { // Update ExerciseOrder of all exercises before saving
+    const finalExercises = [state.warmup, ...state.workingSet, state.cooldown];
+    finalExercises.forEach((exercise, index) => {
+      // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
-    const finalTime = finalExercises.reduce((sum, exercise) => sum += getExerciseLength(exercise), 0);
+    const finalTime = finalExercises.reduce(
+      (sum, exercise) => (sum += getExerciseLength(exercise)),
+      0,
+    );
 
     // Done manually instead of in dispatch because of issues encountered with async.
     // Update/Create was being called without the state being re-rendered
     const updatedRoutine = {
       ...state.routine,
-      duration: finalTime  // or however you need to structure the updated routine object
+      duration: finalTime, // or however you need to structure the updated routine object
     };
 
     if (isRoutineEditing) {
@@ -310,11 +303,10 @@ function RoutineEditScreen({ route }) {
     </AuxiliaryCard>
   );
 
-
-
-
-
-  return !(Object.keys(state.warmup).length > 0 && Object.keys(state.cooldown).length > 0) ? (
+  return !(
+    Object.keys(state.warmup).length > 0 &&
+    Object.keys(state.cooldown).length > 0
+  ) ? (
     <Screen />
   ) : (
     <>
@@ -389,13 +381,15 @@ function RoutineEditScreen({ route }) {
             />
           </View>
           <View style={styles.intervalHeader}>
-            <Text style={styles.sectionTitle}>Intervals</Text>
+            <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>
+              Intervals
+            </Text>
             <View>
               <IconButton
                 iconName="plus"
                 IconFamily={Feather}
                 iconSize={45}
-                foregroundColor={"white"}
+                foregroundColor="white"
                 onPress={() => handleAddExerciseOnPress()}
               />
             </View>
@@ -423,35 +417,31 @@ function RoutineEditScreen({ route }) {
           <NestableDraggableFlatList
             data={state?.workingSet}
             renderItem={({ item, getIndex, drag, isActive }) =>
-
               renderExerciseItem(item, getIndex, drag, isActive)
             }
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
-            onDragBegin={optionalHapticFunction(haptics, async () => {
+            onDragBegin={optionalHapticFunction(async () => {
               dispatch({
                 type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
-                payload: true
-              })
+                payload: true,
+              });
               await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             })}
             onDragEnd={({ data }) => {
               dispatch({
                 type: routineEditActions.SET_WORKING_SET,
-                payload: data
-              })
+                payload: data,
+              });
             }}
-            onPlaceholderIndexChange={optionalHapticFunction(
-              haptics,
-              async () => {
-                await Haptics.selectionAsync();
-              },
-            )}
+            onPlaceholderIndexChange={optionalHapticFunction(async () => {
+              await Haptics.selectionAsync();
+            })}
             onRelease={() => {
               dispatch({
                 type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
-                payload: false
-              })
+                payload: false,
+              });
             }}
             containerStyle={[
               styles.flatlist,
@@ -467,7 +457,7 @@ function RoutineEditScreen({ route }) {
                 title={"Loops"}
                 InputComponent={() => <DummyInputComponent text="Once" />}
                 Icon={() => (
-                  <Feather name="repeat" size={24} color={theme.foreground} />
+                  <Feather name="repeat" size={20} color={theme.foreground} />
                 )}
               />
             </View>
@@ -553,12 +543,18 @@ function RoutineEditScreen({ route }) {
         <View style={styles.timeTab}>
           <Text style={styles.totalTimeText}>
             {" "}
-            {`Total time: ${formatDurationExact(state.warmup.workTime + state.cooldown.workTime + state.workTime)}`}{" "}
+            {`Total time: ${formatDurationExact(
+              state.warmup.workTime + state.cooldown.workTime + state.workTime,
+            )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View style={[styles.timeWarmup, { flex: state.warmup.workTime }]} />
+            <View
+              style={[styles.timeWarmup, { flex: state.warmup.workTime }]}
+            />
             <View style={[styles.timeWorkout, { flex: state.workTime }]} />
-            <View style={[styles.timeCooldown, { flex: state.cooldown.workTime }]} />
+            <View
+              style={[styles.timeCooldown, { flex: state.cooldown.workTime }]}
+            />
           </View>
         </View>
       </BlurView>
@@ -596,10 +592,16 @@ const reducer = (state, action) => {
       return { ...state, [state.activeKey]: state.previous };
 
     case routineEditActions.SET_WARMUP:
-      return { ...state, warmup: { ...state.warmup, workTime: action.payload } };
+      return {
+        ...state,
+        warmup: { ...state.warmup, workTime: action.payload },
+      };
 
     case routineEditActions.SET_COOLDOWN:
-      return { ...state, cooldown: { ...state.cooldown, workTime: action.payload } };
+      return {
+        ...state,
+        cooldown: { ...state.cooldown, workTime: action.payload },
+      };
 
     case routineEditActions.TOGGLE_APPLY:
       return { ...state, apply: !state.apply };
@@ -611,10 +613,10 @@ const reducer = (state, action) => {
       return { ...state, exerciseBeingDragged: action.payload };
 
     case routineEditActions.SET_WORKING_SET:
-      return { ...state, workingSet: action.payload }
+      return { ...state, workingSet: action.payload };
 
     case routineEditActions.UPDATE_ROUTINE_TITLE:
-      return { ...state, routine: { ...state.routine, title: action.payload } }
+      return { ...state, routine: { ...state.routine, title: action.payload } };
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");
@@ -650,7 +652,7 @@ const getStyles = (theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: -5,
+      // marginBottom: -5,
     },
     listSeparator: {
       backgroundColor: "#38383A",
@@ -726,7 +728,7 @@ const getStyles = (theme) =>
     sectionTitle: {
       color: theme.text60,
       fontSize: INFO_FONT_SIZE,
-      marginBottom: 8,
+      marginBottom: 12,
     },
     footer: {
       backgroundColor: theme.secondaryBackground,

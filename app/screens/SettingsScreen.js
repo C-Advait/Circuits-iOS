@@ -161,7 +161,7 @@ const getStyles = (theme) =>
       marginBottom: 8,
     },
     separator: {
-      backgroundColor: "#ffffff0c",
+      backgroundColor: theme.tertiaryBackground,
       height: 1,
     },
     topPanel: {
