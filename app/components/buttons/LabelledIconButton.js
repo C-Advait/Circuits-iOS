@@ -41,6 +41,7 @@ function LabelledIconButton({
 const styles = StyleSheet.create({
   text: {
     fontSize: PARAGRAPH_FONT_SIZE,
+    fontWeight: "600",
   },
   touchable: {
     alignItems: "center",

@@ -131,7 +131,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
             nextExerciseTag={nextExerciseTag}
           />
           {state.routineComplete ? null : (
-            <View>
+            <View style={{ transform: [{ translateY: 10 }] }}>
               <ResetButton
                 onPress={() => dispatch({ type: timerActions.RESET_TIMER })}
               />
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     height: 0.65 * CIRCLE_SIZE,
     position: "absolute",
     gap: 10,
-    top: CIRCLE_SIZE / 3 - 30,
+    top: CIRCLE_SIZE / 3 - 20,
     alignItems: "center",
     justifyContent: "center",
   },
