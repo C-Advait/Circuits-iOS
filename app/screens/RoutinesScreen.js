@@ -34,6 +34,7 @@ import { SortCriteria } from "../classes/SortCriteria";
 import { naturalCompare } from "../utilities/naturalCompare";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import Screen from "../components/Screen";
+import { routineAccentColors } from '../config/colors';
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -107,10 +108,15 @@ function RoutinesScreen() {
   const handleNewRoutineOnpress = async () => {
     try {
       const routineID = await getNewRoutineID();
+
+      const accentColorsArray = Object.values(routineAccentColors);
+      const randomAccentColor = accentColorsArray[Math.floor(Math.random() * accentColorsArray.length)];
+
       const routine = new Routine({
         ...DEFAULT_ROUTINE,
         id: routineID,
         title: `My Routine #${routineID}`,
+        color: randomAccentColor
       });
 
       const warmup = new Exercise({

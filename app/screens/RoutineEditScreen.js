@@ -370,12 +370,6 @@ function RoutineEditScreen({ route }) {
             }
           />
           <View style={styles.headingPanel}>
-            <LinearGradient
-              colors={["#ffffff", "#3397f3"]}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 0.25 }}
-              style={styles.emojiBox}
-            />
             <TextInput
               style={styles.title}
               onChangeText={updateRoutineTitle}
