@@ -38,3 +38,21 @@ export const lightTheme = {
   foreground: "#121212",
   text: "#333",
 };
+
+export const routineAccentColors = {
+  yellow: "#fccb06",
+  lightBlue: "#b1ddf1",
+  fuschia: "#ca2c92",
+  teal: "#008080",
+  cobalt: "#0047ab",
+  burgundy: "#800020",
+  orange: "#ff7f11",
+  brightRed: "#ee4b2b",
+  emeraldGreen: "#50c878",
+  deepGreen: "#5b7553",
+  roseGold: "#b76e79",
+  coral: "#ff7f50",
+  peach: "#ffcda2",
+  leafGreen: "#306433",
+  plum: "#8e4585",
+}
