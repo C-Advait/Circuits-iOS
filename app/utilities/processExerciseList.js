@@ -3,7 +3,6 @@ import { Tag } from "../classes/Exercise";
 // Given a list of exercises,
 // decompresses into a Timer-friendly format.
 const decompress = (arr, numberOfLoops) => {
-  console.log(numberOfLoops);
   return arr.flatMap((item, idx, originalArr) => {
     // Handle pre-routine and post-routine specially:
     // They should have no break and no rest after.
@@ -49,7 +48,6 @@ const decompress = (arr, numberOfLoops) => {
     }
 
     const withLoops = [];
-    console.log(withRest, numberOfLoops);
     for (let i = 1; i <= numberOfLoops; i++) {
       for (let item of withRest) {
         withLoops.push({ ...item, currentLoop: i });

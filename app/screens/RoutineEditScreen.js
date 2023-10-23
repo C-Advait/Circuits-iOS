@@ -371,22 +371,6 @@ function RoutineEditScreen({ route }) {
           </View>
         </View>
         <NestableScrollContainer contentContainerStyle={styles.scrollContainer}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              navigation.navigate(routes.TEMPLATE_SELECTION_SCREEN, {
-                edit: isRoutineEditing,
-              });
-            }}
-            style={styles.sectionSeparator}
-          >
-            <AuxiliaryCard
-              title={"Template"}
-              InputComponent={() => (
-                <DummyInputComponent text={selectedTemplate} />
-              )}
-            />
-          </TouchableOpacity>
           <Text style={styles.sectionTitle}>Pre-routine</Text>
           <View style={styles.sectionSeparator}>
             <InputModalButton
