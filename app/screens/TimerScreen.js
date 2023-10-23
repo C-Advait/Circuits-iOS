@@ -88,22 +88,9 @@ function TimerScreen({ route }) {
         />
       </View>
       <View style={styles.progressRow}>
-        <InfoWidget
-          title="Round"
-          current={state.intervals[state.currentIndex]?.currentRound}
-          total={state.intervals[state.currentIndex]?.numberOfRounds}
-        />
-        <InfoWidget
-          title="Exercise"
-          // exerciseOrder is 0-indexed
-          current={state.intervals[state.currentIndex]?.exerciseOrder + 1}
-          total={state?.numberOfExercises}
-        />
-        <InfoWidget
-          title="Loop"
-          current={state?.currentLoop}
-          total={state?.numberOfLoops}
-        />
+        <InfoWidget title="Round" state={state} />
+        <InfoWidget title="Exercise" state={state} />
+        <InfoWidget title="Loop" state={state} />
       </View>
       <View style={styles.sliderContainer}>
         <ProgressSlider
@@ -235,7 +222,7 @@ const initTimerSequence = async (id, dispatch) => {
 
   dispatch({
     type: timerActions.SET_EXERCISE_DATA,
-    numberOfExercises: exercises.length,
+    numberOfExercises: exercises.length - 2,
     intervals: processExerciseList(exercises),
     initialDuration: exercises[0]?.workTime,
     loopDuration: calculateLoopDuration(exercises),
