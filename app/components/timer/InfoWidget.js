@@ -9,6 +9,8 @@ function InfoWidget({ title, state }) {
 
   let current, total;
 
+  if (title === "Loop" && state.numberOfLoops) return null;
+
   if (
     state.intervals[state.currentIndex]?.tag === Tag.PREROUTINE ||
     state.intervals[state.currentIndex]?.tag === Tag.POSTROUTINE
@@ -35,8 +37,6 @@ function InfoWidget({ title, state }) {
       if (typeof total === "undefined") total = state?.numberOfLoops;
       break;
   }
-
-  if (title === "Loop" && total === 1) return null;
 
   return (
     <View style={styles.container}>
