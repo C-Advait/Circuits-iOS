@@ -6,31 +6,22 @@ import { useNavigation } from "@react-navigation/native";
 import { useSettings } from "../contexts/SettingsContext";
 import {
   INFO_FONT_SIZE,
-  PARAGRAPH_FONT_SIZE,
-  PARAGRAPH_FONT_WEIGHT,
 } from "../config/appConstants";
-import routes from "../navigation/routes";
 
-function ExerciseCard({ title, subTitle, accentColor, drag, style, onPress }) {
+function ExerciseCard({ title, subTitle, accentColor, drag, style, contentOnpress, deleteOnpress }) {
   const { theme } = useSettings();
   const styles = getStyles(theme);
-  const navigation = useNavigation();
 
-  accentColor = accentColor ? accentColor : theme.tileBackground;
-
-  const handlePress = () => {
-    console.log("Delete Pressed");
-    console.log("Delete Pressed");
-  };
+  accentColor = accentColor ? accentColor : "transparent"
 
   return (
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
-      <TouchableOpacity style={styles.closeButton} onPress={handlePress}>
+      <TouchableOpacity style={styles.closeButton} onPress={deleteOnpress}>
         <EvilIcons name="close" size={28} color={theme.closeIcon} />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableOpacity style={styles.touchable} onPress={onPress}>
+        <TouchableOpacity style={styles.touchable} onPress={contentOnpress}>
           <View style={styles.infoContainer}>
             <Text style={styles.title} numberOfLines={1}>
               {title}

@@ -45,6 +45,7 @@ import { formatMinutesSeconds } from "../utilities/formatDuration";
 import {
   createExercise,
   createRoutine,
+  deleteExercise,
   updateExercise,
   updateRoutine,
 } from "../db/DBActions";
@@ -108,6 +109,7 @@ function RoutineEditScreen({ route }) {
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
+  const [exerciseIDsToDelete, setExerciseIDsToDelete] = useState([]);
 
   // Initialize state
   useFocusEffect(
@@ -182,7 +184,8 @@ function RoutineEditScreen({ route }) {
               { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
               isActive && state.exerciseBeingDragged && styles.activeItem,
             ]}
-            onPress={() => handleExerciseEditOnPress(item)}
+            contentOnpress={() => handleExerciseEditOnPress(item)}
+            deleteOnpress={() => handleExerciseDeleteOnPress(item)}
           />
         );
       case (state.numExercises - 1):
@@ -197,7 +200,8 @@ function RoutineEditScreen({ route }) {
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
-            onPress={() => handleExerciseEditOnPress(item)}
+            contentOnpress={() => handleExerciseEditOnPress(item)}
+            deleteOnpress={() => handleExerciseDeleteOnPress(item)}
           />
         );
       default:
@@ -212,7 +216,8 @@ function RoutineEditScreen({ route }) {
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
-            onPress={() => handleExerciseEditOnPress(item)}
+            contentOnpress={() => handleExerciseEditOnPress(item)}
+            deleteOnpress={() => handleExerciseDeleteOnPress(item)}
           />
         );
     }
@@ -247,22 +252,28 @@ function RoutineEditScreen({ route }) {
     });
   };
 
+  const handleExerciseDeleteOnPress = (exerciseItem) => {
+    const newData = state.workingSet.filter(exercise => exercise.exerciseOrder !== exerciseItem.exerciseOrder);
+
+    if (exerciseItem.id) {
+      setExerciseIDsToDelete([...exerciseIDsToDelete, exerciseItem.id]);
+    }
+    dispatch({
+      type: routineEditActions.SET_WORKING_SET,
+      payload: newData
+    })
+  };
+
   const handleSavePress = async () => {
     const finalExercises = [state.warmup, ...state.workingSet, state.cooldown];
     finalExercises.forEach((exercise, index) => {
       // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
-    const finalTime = finalExercises.reduce((sum, exercise, idx) => {
-      let exerciseLength = getExerciseLength(exercise);
-
-      // Check if the current exercise is neither the first nor the last
-      if (idx !== 0 && idx !== finalExercises.length - 1) {
-        exerciseLength *= routine.numberOfLoops;
-      }
-
-      return sum + exerciseLength;
-    }, 0);
+    const finalTime = finalExercises.reduce(
+      (sum, exercise) => (sum += getExerciseLength(exercise)),
+      0,
+    );
 
     // Done manually instead of in dispatch because of issues encountered with async.
     // Update/Create was being called without the state being re-rendered
@@ -277,10 +288,16 @@ function RoutineEditScreen({ route }) {
       createRoutine(updatedRoutine);
     }
 
+    // Update the exercises
     finalExercises.forEach((exercise) => {
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
     });
     console.log(isRoutineEditing ? "Routine Updated" : " Routine Created");
+    // Delete removed exercises
+    exerciseIDsToDelete.forEach((id) => {
+      deleteExercise(id);
+    });
+
 
     // How to cleanup Context?
     navigation.navigate(routes.ROUTINES_SCREEN);
