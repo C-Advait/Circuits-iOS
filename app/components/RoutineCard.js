@@ -47,7 +47,7 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   useFocusEffect(
     useCallback(() => {
       createDescription();
-    }, []),
+    }, [routine]),
   );
 
   const handleEditRoutineOnpress = async () => {

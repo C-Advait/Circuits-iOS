@@ -10,4 +10,8 @@ export const ROUTINE_EDIT_MODAL = {
     key: "cooldownDuration",
     title: "Cooldown Duration",
   },
+  LOOPS: {
+    key: "numberOfLoops",
+    title: "Number of loops",
+  },
 };
