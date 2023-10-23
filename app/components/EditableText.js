@@ -69,7 +69,6 @@ const EditableText = forwardRef((props, ref) => {
           </Text>
           <TextInput
             ref={inputRef}
-            value={text}
             enterKeyHint="done"
             onChangeText={setText}
             onBlur={handleBlur}
