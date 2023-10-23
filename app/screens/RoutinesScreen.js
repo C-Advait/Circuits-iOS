@@ -58,7 +58,7 @@ function RoutinesScreen() {
   useFocusEffect(
     useCallback(() => {
       loadRoutines();
-    }, []),
+    }, [routines]),
   );
 
   useEffect(() => {
