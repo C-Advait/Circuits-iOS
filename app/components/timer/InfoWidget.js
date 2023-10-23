@@ -1,20 +1,48 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { useSettings } from "../../contexts/SettingsContext";
+import { Tag } from "../../classes/Exercise";
 
-function InfoWidget({ title, current, total }) {
+function InfoWidget({ title, state }) {
   const { theme } = useSettings();
   const styles = getStyles(theme);
 
-  if (title === "Loop" && total === 1) return null;
+  let current, total;
+
+  if (title === "Loop" && state.numberOfLoops) return null;
+
+  if (
+    state.intervals[state.currentIndex]?.tag === Tag.PREROUTINE ||
+    state.intervals[state.currentIndex]?.tag === Tag.POSTROUTINE
+  ) {
+    current = "-";
+    total = "-";
+  }
+
+  switch (title) {
+    case "Round":
+      if (typeof current === "undefined")
+        current = state.intervals[state.currentIndex]?.currentRound;
+      if (typeof total === "undefined")
+        total = state.intervals[state.currentIndex]?.numberOfRounds;
+      break;
+    case "Exercise":
+      if (typeof current === "undefined")
+        // exerciseOrder is 0-indexed, but warmups always exist.
+        current = state.intervals[state.currentIndex]?.exerciseOrder;
+      if (typeof total === "undefined") total = state?.numberOfExercises;
+      break;
+    case "Loop":
+      if (typeof current === "undefined") current = state?.currentLoop;
+      if (typeof total === "undefined") total = state?.numberOfLoops;
+      break;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.progress}>
-        {current}
-        <Text style={styles.specialChar}> / </Text>
-        {total}
+        {current} / {total}
       </Text>
     </View>
   );
