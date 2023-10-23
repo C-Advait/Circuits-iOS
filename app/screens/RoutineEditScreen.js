@@ -253,10 +253,16 @@ function RoutineEditScreen({ route }) {
       // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
-    const finalTime = finalExercises.reduce(
-      (sum, exercise) => (sum += getExerciseLength(exercise)),
-      0,
-    );
+    const finalTime = finalExercises.reduce((sum, exercise, idx) => {
+      let exerciseLength = getExerciseLength(exercise);
+
+      // Check if the current exercise is neither the first nor the last
+      if (idx !== 0 && idx !== finalExercises.length - 1) {
+        exerciseLength *= routine.numberOfLoops;
+      }
+
+      return sum + exerciseLength;
+    }, 0);
 
     // Done manually instead of in dispatch because of issues encountered with async.
     // Update/Create was being called without the state being re-rendered
