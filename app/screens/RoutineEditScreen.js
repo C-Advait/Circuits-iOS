@@ -185,17 +185,15 @@ function RoutineEditScreen({ route }) {
             onPress={() => handleExerciseEditOnPress(item)}
           />
         );
-      case state.numExercises - 1:
+      case (state.numExercises - 1):
         return (
           <ExerciseCard
             title={item.title}
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[
-              { borderTopStartRadius: 0, borderTopEndRadius: 0 },
-              isActive && state.exerciseBeingDragged && styles.activeItem,
-            ]}
+            style={[{ borderTopStartRadius: 0, borderTopEndRadius: 0 },
+            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
@@ -209,10 +207,8 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[
-              { borderRadius: 0 },
-              isActive && state.exerciseBeingDragged && styles.activeItem,
-            ]}
+            style={[{ borderRadius: 0 },
+            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
@@ -303,10 +299,7 @@ function RoutineEditScreen({ route }) {
     </AuxiliaryCard>
   );
 
-  return !(
-    Object.keys(state.warmup).length > 0 &&
-    Object.keys(state.cooldown).length > 0
-  ) ? (
+  return !(Object.keys(state.warmup).length > 0 && Object.keys(state.cooldown).length > 0) ? (
     <Screen />
   ) : (
     <>
@@ -417,6 +410,7 @@ function RoutineEditScreen({ route }) {
           <NestableDraggableFlatList
             data={state?.workingSet}
             renderItem={({ item, getIndex, drag, isActive }) =>
+
               renderExerciseItem(item, getIndex, drag, isActive)
             }
             scrollEnabled={false}
@@ -543,21 +537,15 @@ function RoutineEditScreen({ route }) {
         <View style={styles.timeTab}>
           <Text style={styles.totalTimeText}>
             {" "}
-            {`Total time: ${formatDurationExact(
-              state.warmup.workTime + state.cooldown.workTime + state.workTime,
-            )}`}{" "}
+            {`Total time: ${formatDurationExact(state.warmup.workTime + state.cooldown.workTime + state.workTime)}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View
-              style={[styles.timeWarmup, { flex: state.warmup.workTime }]}
-            />
+            <View style={[styles.timeWarmup, { flex: state.warmup.workTime }]} />
             <View style={[styles.timeWorkout, { flex: state.workTime }]} />
-            <View
-              style={[styles.timeCooldown, { flex: state.cooldown.workTime }]}
-            />
+            <View style={[styles.timeCooldown, { flex: state.cooldown.workTime }]} />
           </View>
-        </View>
-      </BlurView>
+        </View >
+      </BlurView >
     </>
   );
 }
@@ -592,16 +580,10 @@ const reducer = (state, action) => {
       return { ...state, [state.activeKey]: state.previous };
 
     case routineEditActions.SET_WARMUP:
-      return {
-        ...state,
-        warmup: { ...state.warmup, workTime: action.payload },
-      };
+      return { ...state, warmup: { ...state.warmup, workTime: action.payload } };
 
     case routineEditActions.SET_COOLDOWN:
-      return {
-        ...state,
-        cooldown: { ...state.cooldown, workTime: action.payload },
-      };
+      return { ...state, cooldown: { ...state.cooldown, workTime: action.payload } };
 
     case routineEditActions.TOGGLE_APPLY:
       return { ...state, apply: !state.apply };
