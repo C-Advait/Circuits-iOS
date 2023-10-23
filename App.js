@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as SplashScreen from "expo-splash-screen";
 
 import { SettingsProvider } from "./app/contexts/SettingsContext";
 import AppNavigator from "./app/navigation/AppNavigator";
@@ -13,17 +14,24 @@ export default function App() {
 
   useEffect(() => {
     const init = async () => {
-      setReady(await initializeDB());
-      await Audio.setAudioModeAsync({
-        staysActiveInBackground: false,
-        interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
-      });
+      try {
+        SplashScreen.preventAutoHideAsync();
+        await initializeDB();
+        await Audio.setAudioModeAsync({
+          staysActiveInBackground: false,
+          interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setReady(true);
+        await SplashScreen.hideAsync();
+      }
     };
 
     init();
-  }, []);
+  });
 
-  // Should return loading screen -- not null.
   return ready ? (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Host>
