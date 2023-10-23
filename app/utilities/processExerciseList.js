@@ -7,7 +7,7 @@ const decompress = (arr) => {
     // Handle pre-routine and post-routine specially:
     // They should have no break and no rest after.
     if (item.tag === Tag.PREROUTINE || item.tag === Tag.POSTROUTINE) {
-      return { ...item, numberOfRounds: 1 };
+      return { ...item, numberOfRounds: 1, duration: item.workTime };
     }
 
     // Generate round objects

@@ -21,16 +21,24 @@ import {
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
 import CountdownModal from "./CountdownModal";
-import { KEYBOARD_STATE } from "@gorhom/bottom-sheet";
+import { SOUNDS } from "../../config/sounds";
+import { useSoundContext } from "../../contexts/SoundContext";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const Timer = ({ state, dispatch, nextExerciseTag }) => {
+  const { playSound, pauseSound } = useSoundContext();
   const [isAnimationVisible, setIsAnimationVisible] = useState(true);
 
   const progress = useSharedValue(1);
   // Consider moving into state directly.
   const { title, tag } = state.intervals[state.currentIndex] || {};
+
+  useEffect(() => {
+    if (isAnimationVisible) {
+      playSound(SOUNDS.BEGIN_REST.key);
+    }
+  }, [isAnimationVisible]);
 
   // Reload timer when flag set, then unset flag.
   useEffect(() => {
@@ -102,6 +110,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
         </G>
       </Svg>
       <CountdownModal
+        playSound={playSound}
         isAnimationVisible={isAnimationVisible}
         setIsAnimationVisible={setIsAnimationVisible}
         onClose={() => {
@@ -122,7 +131,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
             nextExerciseTag={nextExerciseTag}
           />
           {state.routineComplete ? null : (
-            <View>
+            <View style={{ transform: [{ translateY: 10 }] }}>
               <ResetButton
                 onPress={() => dispatch({ type: timerActions.RESET_TIMER })}
               />
@@ -158,7 +167,7 @@ const styles = StyleSheet.create({
     height: 0.65 * CIRCLE_SIZE,
     position: "absolute",
     gap: 10,
-    top: CIRCLE_SIZE / 3 - 30,
+    top: CIRCLE_SIZE / 3 - 20,
     alignItems: "center",
     justifyContent: "center",
   },

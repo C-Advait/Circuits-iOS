@@ -23,10 +23,7 @@ import AuxiliaryCard from "../components/AuxiliaryCard";
 import DummyInputComponent from "../components/DummyInputComponent";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
-import {
-  optionalHapticFunction,
-  useSettings,
-} from "../contexts/SettingsContext";
+import { useSettings } from "../contexts/SettingsContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import {
@@ -59,6 +56,7 @@ import {
   NestableDraggableFlatList,
   NestableScrollContainer,
 } from "react-native-draggable-flatlist";
+import { Routine } from "../classes/Routine";
 
 const MODAL_HEIGHT = 350;
 
@@ -86,11 +84,7 @@ const getExerciseInfo = (exercises) => {
     }
   });
 
-  return [
-    workTime,
-    numExercises,
-    greatestExerciseOrder,
-  ];
+  return [workTime, numExercises, greatestExerciseOrder];
 };
 function RoutineEditScreen({ route }) {
   // Setup Functionality
@@ -108,9 +102,8 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme, haptics } = useSettings();
+  const { theme, optionalHapticFunction } = useSettings();
   const styles = getStyles(theme);
-  // const [exerciseBeingDragged, setExerciseBeingDragged] = useState(false);
 
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -119,17 +112,13 @@ function RoutineEditScreen({ route }) {
   // Initialize state
   useFocusEffect(
     useCallback(() => {
-
-      if (exercises) {
+      if (exercises && routine) {
         const warmup = exercises.find((item) => item.tag === Tag.PREROUTINE); // could be optimized
         const cooldown = exercises.find((item) => item.tag === Tag.POSTROUTINE);
 
         const workingSet = sortedExercises(exercises).slice(1, -1); // The working set is everything between [1, N-1] elements
-        const [
-          workTime,
-          numExercises,
-          maxExerciseOrder,
-        ] = getExerciseInfo(exercises);
+        const [workTime, numExercises, maxExerciseOrder] =
+          getExerciseInfo(exercises);
 
         dispatch({
           type: routineEditActions.INIT,
@@ -140,13 +129,15 @@ function RoutineEditScreen({ route }) {
             workTime: workTime,
             numExercises: numExercises,
             maxExerciseOrder: maxExerciseOrder,
+            routine: routine,
           },
         });
       } else {
         null; // What to do if exercises is not loaded from context yet?
       }
 
-      return () => { // Is there any TEARDOWN NECessary here?
+      return () => {
+        // Is there any TEARDOWN NECessary here?
       };
     }, [exercises]), // Depend on exercises so the callback updates if exercises change
   );
@@ -173,13 +164,12 @@ function RoutineEditScreen({ route }) {
 
   // Helper Functions
   const updateRoutineTitle = (newTitle) => {
-    setContextRoutine({
-      ...routine,
-      title: newTitle,
+    dispatch({
+      type: routineEditActions.UPDATE_ROUTINE_TITLE,
+      payload: newTitle,
     });
   };
   const renderExerciseItem = (item, getIndex, drag, isActive) => {
-
     switch (getIndex()) {
       case 0:
         return (
@@ -190,7 +180,7 @@ function RoutineEditScreen({ route }) {
             drag={drag}
             style={[
               { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
-              (isActive && state.exerciseBeingDragged) && styles.activeItem,
+              isActive && state.exerciseBeingDragged && styles.activeItem,
             ]}
             onPress={() => handleExerciseEditOnPress(item)}
           />
@@ -228,9 +218,9 @@ function RoutineEditScreen({ route }) {
     }
   };
   const handleAddExerciseOnPress = () => {
-
     // Save current state to context so that it can be loaded when navigating back
     setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
+    setContextRoutine({ ...state.routine });
 
     const newExercise = new Exercise({
       ...DEFAULT_EXERCISE,
@@ -246,9 +236,9 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleExerciseEditOnPress = (exerciseItem) => {
-
-    // save state to context
+    // Save current state to context so that it can be loaded when navigating back
     setContextExercises([state.warmup, ...state.workingSet, state.cooldown]);
+    setContextRoutine({ ...state.routine });
 
     navigation.navigate(routes.EXERCISE_EDIT_SCREEN, {
       isRoutineEditing: isRoutineEditing,
@@ -258,21 +248,27 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleSavePress = async () => {
-
-    const finalExercises = [
-      state.warmup,
-      ...state.workingSet,
-      state.cooldown
-    ];
-
-    finalExercises.forEach((exercise, index) => { // Update ExerciseOrder of all exercises before saving
+    const finalExercises = [state.warmup, ...state.workingSet, state.cooldown];
+    finalExercises.forEach((exercise, index) => {
+      // Update ExerciseOrder of all exercises before saving
       exercise.exerciseOrder = index;
     });
+    const finalTime = finalExercises.reduce(
+      (sum, exercise) => (sum += getExerciseLength(exercise)),
+      0,
+    );
+
+    // Done manually instead of in dispatch because of issues encountered with async.
+    // Update/Create was being called without the state being re-rendered
+    const updatedRoutine = {
+      ...state.routine,
+      duration: finalTime, // or however you need to structure the updated routine object
+    };
 
     if (isRoutineEditing) {
-      updateRoutine(routine);
+      updateRoutine(updatedRoutine);
     } else {
-      createRoutine(routine);
+      createRoutine(updatedRoutine);
     }
 
     finalExercises.forEach((exercise) => {
@@ -302,10 +298,6 @@ function RoutineEditScreen({ route }) {
       <Text style={styles.inputText}>{text}</Text>
     </AuxiliaryCard>
   );
-
-
-
-
 
   return !(Object.keys(state.warmup).length > 0 && Object.keys(state.cooldown).length > 0) ? (
     <Screen />
@@ -382,13 +374,15 @@ function RoutineEditScreen({ route }) {
             />
           </View>
           <View style={styles.intervalHeader}>
-            <Text style={styles.sectionTitle}>Intervals</Text>
+            <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>
+              Intervals
+            </Text>
             <View>
               <IconButton
                 iconName="plus"
                 IconFamily={Feather}
                 iconSize={45}
-                foregroundColor={"white"}
+                foregroundColor="white"
                 onPress={() => handleAddExerciseOnPress()}
               />
             </View>
@@ -421,33 +415,27 @@ function RoutineEditScreen({ route }) {
             }
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
-            onDragBegin={optionalHapticFunction(haptics, async () => {
-              // null
+            onDragBegin={optionalHapticFunction(async () => {
               dispatch({
                 type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
-                payload: true
-              })
+                payload: true,
+              });
               await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             })}
             onDragEnd={({ data }) => {
-              // null
               dispatch({
                 type: routineEditActions.SET_WORKING_SET,
-                payload: data
-              })
+                payload: data,
+              });
             }}
-            onPlaceholderIndexChange={optionalHapticFunction(
-              haptics,
-              async () => {
-                await Haptics.selectionAsync();
-              },
-            )}
+            onPlaceholderIndexChange={optionalHapticFunction(async () => {
+              await Haptics.selectionAsync();
+            })}
             onRelease={() => {
-              // null;
               dispatch({
                 type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
-                payload: false
-              })
+                payload: false,
+              });
             }}
             containerStyle={[
               styles.flatlist,
@@ -463,7 +451,7 @@ function RoutineEditScreen({ route }) {
                 title={"Loops"}
                 InputComponent={() => <DummyInputComponent text="Once" />}
                 Icon={() => (
-                  <Feather name="repeat" size={24} color={theme.foreground} />
+                  <Feather name="repeat" size={20} color={theme.foreground} />
                 )}
               />
             </View>
@@ -556,8 +544,8 @@ function RoutineEditScreen({ route }) {
             <View style={[styles.timeWorkout, { flex: state.workTime }]} />
             <View style={[styles.timeCooldown, { flex: state.cooldown.workTime }]} />
           </View>
-        </View>
-      </BlurView>
+        </View >
+      </BlurView >
     </>
   );
 }
@@ -574,6 +562,7 @@ const initialState = {
   numExercises: 0,
   maxExerciseOrder: 0,
   exerciseBeingDragged: false,
+  routine: new Routine({}),
 };
 
 const reducer = (state, action) => {
@@ -606,7 +595,10 @@ const reducer = (state, action) => {
       return { ...state, exerciseBeingDragged: action.payload };
 
     case routineEditActions.SET_WORKING_SET:
-      return { ...state, workingSet: action.payload }
+      return { ...state, workingSet: action.payload };
+
+    case routineEditActions.UPDATE_ROUTINE_TITLE:
+      return { ...state, routine: { ...state.routine, title: action.payload } };
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");
@@ -642,7 +634,7 @@ const getStyles = (theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: -5,
+      // marginBottom: -5,
     },
     listSeparator: {
       backgroundColor: "#38383A",
@@ -718,7 +710,7 @@ const getStyles = (theme) =>
     sectionTitle: {
       color: theme.text60,
       fontSize: INFO_FONT_SIZE,
-      marginBottom: 8,
+      marginBottom: 12,
     },
     footer: {
       backgroundColor: theme.secondaryBackground,

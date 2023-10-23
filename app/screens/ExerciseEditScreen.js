@@ -78,16 +78,16 @@ function ExerciseEditScreen({ route }) {
         onPress={
           enabled
             ? () => {
-                dispatch({
-                  type: exerciseEditActions.SET_ACTIVE_KEY,
-                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-                });
-                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-                Keyboard.dismiss();
-                modalRef.current?.expand();
-              }
+              dispatch({
+                type: exerciseEditActions.SET_ACTIVE_KEY,
+                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+              });
+              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+              Keyboard.dismiss();
+              modalRef.current?.expand();
+            }
             : () => null
         }
       >
@@ -344,6 +344,8 @@ const getStyles = (theme) =>
       paddingTop: Constants.statusBarHeight,
     },
     disabled: {
+      fontSize: PICKER_BUTTON_FONT_SIZE,
+      fontWeight: PICKER_BUTTON_FONT_WEIGHT,
       color: theme.textDisabled,
     },
     footer: {

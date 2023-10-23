@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,60 +6,92 @@ import {
   Alert,
   Text,
   TouchableOpacity,
+  Switch,
 } from "react-native";
 import Header from "../components/Header";
 import Constants from "expo-constants";
-
-import { IconButton } from "../components/buttons";
+import * as Haptics from "expo-haptics";
 
 import { useSettings } from "../contexts/SettingsContext";
 import { Feather } from "@expo/vector-icons";
-
-const appearance = [
-  {
-    id: 1,
-    title: "Haptics",
-  },
-  {
-    id: 2,
-    title: "Something else",
-  },
-];
-
-const support = [
-  {
-    id: 4,
-    title: "Contact us",
-  },
-  {
-    id: 5,
-    title: "Rate us",
-  },
-];
-
-const privacy = [
-  {
-    id: 6,
-    title: "Privacy policy",
-  },
-];
 
 // localize 'behaviour'?
 function SettingsScreen() {
   const { theme } = useSettings();
   const styles = getStyles(theme);
+  const [soundOn, setSoundOn] = useState(true);
+  const [haptics, setHaptics] = useState(true);
+
+  const toggleSound = () => setSoundOn((prev) => !prev);
+  const toggleHaptics = async () => {
+    if (!haptics) await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setHaptics((prev) => !prev);
+  };
+
+  const behaviour = [
+    {
+      id: 1,
+      title: "Haptics",
+      onTouchablePress: toggleHaptics,
+      Component: (
+        <Switch
+          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+          onValueChange={toggleHaptics}
+          value={haptics}
+        />
+      ),
+    },
+    {
+      id: 2,
+      title: "Sounds",
+      onTouchablePress: toggleSound,
+      Component: (
+        <Switch
+          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+          onValueChange={toggleSound}
+          value={soundOn}
+        />
+      ),
+    },
+  ];
+
+  const support = [
+    {
+      id: 4,
+      title: "Contact us",
+    },
+    {
+      id: 5,
+      title: "Rate us",
+    },
+  ];
+
+  const privacy = [
+    {
+      id: 6,
+      title: "Privacy policy",
+    },
+  ];
 
   const renderItem = (item, isLast) => (
     <React.Fragment key={item.id}>
       <TouchableOpacity
         activeOpacity={0.9}
         style={styles.item}
-        onPress={() => {
-          console.log(item);
-        }}
+        onPress={
+          item.onTouchablePress
+            ? item.onTouchablePress
+            : () => {
+                Alert.alert(item.title, item.title);
+              }
+        }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
-        <Feather name="chevron-right" color={theme.text38} size={25} />
+        {item.Component ? (
+          item.Component
+        ) : (
+          <Feather name="chevron-right" color={theme.text38} size={25} />
+        )}
       </TouchableOpacity>
       {!isLast ? <View style={styles.separator} /> : null}
     </React.Fragment>
@@ -82,7 +114,7 @@ function SettingsScreen() {
         <Header>Settings</Header>
       </View>
       <ScrollView style={styles.scrollContainer}>
-        {renderSection("Appearance & Behaviour", appearance)}
+        {renderSection("Behaviour", behaviour)}
         {renderSection("Support", support)}
         {renderSection("Privacy", privacy)}
       </ScrollView>
@@ -129,7 +161,7 @@ const getStyles = (theme) =>
       marginBottom: 8,
     },
     separator: {
-      backgroundColor: "#ffffff0c",
+      backgroundColor: theme.tertiaryBackground,
       height: 1,
     },
     topPanel: {

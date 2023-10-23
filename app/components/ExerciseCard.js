@@ -27,13 +27,10 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, onPress }) {
     <View style={[styles.container, style]}>
       <View style={[styles.accent, { backgroundColor: accentColor }]} />
       <TouchableOpacity style={styles.closeButton} onPress={handlePress}>
-        <EvilIcons name="close" size={35} color={theme.closeIcon} />
+        <EvilIcons name="close" size={28} color={theme.closeIcon} />
       </TouchableOpacity>
       <View style={styles.contentContainer}>
-        <TouchableOpacity
-          style={styles.touchable}
-          onPress={onPress}
-        >
+        <TouchableOpacity style={styles.touchable} onPress={onPress}>
           <View style={styles.infoContainer}>
             <Text style={styles.title} numberOfLines={1}>
               {title}
@@ -47,7 +44,7 @@ function ExerciseCard({ title, subTitle, accentColor, drag, style, onPress }) {
           <TouchableOpacity onPressIn={drag} style={styles.draggableOpacity}>
             <MaterialIcons
               name="drag-handle"
-              size={30}
+              size={28}
               color={theme.waffleIcon}
             />
           </TouchableOpacity>
@@ -112,10 +109,10 @@ const getStyles = (theme) =>
       width: "100%",
     },
     title: {
-      color: theme.text87,
-      fontSize: PARAGRAPH_FONT_SIZE,
-      fontWeight: PARAGRAPH_FONT_WEIGHT,
-      marginBottom: 10,
+      color: theme.primary,
+      fontSize: 17,
+      fontWeight: 500,
+      marginBottom: 7,
     },
     subTitle: {
       color: theme.text60,

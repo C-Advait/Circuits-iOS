@@ -39,13 +39,14 @@ const styles = StyleSheet.create({
   },
   touchable: {
     alignItems: "center",
-    backgroundColor: "#ffffff0c",
+    backgroundColor: "#2c2c2e",
     borderRadius: 8,
     flexDirection: "row",
     gap: 10,
     justifyContent: "center",
     paddingVertical: 10,
     width: "39%",
+    height: 40,
   },
 });
 

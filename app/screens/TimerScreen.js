@@ -310,24 +310,26 @@ const getStyles = (theme) =>
       alignItems: "center",
       alignSelf: "center",
       gap: 46,
-      marginBottom: 55,
+      marginBottom: 48,
     },
     nextContainer: {
+      marginTop: 5,
       justifyContent: "center",
       alignItems: "center",
+      gap: 8,
     },
     nextExercise: {
       color: theme.secondary,
-      fontWeight: 500,
-      fontSize: 27,
-      marginBottom: 25,
+      fontWeight: "500",
+      fontSize: 25,
+      marginBottom: 48,
     },
     progressRow: {
       flexDirection: "row",
       justifyContent: "space-between",
       gap: 10,
       marginHorizontal: 15,
-      marginBottom: 22,
+      marginBottom: 16,
     },
     routineTitle: {
       color: theme.foreground,
@@ -341,10 +343,11 @@ const getStyles = (theme) =>
       alignItems: "center",
       justifyContent: "center",
       marginTop: 25,
+      marginBottom: 10,
     },
     upNext: {
       color: theme.primary,
-      fontSize: 17,
+      fontSize: 15,
     },
   });
 

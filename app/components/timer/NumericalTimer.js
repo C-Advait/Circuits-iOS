@@ -2,25 +2,29 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import timerActions from "../../actions/timerActions";
 
-import playSound from "../../utilities/playSound";
-import {
-  COUNTDOWN_BEEP_SOUND,
-  BEGIN_EXERCISE_SOUND,
-  REST_SOUND,
-} from "../../config/appConstants";
 import { Tag } from "../../classes/Exercise";
+import { SOUNDS } from "../../config/sounds";
+import { useSoundContext } from "../../contexts/SoundContext";
 
 const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
   const transitionSound = getSoundToPlay(nextExerciseTag);
+  const { playSound, pauseSound } = useSoundContext();
 
   const [exerciseSecondsRemaining, setExerciseSecondsRemaining] = useState(
     state.intervals[state.currentIndex]?.duration,
   );
+
   const EPS = 0.01; // Tolerance for elapsedTime === 1.
 
   useEffect(() => {
     setExerciseSecondsRemaining(state.exerciseSecondsRemaining);
   }, [state.shouldResetTimer, state.exerciseSecondsRemaining]);
+
+  useEffect(() => {
+    if (exerciseSecondsRemaining <= 3) {
+      playSound(transitionSound);
+    }
+  }, [exerciseSecondsRemaining]);
 
   useEffect(() => {
     let startTime;
@@ -41,14 +45,6 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
           cancelAnimationFrame(rafID);
         } else {
           if (Math.abs(elapsedTime - 1) <= EPS) {
-            if (exerciseSecondsRemaining === 1) {
-              playSound(transitionSound);
-            } else if (
-              1 < exerciseSecondsRemaining &&
-              exerciseSecondsRemaining <= 4
-            ) {
-              playSound(COUNTDOWN_BEEP_SOUND);
-            }
             setExerciseSecondsRemaining((prev) => prev - 1);
             dispatch({ type: timerActions.ELAPSE });
             elapsedTime -= 1;
@@ -71,6 +67,8 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
       startTime = startTime || Date.now();
       lastUpdateTime = lastUpdateTime || startTime;
       rafID = requestAnimationFrame(frame);
+    } else {
+      pauseSound(transitionSound);
     }
 
     return () => cancelAnimationFrame(rafID);
@@ -91,12 +89,13 @@ const getSoundToPlay = (tag) => {
   switch (tag) {
     case Tag.REST:
     case Tag.BREAK:
-      return REST_SOUND;
+    case Tag.POSTROUTINE:
+      return SOUNDS.BEGIN_REST.key;
     case Tag.WORKING:
     case Tag.PREROUTINE:
-    case Tag.POSTROUTINE:
+      return SOUNDS.BEGIN_EXERCISE.key;
     case Tag.FINISH:
-      return BEGIN_EXERCISE_SOUND;
+      return SOUNDS.COMPLETION.key;
   }
 };
 

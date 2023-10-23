@@ -100,14 +100,15 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
                 }
                 iconName="play-outline"
                 IconFamily={Ionicons}
-                foregroundColor={theme.text87}
+                foregroundColor={theme.primary}
               />
               <RoutineActionButton
                 title="Edit"
                 onPress={() => handleEditRoutineOnpress()}
                 iconName="edit-2"
+                iconSize={40}
                 IconFamily={Feather}
-                foregroundColor={theme.text87}
+                foregroundColor={theme.primary}
               />
               <IconButton
                 iconName="trash-can-outline"
@@ -174,7 +175,7 @@ const getStyles = (theme) =>
       alignSelf: "center",
     },
     container: {
-      backgroundColor: theme.tileBackground,
+      backgroundColor: theme.secondaryBackground,
       borderRadius: 8,
       overflow: "hidden",
       paddingLeft: 24,
@@ -186,8 +187,9 @@ const getStyles = (theme) =>
       fontWeight: 600,
     },
     header: {
-      color: theme.text87,
+      color: theme.primary,
       fontSize: ROUTINE_TITLE_FONT_SIZE,
+      fontWeight: 700,
       marginBottom: 8,
     },
     permanentInfoContainer: {
