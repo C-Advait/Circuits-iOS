@@ -55,11 +55,7 @@ function RoutinesScreen() {
     setRoutines(sortedRoutines);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      loadRoutines();
-    }, [routines]),
-  );
+  useFocusEffect(useCallback(() => loadRoutines(), []));
 
   useEffect(() => {
     if (!routines) return;
