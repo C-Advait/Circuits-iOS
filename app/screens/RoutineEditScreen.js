@@ -45,7 +45,7 @@ import { formatMinutesSeconds } from "../utilities/formatDuration";
 import {
   createExercise,
   createRoutine,
-  getAllUserCreatedRoutines,
+  deleteExercise,
   updateExercise,
   updateRoutine,
 } from "../db/DBActions";
@@ -113,6 +113,7 @@ function RoutineEditScreen({ route }) {
   const modalRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
+  const [exerciseIDsToDelete, setExerciseIDsToDelete] = useState([]);
 
   // Initialize state
   useFocusEffect(
@@ -188,7 +189,8 @@ function RoutineEditScreen({ route }) {
               { borderBottomStartRadius: 0, borderBottomEndRadius: 0 },
               isActive && state.exerciseBeingDragged && styles.activeItem,
             ]}
-            onPress={() => handleExerciseEditOnPress(item)}
+            contentOnpress={() => handleExerciseEditOnPress(item)}
+            deleteOnpress={() => handleExerciseDeleteOnPress(item)}
           />
         );
       case state.numExercises - 1:
@@ -205,7 +207,8 @@ function RoutineEditScreen({ route }) {
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
-            onPress={() => handleExerciseEditOnPress(item)}
+            contentOnpress={() => handleExerciseEditOnPress(item)}
+            deleteOnpress={() => handleExerciseDeleteOnPress(item)}
           />
         );
       default:
@@ -222,7 +225,8 @@ function RoutineEditScreen({ route }) {
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
-            onPress={() => handleExerciseEditOnPress(item)}
+            contentOnpress={() => handleExerciseEditOnPress(item)}
+            deleteOnpress={() => handleExerciseDeleteOnPress(item)}
           />
         );
     }
@@ -255,6 +259,18 @@ function RoutineEditScreen({ route }) {
       isExerciseEditing: true,
       referenceExercise: exerciseItem,
     });
+  };
+
+  const handleExerciseDeleteOnPress = (exerciseItem) => {
+    const newData = state.workingSet.filter(exercise => exercise.exerciseOrder !== exerciseItem.exerciseOrder);
+
+    if (exerciseItem.id) {
+      setExerciseIDsToDelete([...exerciseIDsToDelete, exerciseItem.id]);
+    }
+    dispatch({
+      type: routineEditActions.SET_WORKING_SET,
+      payload: newData
+    })
   };
 
   const handleSavePress = async () => {
@@ -290,10 +306,16 @@ function RoutineEditScreen({ route }) {
       await createRoutine(updatedRoutine);
     }
 
+    // Update the exercises
     finalExercises.forEach((exercise) => {
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
     });
     console.log(isRoutineEditing ? "Routine Updated" : " Routine Created");
+    // Delete removed exercises
+    exerciseIDsToDelete.forEach((id) => {
+      deleteExercise(id);
+    });
+
 
     // How to cleanup Context?
     navigation.navigate(routes.ROUTINES_SCREEN);
@@ -558,8 +580,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-                state.cooldown.workTime +
-                state.numberOfLoops * state.workTime,
+              state.cooldown.workTime +
+              state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
