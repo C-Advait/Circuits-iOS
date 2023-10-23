@@ -9,7 +9,7 @@ function InfoWidget({ title, state }) {
 
   let current, total;
 
-  if (title === "Loop" && state.numberOfLoops) return null;
+  if (title === "Loop" && state.numberOfLoops === 1) return null;
 
   if (
     state.intervals[state.currentIndex]?.tag === Tag.PREROUTINE ||

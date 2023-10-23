@@ -30,7 +30,7 @@ function TimerScreen({ route }) {
 
   useEffect(() => {
     dispatch({ type: timerActions.INIT_FROM_PARAMS, params: route.params });
-    initTimerSequence(route.params.id, dispatch);
+    initTimerSequence(route.params, dispatch);
   }, []);
 
   useEffect(() => {
@@ -72,19 +72,13 @@ function TimerScreen({ route }) {
         <SkipButton
           shouldSkipForward={false}
           dispatch={dispatch}
-          active={
-            (state.currentIndex !== 0 || state.currentLoop !== 1) &&
-            !state.routineComplete
-          }
+          active={state.currentIndex !== 0 && !state.routineComplete}
         />
         <PlayPause isPlaying={state.isPlaying} dispatch={dispatch} />
         <SkipButton
           shouldSkipForward={true}
           dispatch={dispatch}
-          active={
-            state.currentIndex !== state.intervals.length - 1 ||
-            state.currentLoop !== state.numberOfLoops
-          }
+          active={state.currentIndex !== state.intervals.length - 1}
         />
       </View>
       <View style={styles.progressRow}>
@@ -120,7 +114,6 @@ function reducer(state, action) {
         numberOfExercises: action.numberOfExercises,
         intervals: action.intervals,
         exerciseSecondsRemaining: action.initialDuration,
-        loopDuration: action.loopDuration,
       };
     case timerActions.SKIP_FORWARD:
       // If we've reached the end of 'intervals', then either
@@ -130,65 +123,34 @@ function reducer(state, action) {
       if (state.routineComplete) return state;
 
       if (state.currentIndex === state.intervals.length - 1) {
-        if (state.currentLoop === state.numberOfLoops) {
-          console.log("Routine is complete.");
-          return {
-            ...state,
-            // currentLoop: state.currentLoop + 1,
-            // currentIndex: state.currentIndex + 1,
-            routineComplete: true,
-          };
-        } else {
-          return {
-            ...state,
-            shouldResetTimer: true,
-            currentLoop: state.currentLoop + 1,
-            currentIndex: 0,
-            exerciseSecondsRemaining: state.intervals[0]?.duration,
-            totalElapsedTime: state.currentLoop * state.loopDuration,
-          };
-        }
+        console.log("Routine is complete.");
+        return {
+          ...state,
+          routineComplete: true,
+        };
       } else {
         return {
           ...state,
           shouldResetTimer: true,
           currentIndex: state.currentIndex + 1,
+          currentLoop: state.intervals[state.currentIndex + 1]?.currentLoop,
           exerciseSecondsRemaining:
             state.intervals[state.currentIndex + 1]?.duration,
-          totalElapsedTime:
-            (state.currentLoop - 1) * state.loopDuration +
-            state.intervals[state.currentIndex + 1]?.startTime,
+          totalElapsedTime: state.intervals[state.currentIndex + 1]?.startTime,
         };
       }
     case timerActions.SKIP_BACKWARD:
-      if (state.routineComplete) return state;
+      if (state.routineComplete || state.currentIndex === 0) return state;
 
-      if (state.currentIndex !== 0) {
-        return {
-          ...state,
-          shouldResetTimer: true,
-          currentIndex: state.currentIndex - 1,
-          exerciseSecondsRemaining:
-            state.intervals[state.currentIndex - 1]?.duration,
-          totalElapsedTime:
-            (state.currentLoop - 1) * state.loopDuration +
-            state.intervals[state.currentIndex - 1]?.startTime,
-        };
-      } else if (state.currentLoop !== 1) {
-        return {
-          ...state,
-          shouldResetTimer: true,
-          currentIndex: state.intervals.length - 1,
-          currentLoop: state.currentLoop - 1,
-          exerciseSecondsRemaining:
-            state.intervals[state.intervals.length - 1]?.duration,
-          totalElapsedTime:
-            (state.currentLoop - 2) * state.loopDuration +
-            state.intervals[state.intervals.length - 1]?.startTime,
-        };
-      }
-
-      return state;
+      return {
+        ...state,
+        shouldResetTimer: true,
+        currentIndex: state.currentIndex - 1,
+        currentLoop: state.intervals[state.currentIndex - 1]?.currentLoop,
+        exerciseSecondsRemaining:
+          state.intervals[state.currentIndex - 1]?.duration,
+        totalElapsedTime: state.intervals[state.currentIndex - 1]?.startTime,
+      };
     case timerActions.ELAPSE:
       return {
         ...state,
@@ -205,9 +167,7 @@ function reducer(state, action) {
         ...state,
         shouldResetTimer: true,
         exerciseSecondsRemaining: state.intervals[state.currentIndex]?.duration,
-        totalElapsedTime:
-          (state.currentLoop - 1) * state.loopDuration +
-          state.intervals[state.currentIndex]?.startTime,
+        totalElapsedTime: state.intervals[state.currentIndex]?.startTime,
       };
     case timerActions.MARK_TIMER_LOAD_COMPLETE:
       return {
@@ -217,35 +177,20 @@ function reducer(state, action) {
   }
 }
 
-const initTimerSequence = async (id, dispatch) => {
+const initTimerSequence = async ({ id, numberOfLoops }, dispatch) => {
   const exercises = await getExercisesForRoutine(id);
 
   dispatch({
     type: timerActions.SET_EXERCISE_DATA,
     numberOfExercises: exercises.length - 2,
-    intervals: processExerciseList(exercises),
+    intervals: processExerciseList(exercises, numberOfLoops),
     initialDuration: exercises[0]?.workTime,
-    loopDuration: calculateLoopDuration(exercises),
   });
-};
-
-const calculateLoopDuration = (exerciseList) => {
-  let acc = 0;
-  exerciseList.forEach((exercise) => {
-    acc +=
-      exercise.numberOfRounds * exercise.workTime +
-      (exercise.numberOfRounds - 1) * exercise.restBetweenRounds +
-      exercise.breakBeforeNext;
-  });
-  return acc;
 };
 
 // Returns [title, tag]
 const getNextExercise = (state) => {
-  if (
-    state.currentLoop === state.numberOfLoops &&
-    state.currentIndex === state.intervals.length - 1
-  ) {
+  if (state.currentIndex === state.intervals.length - 1) {
     return ["Finish", Tag.FINISH];
   }
   const nextIndex =
@@ -268,9 +213,8 @@ const initialState = {
 
   numberOfExercises: 0,
 
-  currentLoop: 1,
+  currentLoop: 0,
   numberOfLoops: 1,
-  loopDuration: 0,
 
   shouldResetTimer: false,
   routineComplete: false,
