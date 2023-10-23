@@ -45,18 +45,13 @@ import { formatMinutesSeconds } from "../utilities/formatDuration";
 import {
   createExercise,
   createRoutine,
-  getAllUserCreatedRoutines,
   updateExercise,
   updateRoutine,
 } from "../db/DBActions";
 import { IconButton } from "../components/buttons";
 import { ROUTINE_EDIT_MODAL } from "../config/RoutineModalConfig";
 import routineEditActions from "../actions/routineEditActions";
-import {
-  TimeWheelPicker,
-  BottomSheetHandle,
-  NumberWheelPicker,
-} from "../components/pickers";
+import { TimeWheelPicker, BottomSheetHandle } from "../components/pickers";
 import {
   NestableDraggableFlatList,
   NestableScrollContainer,
@@ -135,7 +130,6 @@ function RoutineEditScreen({ route }) {
             numExercises: numExercises,
             maxExerciseOrder: maxExerciseOrder,
             routine: routine,
-            numberOfLoops: routine.numberOfLoops,
           },
         });
       } else {
@@ -191,17 +185,15 @@ function RoutineEditScreen({ route }) {
             onPress={() => handleExerciseEditOnPress(item)}
           />
         );
-      case state.numExercises - 1:
+      case (state.numExercises - 1):
         return (
           <ExerciseCard
             title={item.title}
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[
-              { borderTopStartRadius: 0, borderTopEndRadius: 0 },
-              isActive && state.exerciseBeingDragged && styles.activeItem,
-            ]}
+            style={[{ borderTopStartRadius: 0, borderTopEndRadius: 0 },
+            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
@@ -215,10 +207,8 @@ function RoutineEditScreen({ route }) {
             subTitle={formatExerciseInfo(item)}
             accentColor={theme.accentLightPurple}
             drag={drag}
-            style={[
-              { borderRadius: 0 },
-              isActive && state.exerciseBeingDragged && styles.activeItem,
-            ]}
+            style={[{ borderRadius: 0 },
+            (isActive && state.exerciseBeingDragged) && styles.activeItem]}
             isRoutineEditing={isRoutineEditing}
             isExerciseEditing={true}
             referenceExercise={item}
@@ -268,7 +258,7 @@ function RoutineEditScreen({ route }) {
 
       // Check if the current exercise is neither the first nor the last
       if (idx !== 0 && idx !== finalExercises.length - 1) {
-        exerciseLength *= state.numberOfLoops;
+        exerciseLength *= routine.numberOfLoops;
       }
 
       return sum + exerciseLength;
@@ -276,18 +266,15 @@ function RoutineEditScreen({ route }) {
 
     // Done manually instead of in dispatch because of issues encountered with async.
     // Update/Create was being called without the state being re-rendered
-    const updatedRoutine = new Routine({
+    const updatedRoutine = {
       ...state.routine,
-      numberOfLoops: state.numberOfLoops,
       duration: finalTime, // or however you need to structure the updated routine object
-    });
-
-    // console.log("updatedRoutine: ", JSON.stringify(updatedRoutine, null, 2));
+    };
 
     if (isRoutineEditing) {
-      await updateRoutine(updatedRoutine);
+      updateRoutine(updatedRoutine);
     } else {
-      await createRoutine(updatedRoutine);
+      createRoutine(updatedRoutine);
     }
 
     finalExercises.forEach((exercise) => {
@@ -299,11 +286,10 @@ function RoutineEditScreen({ route }) {
     navigation.navigate(routes.ROUTINES_SCREEN);
   };
 
-  const InputModalButton = ({ accentColor, title, text, contentKey, Icon }) => (
+  const InputModalButton = ({ accentColor, title, text, contentKey }) => (
     <AuxiliaryCard
       accentColor={accentColor}
       title={title}
-      Icon={Icon}
       onPress={() => {
         dispatch({
           type: routineEditActions.SET_ACTIVE_KEY,
@@ -319,10 +305,7 @@ function RoutineEditScreen({ route }) {
     </AuxiliaryCard>
   );
 
-  return !(
-    Object.keys(state.warmup).length > 0 &&
-    Object.keys(state.cooldown).length > 0
-  ) ? (
+  return !(Object.keys(state.warmup).length > 0 && Object.keys(state.cooldown).length > 0) ? (
     <Screen />
   ) : (
     <>
@@ -433,6 +416,7 @@ function RoutineEditScreen({ route }) {
           <NestableDraggableFlatList
             data={state?.workingSet}
             renderItem={({ item, getIndex, drag, isActive }) =>
+
               renderExerciseItem(item, getIndex, drag, isActive)
             }
             scrollEnabled={false}
@@ -469,10 +453,9 @@ function RoutineEditScreen({ route }) {
           />
           {state.workingSet?.length > 0 && (
             <View style={styles.sectionSeparator}>
-              <InputModalButton
-                title="Loops"
-                text={state.numberOfLoops}
-                contentKey="LOOPS"
+              <AuxiliaryCard
+                title={"Loops"}
+                InputComponent={() => <DummyInputComponent text="Once" />}
                 Icon={() => (
                   <Feather name="repeat" size={20} color={theme.foreground} />
                 )}
@@ -526,18 +509,6 @@ function RoutineEditScreen({ route }) {
               }
             />
           )}
-          {modalContent.key === ROUTINE_EDIT_MODAL.LOOPS.key && (
-            <NumberWheelPicker
-              key={state.refresh}
-              number={state.numberOfLoops}
-              onValueChange={(data) =>
-                dispatch({
-                  type: routineEditActions.SET_LOOPS,
-                  payload: data,
-                })
-              }
-            />
-          )}
           <View style={styles.footer}>
             <View style={styles.buttonContainer}>
               <Button
@@ -572,28 +543,15 @@ function RoutineEditScreen({ route }) {
         <View style={styles.timeTab}>
           <Text style={styles.totalTimeText}>
             {" "}
-            {`Total time: ${formatDurationExact(
-              state.warmup.workTime +
-                state.cooldown.workTime +
-                state.numberOfLoops * state.workTime,
-            )}`}{" "}
+            {`Total time: ${formatDurationExact(state.warmup.workTime + state.cooldown.workTime + state.workTime)}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
-            <View
-              style={[styles.timeWarmup, { flex: state.warmup.workTime }]}
-            />
-            <View
-              style={[
-                styles.timeWorkout,
-                { flex: state.workTime * state.numberOfLoops },
-              ]}
-            />
-            <View
-              style={[styles.timeCooldown, { flex: state.cooldown.workTime }]}
-            />
+            <View style={[styles.timeWarmup, { flex: state.warmup.workTime }]} />
+            <View style={[styles.timeWorkout, { flex: state.workTime }]} />
+            <View style={[styles.timeCooldown, { flex: state.cooldown.workTime }]} />
           </View>
-        </View>
-      </BlurView>
+        </View >
+      </BlurView >
     </>
   );
 }
@@ -608,7 +566,6 @@ const initialState = {
   cooldown: {},
   workTime: 0,
   numExercises: 0,
-  numberOfLoops: 1,
   maxExerciseOrder: 0,
   exerciseBeingDragged: false,
   routine: new Routine({}),
@@ -629,20 +586,10 @@ const reducer = (state, action) => {
       return { ...state, [state.activeKey]: state.previous };
 
     case routineEditActions.SET_WARMUP:
-      return {
-        ...state,
-        warmup: { ...state.warmup, workTime: action.payload },
-      };
+      return { ...state, warmup: { ...state.warmup, workTime: action.payload } };
 
     case routineEditActions.SET_COOLDOWN:
-      return {
-        ...state,
-        cooldown: { ...state.cooldown, workTime: action.payload },
-      };
-
-    case routineEditActions.SET_LOOPS:
-      console.log("Setting loops to, ", action.payload);
-      return { ...state, numberOfLoops: action.payload };
+      return { ...state, cooldown: { ...state.cooldown, workTime: action.payload } };
 
     case routineEditActions.TOGGLE_APPLY:
       return { ...state, apply: !state.apply };
