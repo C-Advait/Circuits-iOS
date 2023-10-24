@@ -19,12 +19,19 @@ import { Feather } from "@expo/vector-icons";
 function SettingsScreen() {
   const { theme } = useSettings();
   const styles = getStyles(theme);
-  const [soundOn, setSoundOn] = useState(true);
-  const [haptics, setHaptics] = useState(true);
+  const [componentSoundOn, setComponentSoundOn] = useState(true);
+  const [componentHaptics, setComponentHaptics] = useState(true);
 
-  const toggleSound = () => setSoundOn((prev) => !prev);
+  const { setHaptics, setSoundOn } = useSettings();
+
+  const toggleSound = () => {
+    setComponentSoundOn((prev) => !prev);
+    setSoundOn((prev) => !prev);
+  };
   const toggleHaptics = async () => {
-    if (!haptics) await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (!componentHaptics)
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setComponentHaptics((prev) => !prev);
     setHaptics((prev) => !prev);
   };
 
@@ -37,7 +44,7 @@ function SettingsScreen() {
         <Switch
           style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
           onValueChange={toggleHaptics}
-          value={haptics}
+          value={componentHaptics}
         />
       ),
     },
@@ -49,7 +56,7 @@ function SettingsScreen() {
         <Switch
           style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
           onValueChange={toggleSound}
-          value={soundOn}
+          value={componentSoundOn}
         />
       ),
     },
