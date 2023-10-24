@@ -1,24 +1,35 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { lightTheme, darkTheme } from "../config/colors";
+import { retrieveSetting, saveSetting } from "../db/asyncStorage";
+import { SETTINGS_KEYS } from "../config/settingsKeys";
 
 export const SettingsContext = createContext();
 
 export const SettingsProvider = ({ children }) => {
   // default theme
   const [theme, setTheme] = useState(darkTheme);
-  const [haptics, setHaptics] = useState(true);
   const [soundOn, setSoundOn] = useState(true);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
   };
 
-  const optionalHapticFunction = (asyncHapticFunction) => {
-    if (haptics) {
-      return asyncHapticFunction;
-    } else {
-      return () => null;
-    }
+  // Load settings from asyncStorage initially.
+  useEffect(() => {
+    const loadSettings = async () => {
+      const setting = JSON.parse(await retrieveSetting(SETTINGS_KEYS.SOUND));
+      if (setting) {
+        setSoundOn(setting);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Right now handles only sound settings.
+  const updateSound = async (value) => {
+    await saveSetting(SETTINGS_KEYS.SOUND, JSON.stringify(value));
+    setSoundOn(value);
   };
 
   return (
@@ -26,11 +37,8 @@ export const SettingsProvider = ({ children }) => {
       value={{
         theme,
         toggleTheme,
-        haptics,
-        setHaptics,
         soundOn,
-        setSoundOn,
-        optionalHapticFunction,
+        updateSound,
       }}
     >
       {children}
