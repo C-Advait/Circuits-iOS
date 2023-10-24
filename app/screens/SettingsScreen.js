@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import Header from "../components/Header";
 import Constants from "expo-constants";
-import * as Haptics from "expo-haptics";
 
 import { useSettings } from "../contexts/SettingsContext";
 import { Feather } from "@expo/vector-icons";
@@ -19,44 +18,23 @@ import { Feather } from "@expo/vector-icons";
 function SettingsScreen() {
   const { theme } = useSettings();
   const styles = getStyles(theme);
-  const [componentSoundOn, setComponentSoundOn] = useState(true);
-  const [componentHaptics, setComponentHaptics] = useState(true);
 
-  const { setHaptics, setSoundOn } = useSettings();
+  const { soundOn, setSoundOn } = useSettings();
 
   const toggleSound = () => {
-    setComponentSoundOn((prev) => !prev);
     setSoundOn((prev) => !prev);
-  };
-  const toggleHaptics = async () => {
-    if (!componentHaptics)
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setComponentHaptics((prev) => !prev);
-    setHaptics((prev) => !prev);
   };
 
   const behaviour = [
     {
       id: 1,
-      title: "Haptics",
-      onTouchablePress: toggleHaptics,
-      Component: (
-        <Switch
-          style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-          onValueChange={toggleHaptics}
-          value={componentHaptics}
-        />
-      ),
-    },
-    {
-      id: 2,
       title: "Sounds",
       onTouchablePress: toggleSound,
       Component: (
         <Switch
           style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
           onValueChange={toggleSound}
-          value={componentSoundOn}
+          value={soundOn}
         />
       ),
     },
