@@ -33,7 +33,6 @@ const getStyles = (theme) =>
     },
     handleIndicator: {
       backgroundColor: "rgba(255, 255, 255, 0.25)",
-      borderRadius: 3,
       height: 5,
       marginBottom: 5,
       width: 90,
