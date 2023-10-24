@@ -16,11 +16,9 @@ import {
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import AuxiliaryCard from "../components/AuxiliaryCard";
-import DummyInputComponent from "../components/DummyInputComponent";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
 import { useSettings } from "../contexts/SettingsContext";
@@ -107,7 +105,7 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme, optionalHapticFunction } = useSettings();
+  const { theme } = useSettings();
   const styles = getStyles(theme);
 
   const modalRef = useRef(null);
@@ -262,15 +260,17 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleExerciseDeleteOnPress = (exerciseItem) => {
-    const newData = state.workingSet.filter(exercise => exercise.exerciseOrder !== exerciseItem.exerciseOrder);
+    const newData = state.workingSet.filter(
+      (exercise) => exercise.exerciseOrder !== exerciseItem.exerciseOrder,
+    );
 
     if (exerciseItem.id) {
       setExerciseIDsToDelete([...exerciseIDsToDelete, exerciseItem.id]);
     }
     dispatch({
       type: routineEditActions.SET_WORKING_SET,
-      payload: newData
-    })
+      payload: newData,
+    });
   };
 
   const handleSavePress = async () => {
@@ -315,7 +315,6 @@ function RoutineEditScreen({ route }) {
     exerciseIDsToDelete.forEach((id) => {
       deleteExercise(id);
     });
-
 
     // How to cleanup Context?
     navigation.navigate(routes.ROUTINES_SCREEN);
@@ -437,22 +436,22 @@ function RoutineEditScreen({ route }) {
             }
             scrollEnabled={false}
             keyExtractor={(item) => item.exerciseOrder}
-            onDragBegin={optionalHapticFunction(async () => {
+            onDragBegin={async () => {
               dispatch({
                 type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
                 payload: true,
               });
-              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            })}
+              await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            }}
             onDragEnd={({ data }) => {
               dispatch({
                 type: routineEditActions.SET_WORKING_SET,
                 payload: data,
               });
             }}
-            onPlaceholderIndexChange={optionalHapticFunction(async () => {
+            onPlaceholderIndexChange={async () => {
               await Haptics.selectionAsync();
-            })}
+            }}
             onRelease={() => {
               dispatch({
                 type: routineEditActions.TOGGLE_EXERCISE_ITEM_DRAG,
@@ -574,8 +573,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-              state.cooldown.workTime +
-              state.numberOfLoops * state.workTime,
+                state.cooldown.workTime +
+                state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
