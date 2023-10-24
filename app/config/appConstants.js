@@ -18,13 +18,8 @@ export const EDITABLE_TEXT_FONT_WEIGHT = 400;
 export const DEFAULT_ROUTINE = new Routine({
   // missing routineID && Title incomplete
   numberOfLoops: 1,
-  exerciseSoundID: 1,
-  restSoundID: 1,
-  breakSoundID: 1,
-  endSoundID: 1,
   title: "My Routine #",
   duration: 1200, // e.g., 20 minutes
-  color: "#AABBCC",
   userCreated: true,
 });
 

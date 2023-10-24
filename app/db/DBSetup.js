@@ -29,29 +29,9 @@ export const createTables = async () => {
   console.log("Creating tables: ", db);
   db.transaction((tx) => {
     tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS Sound (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT,
-        file TEXT,
-        type TEXT
-      );`,
-      [],
-      (_tx, _resultSet) => {
-        return;
-      },
-      (error) => {
-        console.error("Error creating `Sound` table.", error);
-      },
-    );
-
-    tx.executeSql(
       `CREATE TABLE IF NOT EXISTS Routine (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         numberOfLoops INTEGER,
-        exerciseSoundID INTEGER REFERENCES Sound(id),
-        restSoundID INTEGER REFERENCES Sound(id),
-        breakSoundID INTEGER REFERENCES Sound(id),
-        endSoundID INTEGER REFERENCES Sound(id),
         title TEXT,
         duration INTEGER,
         color TEXT,
