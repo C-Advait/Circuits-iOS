@@ -84,29 +84,6 @@ const createRoutine = async (routine: Routine) => {
   });
 };
 
-// const createSound = (sound: Sound) => {
-//   const db = getDBInstance();
-
-//   return new Promise((resolve, reject) => {
-//     db.transaction((tx: any) => {
-//       tx.executeSql(
-//         `INSERT INTO Sound (
-//           title,
-//           file,
-//           type
-//         ) VALUES (?, ?, ?)`,
-//         [sound.title, sound.file, sound.type],
-//         (_tx: any, resultSet: any) => {
-//           resolve(resultSet.insertId);
-//         },
-//         (_tx: any, error: any) => {
-//           reject(error);
-//         },
-//       );
-//     });
-//   });
-// };
-
 // Writes to a table of RoutineCompletion rows,
 // contrast with updateMostRecentRoutineCompletion
 const logRoutineCompletion = async (routineID: number) => {
@@ -159,13 +136,13 @@ const getNewRoutineID = async () => {
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'SELECT MAX(id) as maxID FROM Routine',
+        "SELECT MAX(id) as maxID FROM Routine",
         [],
         (_tx, results) => {
           const maxID = results.rows.item(0).maxID || 0;
           resolve(maxID + 1);
         },
-        (error) => reject(error)
+        (error) => reject(error),
       );
     });
   });

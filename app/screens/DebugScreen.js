@@ -34,11 +34,6 @@ const dumpDB = async () => {
   );
 };
 
-// const createDummySound = async () => {
-//   const dummySound = new Sound(1, "Beep", "path/to/beep.mp3", "mp3");
-//   const id = await createSound(dummySound);
-// };
-
 const createDummyRoutine = async () => {
   const routine0 = new Routine({
     numberOfLoops: 5,
@@ -234,7 +229,22 @@ const createDummyExercises = async () => {
     category: "Uncategorized",
   });
 
-  const exercises = [e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, eNEW];
+  const exercises = [
+    e1,
+    e2,
+    e3,
+    e4,
+    e5,
+    e6,
+    e7,
+    e8,
+    e9,
+    e10,
+    e11,
+    e12,
+    e13,
+    eNEW,
+  ];
 
   Promise.all(exercises.map((e) => createExercise(e)));
 };
@@ -282,13 +292,12 @@ function DebugScreen() {
       <View style={styles.topPanel}>
         <Header>Settings</Header>
       </View>
-      {/* <Button title="Create 1 dummy sound" onPress={() => createDummySound()} /> */}
       <Button
-        title="Create 5 dummy routines"
+        title="Create dummy routines"
         onPress={() => createDummyRoutine()}
       />
       <Button
-        title="Create 8 dummy exercises"
+        title="Create dummy exercises"
         onPress={() => createDummyExercises()}
       />
       <Button title="Reset DB" onPress={() => resetDB()} />
