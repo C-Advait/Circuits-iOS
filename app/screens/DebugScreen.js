@@ -9,7 +9,6 @@ import {
   createExercise,
   getAllRoutineNames,
   createRoutine,
-  createSound,
   getRoutineByID,
   deleteExercise,
   deleteRoutine,
@@ -19,12 +18,10 @@ import {
 import { createTables } from "../db/DBSetup";
 import { Exercise, Tag } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
-import { Sound } from "../classes/Sound";
 
 const resetDB = async () => {
   dropTable("Exercise")
     .then(dropTable("Routine"))
-    .then(dropTable("Sound"))
     .then(createTables())
     .then(Alert.alert("All tables dropped and recreated!"));
 };
@@ -37,18 +34,14 @@ const dumpDB = async () => {
   );
 };
 
-const createDummySound = async () => {
-  const dummySound = new Sound(1, "Beep", "path/to/beep.mp3", "mp3");
-  const id = await createSound(dummySound);
-};
+// const createDummySound = async () => {
+//   const dummySound = new Sound(1, "Beep", "path/to/beep.mp3", "mp3");
+//   const id = await createSound(dummySound);
+// };
 
 const createDummyRoutine = async () => {
   const routine0 = new Routine({
     numberOfLoops: 5,
-    exerciseSoundID: 1,
-    restSoundID: 1,
-    breakSoundID: 1,
-    endSoundID: 1,
     title: "Sample Routine",
     duration: 1200, // e.g., 20 minutes
     color: "#AABBCC",
@@ -57,10 +50,6 @@ const createDummyRoutine = async () => {
 
   const routine1 = new Routine({
     numberOfLoops: 3,
-    exerciseSoundID: 1,
-    restSoundID: 1,
-    breakSoundID: 1,
-    endSoundID: 1,
     title: "Morning Stretches",
     duration: 600, // e.g., 10 minutes
     color: "#FFDDAA",
@@ -293,7 +282,7 @@ function DebugScreen() {
       <View style={styles.topPanel}>
         <Header>Settings</Header>
       </View>
-      <Button title="Create 1 dummy sound" onPress={() => createDummySound()} />
+      {/* <Button title="Create 1 dummy sound" onPress={() => createDummySound()} /> */}
       <Button
         title="Create 5 dummy routines"
         onPress={() => createDummyRoutine()}

@@ -1,6 +1,5 @@
 import { getDBInstance } from "./DBSetup";
 
-import { Sound } from "../classes/Sound";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
@@ -55,25 +54,17 @@ const createRoutine = async (routine: Routine) => {
     db.transaction((tx: any) => {
       const query = `INSERT INTO Routine (
          numberOfLoops, 
-         exerciseSoundID, 
-         restSoundID, 
-         breakSoundID, 
-         endSoundID, 
          title, 
          duration, 
          color, 
          userCreated,
          timeMostRecentlyCompleted
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+       ) VALUES (?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
         [
           routine.numberOfLoops,
-          routine.exerciseSoundID,
-          routine.restSoundID,
-          routine.breakSoundID,
-          routine.endSoundID,
           routine.title,
           routine.duration,
           routine.color,
@@ -93,28 +84,28 @@ const createRoutine = async (routine: Routine) => {
   });
 };
 
-const createSound = (sound: Sound) => {
-  const db = getDBInstance();
+// const createSound = (sound: Sound) => {
+//   const db = getDBInstance();
 
-  return new Promise((resolve, reject) => {
-    db.transaction((tx: any) => {
-      tx.executeSql(
-        `INSERT INTO Sound (
-          title,
-          file,
-          type
-        ) VALUES (?, ?, ?)`,
-        [sound.title, sound.file, sound.type],
-        (_tx: any, resultSet: any) => {
-          resolve(resultSet.insertId);
-        },
-        (_tx: any, error: any) => {
-          reject(error);
-        },
-      );
-    });
-  });
-};
+//   return new Promise((resolve, reject) => {
+//     db.transaction((tx: any) => {
+//       tx.executeSql(
+//         `INSERT INTO Sound (
+//           title,
+//           file,
+//           type
+//         ) VALUES (?, ?, ?)`,
+//         [sound.title, sound.file, sound.type],
+//         (_tx: any, resultSet: any) => {
+//           resolve(resultSet.insertId);
+//         },
+//         (_tx: any, error: any) => {
+//           reject(error);
+//         },
+//       );
+//     });
+//   });
+// };
 
 // Writes to a table of RoutineCompletion rows,
 // contrast with updateMostRecentRoutineCompletion
@@ -280,10 +271,6 @@ const updateRoutine = async (routine: Routine) => {
     db.transaction((tx: any) => {
       const query = `UPDATE Routine SET
           numberOfLoops = ?,
-          exerciseSoundID = ?,
-          restSoundID = ?,
-          breakSoundID = ?,
-          endSoundID = ?,
           title = ?,
           duration = ?,
           color = ?,
@@ -294,10 +281,6 @@ const updateRoutine = async (routine: Routine) => {
         query,
         [
           routine.numberOfLoops,
-          routine.exerciseSoundID,
-          routine.restSoundID,
-          routine.breakSoundID,
-          routine.endSoundID,
           routine.title,
           routine.duration,
           routine.color,
@@ -370,7 +353,6 @@ const deleteRoutine = async (routineID: number) => {
 export {
   createExercise,
   createRoutine,
-  createSound,
   logRoutineCompletion,
   getAllUserCreatedRoutines,
   getAllRoutineNames,
