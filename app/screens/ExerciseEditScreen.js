@@ -142,6 +142,7 @@ function ExerciseEditScreen({ route }) {
             iconSize={52}
             foregroundColor={theme.blue}
             onPress={state.dirty ? confirmDiscard : goBack}
+            style={{ alignItems: 'flex-start', marginLeft: -5 }}
           />
         }
         headerText={`Edit ${state.title}`}

@@ -26,6 +26,7 @@ const PrivacyPolicyScreen = () => {
                         iconSize={52}
                         foregroundColor={theme.blue}
                         onPress={() => navigation.navigate(routes.SETTINGS_SCREEN)}
+                        style={{ alignItems: 'flex-start', marginLeft: 7 }}
                     />}
                 headerText='Privacy Policy'
             />
