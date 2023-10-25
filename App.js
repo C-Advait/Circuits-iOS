@@ -22,7 +22,7 @@ export default function App() {
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
       } catch (error) {
-        console.error(error);
+        console.error("Seomthing went wrong during init.", error);
       } finally {
         setReady(true);
         await SplashScreen.hideAsync();

@@ -4,6 +4,50 @@ import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
 
+// Settings
+const retrieveSetting = (key: String) => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT value FROM Setting WHERE key = ?",
+        [key],
+        (_tx: any, results: any) => {
+          resolve(
+            results.rows.raw().length > 0 ? results.rows.raw()[0] : undefined,
+          );
+        },
+        (error: any) => {
+          console.log(`Couldn't retrieve setting with key: ${key}.`);
+          console.log(`It is possible that this is an initial app-load.`);
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
+const updateSetting = (key: String, value: String) => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `INSERT OR REPLACE INTO Setting 
+      (key, value)
+      VALUES ( ?, ? )`;
+      tx.executeSql(
+        query,
+        [key, value],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
 // CREATE
 const createExercise = (exercise: Exercise) => {
   const db = getDBInstance();
@@ -328,6 +372,8 @@ const deleteRoutine = async (routineID: number) => {
 };
 
 export {
+  retrieveSetting,
+  updateSetting,
   createExercise,
   createRoutine,
   logRoutineCompletion,
