@@ -17,16 +17,34 @@ import { useSettings } from "../contexts/SettingsContext";
 import {
   EDITABLE_TEXT_FONT_SIZE,
   EDITABLE_TEXT_FONT_WEIGHT,
+  TITLE_FONT_SIZE,
+  TITLE_FONT_WEIGHT,
 } from "../config/appConstants";
 
 const EditableText = forwardRef((props, ref) => {
   const { theme } = useSettings();
-  const { original, placeholder, onSubmit, maxLength } = props;
-  const styles = getStyles(theme);
+  const { original, originalPlaceholder, onSubmit, maxLength, rightFlush, size = 'regular' } = props;
 
+  const [placeholder, setPlaceholder] = useState(originalPlaceholder);
   const [text, setText] = useState(original);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef(null);
+
+  let fontSize;
+  let fontWeight;
+
+  if (size === "regular") {
+    fontSize = EDITABLE_TEXT_FONT_SIZE;
+    fontWeight = EDITABLE_TEXT_FONT_WEIGHT;
+  } else if (size === "large") {
+    fontSize = TITLE_FONT_SIZE;
+    fontWeight = TITLE_FONT_WEIGHT;
+  } else {
+    throw Error("size prop got an unexpected value: ", size)
+  }
+
+  const styles = getStyles(theme, fontSize, fontWeight);
+
 
   useEffect(() => {
     setText(original);
@@ -63,9 +81,12 @@ const EditableText = forwardRef((props, ref) => {
       style={styles.touchableArea}
     >
       {isEditing ? (
-        <View style={styles.inputContainer}>
+        <View style={[
+          styles.inputContainer,
+          rightFlush ? { justifyContent: "flex-end" } : { justifyContent: "flex-start" }
+        ]}>
           <Text style={[styles.text, styles.fadedSuggestion]} numberOfLines={1}>
-            {text === "" ? placeholder : text}
+            {text === "" ? placeholder : null}
           </Text>
           <TextInput
             ref={inputRef}
@@ -73,6 +94,11 @@ const EditableText = forwardRef((props, ref) => {
             onChangeText={setText}
             onBlur={handleBlur}
             onFocus={handleFocus}
+            onSubmitEditing={(event) => {
+              event.nativeEvent.text !== "" ?
+                setPlaceholder(event.nativeEvent.text) :
+                null
+            }}
             style={[styles.textInput, textStyle]}
             autoFocus={true}
             maxLength={maxLength}
@@ -81,7 +107,10 @@ const EditableText = forwardRef((props, ref) => {
           />
         </View>
       ) : (
-        <View style={styles.inputContainer}>
+        <View style={[
+          styles.inputContainer,
+          rightFlush ? { justifyContent: "flex-end" } : { justifyContent: "flex-start" }
+        ]}>
           <Text style={textStyle} numberOfLines={1}>
             {text || placeholder}
           </Text>
@@ -91,25 +120,24 @@ const EditableText = forwardRef((props, ref) => {
   );
 });
 
-const getStyles = (theme) =>
+const getStyles = (theme, fontSize, fontWeight) =>
   StyleSheet.create({
     touchableArea: {
-      width: 200,
+      // width: 200,
     },
     inputContainer: {
       position: "relative",
       flexDirection: "row",
-      justifyContent: "flex-end",
     },
     text: {
       color: theme.text87,
-      fontSize: EDITABLE_TEXT_FONT_SIZE,
-      fontWeight: EDITABLE_TEXT_FONT_WEIGHT,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
     },
     placeholderText: {
       color: theme.text60,
-      fontSize: EDITABLE_TEXT_FONT_SIZE,
-      fontWeight: EDITABLE_TEXT_FONT_WEIGHT,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
     },
     fadedSuggestion: {
       position: "absolute",
