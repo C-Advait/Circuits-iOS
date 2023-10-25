@@ -19,10 +19,10 @@ function SettingsScreen() {
   const { theme } = useSettings();
   const styles = getStyles(theme);
 
-  const { soundOn, setSoundOn } = useSettings();
+  const { soundOn, updateSound } = useSettings();
 
   const toggleSound = () => {
-    setSoundOn((prev) => !prev);
+    updateSound(!soundOn);
   };
 
   const behaviour = [

@@ -27,7 +27,23 @@ export const initializeDB = async () => {
 
 export const createTables = async () => {
   console.log("Creating tables: ", db);
+
   db.transaction((tx) => {
+    tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS Setting (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT,
+        value TEXT
+      );`,
+      [],
+      (_tx, _resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error("Error creating `Setting` table.", error);
+      },
+    );
+
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS Routine (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
