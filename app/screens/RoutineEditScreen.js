@@ -267,10 +267,15 @@ function RoutineEditScreen({ route }) {
     if (exerciseItem.id) {
       setExerciseIDsToDelete([...exerciseIDsToDelete, exerciseItem.id]);
     }
+
+    const reducedExerciseLength = getExerciseLength(exerciseItem);
+
     dispatch({
-      type: routineEditActions.SET_WORKING_SET,
-      payload: newData,
+      type: routineEditActions.DELETE_EXERCISE,
+      payload: [newData, reducedExerciseLength]
     });
+
+
   };
 
   const handleSavePress = async () => {
@@ -573,8 +578,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-                state.cooldown.workTime +
-                state.numberOfLoops * state.workTime,
+              state.cooldown.workTime +
+              state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
@@ -657,6 +662,12 @@ const reducer = (state, action) => {
 
     case routineEditActions.UPDATE_ROUTINE_TITLE:
       return { ...state, routine: { ...state.routine, title: action.payload } };
+
+    case routineEditActions.DELETE_EXERCISE:
+
+      const [newWorkingSet, removedTime] = action.payload;
+      const newWorkTime = state.workTime - removedTime;
+      return { ...state, workingSet: newWorkingSet, workTime: newWorkTime };
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");
