@@ -35,6 +35,7 @@ function SettingsScreen() {
     Linking.canOpenURL(url)
       .then(supported => {
         if (supported) {
+          console.log("support is: ", supported);
           return Linking.openURL(url);
         } else {
           console.log("Unable to open email client")
@@ -48,7 +49,7 @@ function SettingsScreen() {
 
   const rateUs = () => {
     const options = {
-      AppleAppID: "422689480",
+      AppleAppID: "422689480", // Gmail ID
       // GooglePackageName:"com.mywebsite.myapp",
       // AmazonPackageName:"com.mywebsite.myapp",
       // OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
