@@ -28,18 +28,42 @@ const retrieveSetting = (key: String) => {
   });
 };
 
+export const getSettings = () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM Setting",
+        [],
+        (_tx: any, results: any) => {
+          resolve(
+            results.rows.raw()
+          );
+        },
+        (error: any) => {
+          console.log(`Couldn't retrieve all userSettings.`);
+          reject(error);
+        },
+      );
+    });
+  });
+}
+
 const updateSetting = (key: String, value: String) => {
   const db = getDBInstance();
 
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx: any) => {
-      const query = `INSERT OR REPLACE INTO Setting 
-      (key, value)
-      VALUES ( ?, ? )`;
+      const query = `UPDATE Setting 
+      SET value = ?
+      WHERE key = ?`;
+
       tx.executeSql(
         query,
-        [key, value],
+        [value, key],
         (_txObj: any, resultSet: any) => {
+          console.log(`Update succeeded`);
           resolve(resultSet.rowsAffected);
         },
         (error: any) => reject(error),

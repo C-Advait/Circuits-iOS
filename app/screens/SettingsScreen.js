@@ -54,7 +54,7 @@ function SettingsScreen() {
       // AmazonPackageName:"com.mywebsite.myapp",
       // OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
       // preferredAndroidMarket: AndroidMarket.Google,
-      preferInApp: true,
+      preferInApp: false,
       openAppStoreIfInAppFails: true,
       fallbackPlatformURL: "http://www.google.com",
     }

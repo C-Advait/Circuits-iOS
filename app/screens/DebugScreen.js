@@ -14,23 +14,24 @@ import {
   deleteRoutine,
   updateExercise,
   updateRoutine,
+  getSettings,
 } from "../db/DBActions";
-import { createTables } from "../db/DBSetup";
+import { initTables } from "../db/DBSetup";
 import { Exercise, Tag } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 
 const resetDB = async () => {
   dropTable("Exercise")
-    .then(dropTable("Routine"))
-    .then(createTables())
+    .then(dropTable("Setting"))
+    .then(initTables())
     .then(Alert.alert("All tables dropped and recreated!"));
 };
 
 const dumpDB = async () => {
-  const exercises = await getExercisesForRoutine(1);
+  const settings = await getSettings();
   console.log(
-    "All exercises for routine with id 1",
-    JSON.stringify(exercises, null, 2),
+    "All settings",
+    JSON.stringify(settings, null, 2),
   );
 };
 
@@ -299,6 +300,10 @@ function DebugScreen() {
       <Button
         title="Create dummy exercises"
         onPress={() => createDummyExercises()}
+      />
+      <Button
+        title="Dump settings"
+        onPress={() => dumpDB()}
       />
       <Button title="Reset DB" onPress={() => resetDB()} />
     </Screen>
