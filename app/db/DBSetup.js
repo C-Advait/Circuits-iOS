@@ -1,4 +1,5 @@
 import SQLite from "react-native-sqlite-storage";
+import { SETTINGS_KEYS } from "../config/settingsKeys";
 
 let db;
 
@@ -14,7 +15,7 @@ export const initializeDB = async () => {
       async () => {
         try {
           db.executeSql("PRAGMA foreign_keys = ON;", []);
-          await createTables();
+          await initTables();
           resolve(true);
         } catch (error) {
           reject(error);
@@ -25,8 +26,8 @@ export const initializeDB = async () => {
   });
 };
 
-export const createTables = async () => {
-  console.log("Creating tables: ", db);
+export const initTables = async () => {
+  console.log("Initializing tables: ", db);
 
   db.transaction((tx) => {
     tx.executeSql(
@@ -42,6 +43,19 @@ export const createTables = async () => {
       (error) => {
         console.error("Error creating `Setting` table.", error);
       },
+    );
+
+    tx.executeSql(
+      `INSERT OR IGNORE INTO Setting
+      (id, key, value)
+      VALUES ( ?, ?, ? );`,
+      [1, SETTINGS_KEYS.SOUND, 'true'],
+      (_tx, resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error("Error setting defaults in `Setting` table.", error)
+      }
     );
 
     tx.executeSql(
