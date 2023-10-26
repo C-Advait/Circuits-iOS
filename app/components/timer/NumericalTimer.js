@@ -22,7 +22,7 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
 
   useEffect(() => {
     if (exerciseSecondsRemaining <= 3) {
-      playSound(transitionSound);
+      if (transitionSound) playSound(transitionSound);
     }
   }, [exerciseSecondsRemaining]);
 
@@ -95,7 +95,8 @@ const getSoundToPlay = (tag) => {
     case Tag.PREROUTINE:
       return SOUNDS.BEGIN_EXERCISE.key;
     case Tag.FINISH:
-      return SOUNDS.COMPLETION.key;
+      // Responsibility of success animation.
+      return null;
   }
 };
 

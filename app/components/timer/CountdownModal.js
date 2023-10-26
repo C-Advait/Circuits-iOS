@@ -4,24 +4,17 @@ import { View, StyleSheet, Modal } from "react-native";
 import LottieView from "lottie-react-native";
 import { SOUNDS } from "../../config/sounds";
 
-function CountdownModal({
-  isAnimationVisible,
-  setIsAnimationVisible,
-  onClose,
-}) {
+function CountdownModal({ visible, onClose }) {
   // Currently, countdown lottie is in dark mode only.
   return (
-    <Modal animationType="fade" transparent={true} visible={isAnimationVisible}>
+    <Modal animationType="fade" transparent={true} visible={visible}>
       <View style={styles.overlay}>
         <LottieView
           source={require("../../assets/lotties/countdown.json")}
           autoPlay
           loop={false}
           style={{ height: 322, width: 750 }}
-          onAnimationFinish={() => {
-            onClose();
-            setIsAnimationVisible(false);
-          }}
+          onAnimationFinish={() => onClose()}
         />
       </View>
     </Modal>

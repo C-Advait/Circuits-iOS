@@ -9,5 +9,9 @@ export default function formatDurationExact(seconds) {
     if (minutes > 0) formattedString += `${minutes}m `;
     if (remainingSeconds > 0) formattedString += `${remainingSeconds}s`;
 
+    if (formattedString === '') {
+        formattedString = '0s'
+    }
+
     return formattedString
 }

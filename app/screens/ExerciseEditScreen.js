@@ -16,7 +16,7 @@ import { IconButton } from "../components/buttons";
 import { useSettings } from "../contexts/SettingsContext";
 import routes from "../navigation/routes";
 import AuxiliaryCard from "../components/AuxiliaryCard";
-
+import Screen from "../components/Screen";
 import AppTextButton from "../components/buttons/AppTextButton";
 import EditableText from "../components/EditableText";
 import exerciseEditActions from "../actions/exerciseEditActions";
@@ -34,7 +34,6 @@ import {
   TimeWheelPicker,
   BottomSheetHandle,
 } from "../components/pickers";
-import Constants from "expo-constants";
 
 const MODAL_HEIGHT = 350;
 
@@ -133,7 +132,7 @@ function ExerciseEditScreen({ route }) {
   const confirmDiscard = () => confirmedNavigate(goBack);
 
   return (
-    <View style={styles.container}>
+    <Screen style={styles.container}>
       <NavHeader
         LeftComponent={
           <IconButton
@@ -210,7 +209,11 @@ function ExerciseEditScreen({ route }) {
             subtitle={contentType.subtitle}
           />
         )}
-        backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
+        backgroundStyle={{
+          backgroundColor: theme.tertiaryBackground,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        }}
         onChange={onModalChange}
       >
         {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
@@ -247,6 +250,7 @@ function ExerciseEditScreen({ route }) {
                 payload: data,
               })
             }
+            increment5Seconds={true}
           />
         )}
         {contentType.key === EXERCISE_EDIT_MODAL.BREAK_TIME.key && (
@@ -259,6 +263,7 @@ function ExerciseEditScreen({ route }) {
                 payload: data,
               })
             }
+            increment5Seconds={true}
           />
         )}
         <View style={styles.footer}>
@@ -283,7 +288,7 @@ function ExerciseEditScreen({ route }) {
           </View>
         </View>
       </BottomSheet>
-    </View>
+    </Screen>
   );
 }
 
@@ -336,14 +341,13 @@ const reducer = (state, action) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     buttonContainer: {
-      // marginHorizontal: 16,
+      marginHorizontal: 16,
       marginTop: 12,
     },
     container: {
       backgroundColor: theme.background,
       flex: 1,
       height: "100%",
-      paddingTop: Constants.statusBarHeight,
       paddingHorizontal: 15
     },
     disabled: {
@@ -355,7 +359,7 @@ const getStyles = (theme) =>
       backgroundColor: theme.secondaryBackground,
       bottom: 0,
       flexDirection: "row",
-      height: 75,
+      height: 65,
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",

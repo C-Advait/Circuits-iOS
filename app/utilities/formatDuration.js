@@ -19,12 +19,9 @@ export function formatMinutesSeconds(seconds) {
   const sec = seconds % 60;
 
   if (sec === 0) {
-    if (min > 1)
-      return `${min} minutes`
-    else if (min === 1)
-      return `1 minute`
-    else
-      return `0 seconds`;
+    if (min > 1) return `${min} minutes`;
+    else if (min === 1) return `1 minute`;
+    else return `0 seconds`;
   }
 
   return min > 0 ? `${min}m ${sec}s` : `${sec} seconds`;

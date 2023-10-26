@@ -18,11 +18,12 @@ export default function App() {
         SplashScreen.preventAutoHideAsync();
         await initializeDB();
         await Audio.setAudioModeAsync({
-          staysActiveInBackground: false,
+          staysActiveInBackground: true,
+          playsInSilentModeIOS: true,
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
       } catch (error) {
-        console.error("Seomthing went wrong during init.", error);
+        console.error("Something went wrong during init.", error);
       } finally {
         setReady(true);
         await SplashScreen.hideAsync();

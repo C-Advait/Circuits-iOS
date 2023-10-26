@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Switch,
-  Linking
+  Linking,
 } from "react-native";
 import Constants from "expo-constants";
 import { Feather } from "@expo/vector-icons";
@@ -33,7 +33,7 @@ function SettingsScreen() {
   const contactSupport = () => {
     const url = "mailto:circuit.timer@gmail.com";
     Linking.canOpenURL(url)
-      .then(supported => {
+      .then((supported) => {
         if (supported) {
           console.log("support is: ", supported);
           return Linking.openURL(url);
@@ -43,7 +43,7 @@ function SettingsScreen() {
           // throw new Error("Unable to open email client");
         }
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert("Mail Error: \n", error.message);
       });
   };
@@ -72,8 +72,7 @@ function SettingsScreen() {
 
   const navPrivacyPolicy = () => {
     navigation.navigate(routes.PRIVACY_POLICY_SCREEN);
-  }
-
+  };
 
   const behaviour = [
     {
@@ -93,19 +92,19 @@ function SettingsScreen() {
     {
       id: 4,
       title: "Contact The Developers",
-      onTouchablePress: contactSupport
+      onTouchablePress: contactSupport,
     },
     {
       id: 5,
       title: "Rate This App",
-      onTouchablePress: rateUs
+      onTouchablePress: rateUs,
     },
   ];
   const privacy = [
     {
       id: 6,
       title: "Privacy Policy",
-      onTouchablePress: navPrivacyPolicy
+      onTouchablePress: navPrivacyPolicy,
     },
   ];
 

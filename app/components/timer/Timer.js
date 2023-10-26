@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { AppState, View, StyleSheet, Text } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedProps,
@@ -8,31 +8,49 @@ import Animated, {
   cancelAnimation,
 } from "react-native-reanimated";
 import { Circle, G, Svg, Defs, LinearGradient, Stop } from "react-native-svg";
+import BackgroundTimer from "react-native-background-timer";
 
 import NumericalTimer from "./NumericalTimer";
 import ResetButton from "./ResetButton";
 
-import {
-  CIRCLE_SIZE,
-  CIRCUMFERENCE,
-  RING_STARTING_OFFSET,
-  STROKE_WIDTH,
-} from "./timerConstants";
+import { CIRCLE_SIZE, CIRCUMFERENCE, STROKE_WIDTH } from "./timerConstants";
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
-import CountdownModal from "./CountdownModal";
 import { SOUNDS } from "../../config/sounds";
 import { useSoundContext } from "../../contexts/SoundContext";
+import { Tag } from "../../classes/Exercise";
+import { SkipTypes } from "../../classes/SkipTypes";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const COUNTDOWN_DURATION = 3;
+const MILLIS_IN_SECOND = 1000;
 
 const Timer = ({ state, dispatch, nextExerciseTag }) => {
-  const { playSound, pauseSound } = useSoundContext();
+  // Detect when app moves to background.
+  const [appState, setAppState] = useState(AppState.currentState);
+  // Record time when app moves into background.
+  const [backgroundTime, setBackgroundTime] = useState(null);
+  // Array of timer IDs so we can cancel them after they're scheduled.
+  const [timerIDs, setTimerIDs] = useState([]);
+
+  const { playSound } = useSoundContext();
   const [isAnimationVisible, setIsAnimationVisible] = useState(true);
 
   const progress = useSharedValue(1);
   // Consider moving into state directly.
   const { title, tag } = state.intervals[state.currentIndex] || {};
+
+  // Handle background / foreground changes
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange,
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [appState]);
 
   useEffect(() => {
     if (isAnimationVisible) {
@@ -62,6 +80,19 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
     // Can use exerciseSecondsRemaining?
     const exerciseDuration = state.exerciseSecondsRemaining;
 
+    if (state.skipData === SkipTypes.SKIPPED_WITHIN) {
+      // Stop progress for moment so it can reset to new duration.
+      cancelAnimation(progress);
+      dispatch({ type: timerActions.MARK_SKIP_COMPLETE });
+    } else if (state.skipData === SkipTypes.SKIPPED_BORDER) {
+      // Need to set progress.value if we've reached a new exercise.
+      progress.value =
+        exerciseDuration / state.intervals[state.currentIndex]?.duration;
+      console.log(`state.skipData: ${state.skipData}`);
+      console.log(`progressValue: ${progress.value}`);
+      dispatch({ type: timerActions.MARK_SKIP_COMPLETE });
+    }
+
     if (exerciseDuration && state.isPlaying) {
       progress.value = withTiming(0, {
         duration: exerciseDuration * 1000,
@@ -70,7 +101,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
     } else {
       cancelAnimation(progress);
     }
-  }, [state.isPlaying]);
+  }, [state.isPlaying, state.skipData]);
 
   const animatedProps = useAnimatedProps(() => {
     const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
@@ -78,6 +109,103 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
       strokeDashoffset,
     };
   });
+
+  const handleAppStateChange = (nextAppState) => {
+    if (nextAppState === "active") {
+      handleAppToForeground();
+    } else if (nextAppState === "background") {
+      handleAppLeavingForeground();
+    }
+    setAppState(nextAppState);
+  };
+
+  const handleAppToForeground = () => {
+    console.log("App has come back to the foreground!");
+
+    const currentTime = new Date().getTime();
+
+    if (backgroundTime) {
+      const timeDifference = currentTime - backgroundTime;
+      dispatch({
+        type: timerActions.SKIP_AMOUNT,
+        payload: timeDifference / MILLIS_IN_SECOND,
+      });
+
+      // Reset the backgroundTime
+      setBackgroundTime(null);
+    }
+
+    // Clear scheduled sounds
+    if (Array.isArray(timerIDs) && timerIDs.length > 0) {
+      timerIDs.forEach((id) => {
+        BackgroundTimer.clearTimeout(id);
+        console.log(`Clearing timeout for id ${id}`);
+      });
+      setTimerIDs([]);
+    }
+
+    BackgroundTimer.stop();
+  };
+
+  const handleAppLeavingForeground = () => {
+    console.log("Preparing to move away from foreground");
+
+    dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
+
+    BackgroundTimer.start();
+
+    setBackgroundTime(new Date().getTime());
+
+    const newIDs = [];
+
+    // Schedule sounds
+    state.intervals.forEach((interval) => {
+      // Too close to schedule the sound.
+      if (interval.startTime - COUNTDOWN_DURATION < state.totalElapsedTime)
+        return;
+
+      const tag = interval.tag;
+      const id = BackgroundTimer.setTimeout(
+        () => {
+          let soundKey;
+
+          switch (tag) {
+            // Tag.PREROUTINE is impossible, as nothing can come before it.
+            case Tag.POSTROUTINE:
+            case Tag.REST:
+            case Tag.BREAK:
+              soundKey = SOUNDS.BEGIN_REST.key;
+              break;
+            case Tag.WORKING:
+              soundKey = SOUNDS.BEGIN_EXERCISE.key;
+              break;
+          }
+
+          playSound(soundKey);
+        },
+        MILLIS_IN_SECOND * (interval.startTime - state.totalElapsedTime),
+      );
+
+      console.log(
+        `Scheduling a timer with id ${id} in `,
+        interval.startTime - COUNTDOWN_DURATION - state.totalElapsedTime,
+        " seconds.",
+      );
+      newIDs.push(id);
+    });
+
+    // Schedule completion sound
+    const finalID = BackgroundTimer.setTimeout(
+      () => {
+        playSound(SOUNDS.COMPLETION.key);
+      },
+      MILLIS_IN_SECOND * (state.totalDuration - state.totalElapsedTime),
+    );
+
+    newIDs.push(finalID);
+
+    setTimerIDs(newIDs);
+  };
 
   return (
     <View style={styles.container}>
@@ -109,15 +237,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
           />
         </G>
       </Svg>
-      <CountdownModal
-        playSound={playSound}
-        isAnimationVisible={isAnimationVisible}
-        setIsAnimationVisible={setIsAnimationVisible}
-        onClose={() => {
-          dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
-        }}
-      />
-      {!isAnimationVisible ? (
+      {!state.showCountdown ? (
         <View style={styles.overlay}>
           <Text
             style={[styles.title, styleExerciseTitle(title)]}

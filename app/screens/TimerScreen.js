@@ -17,13 +17,13 @@ import { processExerciseList } from "../utilities/processExerciseList";
 import { confirmedNavigate } from "../alerts/endRoutine";
 import timerActions from "../actions/timerActions";
 import { Tag } from "../classes/Exercise";
+import { SkipTypes } from "../classes/SkipTypes";
+import CountdownModal from "../components/timer/CountdownModal";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
   const { theme } = useSettings();
   const styles = getStyles(theme);
-
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [nextExerciseTitle, nextExerciseTag] = getNextExercise(state);
@@ -35,13 +35,20 @@ function TimerScreen({ route }) {
 
   useEffect(() => {
     if (state.routineComplete) {
-      setShowSuccess(true);
+      dispatch({ type: timerActions.CLOSE_SUCCESS_MODAL });
     }
   }, [state.routineComplete]);
 
   // Check header for length, and potentially truncate!
   return (
     <Screen>
+      <CountdownModal
+        visible={state.showCountdown}
+        onClose={() => {
+          dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
+          dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
+        }}
+      />
       <View style={styles.topContainer}>
         <Text style={styles.routineTitle}>{state.title}</Text>
         <View style={styles.backButtonContainer}>
@@ -94,11 +101,26 @@ function TimerScreen({ route }) {
       </View>
       <SuccessModal
         routineTitle={state.title}
-        visible={showSuccess}
-        setVisible={setShowSuccess}
+        visible={state.showSuccess}
+        dispatch={dispatch}
       />
     </Screen>
   );
+}
+
+function computeSkippedState(elapsedTime, intervals, oldIdx) {
+  const newIdx = intervals.findIndex(
+    (obj) => obj.startTime + obj.duration > elapsedTime,
+  );
+  return [
+    newIdx,
+    intervals[newIdx]?.currentLoop,
+    Math.round(
+      intervals[newIdx]?.duration -
+        (elapsedTime - intervals[newIdx]?.startTime),
+    ),
+    newIdx > oldIdx,
+  ];
 }
 
 function reducer(state, action) {
@@ -151,6 +173,43 @@ function reducer(state, action) {
           state.intervals[state.currentIndex - 1]?.duration,
         totalElapsedTime: state.intervals[state.currentIndex - 1]?.startTime,
       };
+    case timerActions.SKIP_AMOUNT:
+      console.log(
+        `App was outside the foreground for ${action.payload} milliseconds`,
+      );
+
+      // Check if amount to skip is greater than remaining amount of time.
+      // If so, end the routine.
+      const totalTimeLeft = state.totalDuration - state.totalElapsedTime;
+      console.log(
+        `totalDuration: ${state.totalDuration}, totalTimeLeft: ${totalTimeLeft}`,
+      );
+
+      if (action.payload > totalTimeLeft) {
+        return { ...state, routineComplete: true };
+      }
+
+      // If we've reached here, then there is still time
+      // remaining in the routine. Set totalElapsedTime,
+      // exerciseSecondsRemaining, figure out where along
+      // the exercises we need to be, and ensure that the
+      // ring timer is set appropriately.
+      const [newIdx, loop, remainingTime, skippedBorder] = computeSkippedState(
+        state.totalElapsedTime + action.payload,
+        state.intervals,
+        state.currentIndex,
+      );
+
+      return {
+        ...state,
+        totalElapsedTime: state.totalElapsedTime + action.payload,
+        exerciseSecondsRemaining: remainingTime,
+        currentIndex: newIdx,
+        currentLoop: loop,
+        skipData: skippedBorder
+          ? SkipTypes.SKIPPED_BORDER
+          : SkipTypes.SKIPPED_WITHIN,
+      };
     case timerActions.ELAPSE:
       return {
         ...state,
@@ -174,17 +233,33 @@ function reducer(state, action) {
         ...state,
         shouldResetTimer: false,
       };
+    case timerActions.MARK_SKIP_COMPLETE:
+      return {
+        ...state,
+        skipped: false,
+      };
+    case timerActions.MARK_COUNTDOWN_COMPLETE:
+      return {
+        ...state,
+        showCountdown: false,
+      };
+    case timerActions.CLOSE_SUCCESS_MODAL:
+      return {
+        ...state,
+        showSuccess: true,
+      };
   }
 }
 
 const initTimerSequence = async ({ id, numberOfLoops }, dispatch) => {
   const exercises = await getExercisesForRoutine(id);
+  const intervals = processExerciseList(exercises, numberOfLoops);
 
   dispatch({
     type: timerActions.SET_EXERCISE_DATA,
     numberOfExercises: exercises.length - 2,
-    intervals: processExerciseList(exercises, numberOfLoops),
-    initialDuration: exercises[0]?.workTime,
+    intervals: intervals,
+    initialDuration: intervals[0]?.duration,
   });
 };
 
@@ -216,8 +291,13 @@ const initialState = {
   currentLoop: 0,
   numberOfLoops: 1,
 
+  skipped: SkipTypes.UNSKIPPED,
+
   shouldResetTimer: false,
   routineComplete: false,
+
+  showCountdown: true,
+  showSuccess: false,
 };
 
 const getStyles = (theme) =>

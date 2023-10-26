@@ -7,7 +7,9 @@ const decompress = (arr, numberOfLoops) => {
     // Handle pre-routine and post-routine specially:
     // They should have no break and no rest after.
     if (item.tag === Tag.PREROUTINE || item.tag === Tag.POSTROUTINE) {
-      return { ...item, numberOfRounds: 1, duration: item.workTime };
+      if (item.workTime)
+        return { ...item, numberOfRounds: 1, duration: item.workTime };
+      return [];
     }
 
     // Generate round objects
@@ -79,5 +81,6 @@ const augmentWithCumulativeTimes = (arr) => {
 };
 
 export const processExerciseList = (arr, numberOfLoops) => {
+  console.log(JSON.stringify(augmentWithCumulativeTimes(decompress(arr, numberOfLoops)), null, 2));
   return augmentWithCumulativeTimes(decompress(arr, numberOfLoops));
 };
