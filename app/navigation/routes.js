@@ -4,7 +4,9 @@ export default Object.freeze({
   ROUTINE_EDIT_SCREEN: "RoutineEditScreen",
   TIMER_SCREEN: "TimerScreen",
   TEMPLATE_SELECTION_SCREEN: "TemplateSelectionScreen",
-  SETTINGS_SCREEN: "Settings",
+  SETTINGS: "Settings",
+  SETTINGS_SCREEN: "SettingsScreen",
   EXERCISE_EDIT_SCREEN: "ExerciseEditScreen",
   DEBUG_SCREEN: "Debug",
+  PRIVACY_POLICY_SCREEN: "PrivacyPolicyScreen"
 });

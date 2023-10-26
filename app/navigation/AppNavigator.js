@@ -7,6 +7,7 @@ import SettingsScreen from "../screens/SettingsScreen";
 import RoutineNavigator from "./RoutineNavigator";
 import AppTabBar from "./AppTabBar";
 import DebugScreen from "../screens/DebugScreen";
+import SettingsNavigator from "./SettingsNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -19,7 +20,7 @@ function AppNavigator() {
       }}
     >
       <Tab.Screen name={routes.ROUTINES} component={RoutineNavigator} />
-      <Tab.Screen name={routes.SETTINGS_SCREEN} component={SettingsScreen} />
+      <Tab.Screen name={routes.SETTINGS} component={SettingsNavigator} />
       <Tab.Screen name={routes.DEBUG_SCREEN} component={DebugScreen} />
     </Tab.Navigator>
   );

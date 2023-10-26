@@ -10,6 +10,7 @@ import { TemplateProvider } from "../contexts/TemplateContext";
 import TimerScreen from "../screens/TimerScreen";
 import TemplateSelectionScreen from "../screens/TemplateSelectionScreen";
 import { SoundProvider } from "../contexts/SoundContext";
+import PrivacyPolicyScreen from "../screens/PrivacyPolicyScreen";
 const Stack = createStackNavigator();
 
 function RoutineNavigator() {

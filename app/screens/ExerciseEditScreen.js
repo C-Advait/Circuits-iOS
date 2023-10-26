@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
-import Navheader from "../components/NavHeader";
+import NavHeader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
 import { useSettings } from "../contexts/SettingsContext";
 import routes from "../navigation/routes";
@@ -134,8 +134,7 @@ function ExerciseEditScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <Navheader
-        style={styles.navPanel}
+      <NavHeader
         LeftComponent={
           <IconButton
             iconName={"chevron-left"}
@@ -143,6 +142,7 @@ function ExerciseEditScreen({ route }) {
             iconSize={52}
             foregroundColor={theme.blue}
             onPress={state.dirty ? confirmDiscard : goBack}
+            style={{ alignItems: 'flex-start', marginLeft: -5 }}
           />
         }
         headerText={`Edit ${state.title}`}
@@ -154,7 +154,7 @@ function ExerciseEditScreen({ route }) {
           ) : null
         }
       />
-      <ScrollView style={{ flex: 1, paddingHorizontal: 11 }}>
+      <ScrollView style={{ flex: 1 }}>
         <View style={{ marginTop: 10 }}>
           <AuxiliaryCard
             title="Name"
@@ -336,7 +336,7 @@ const reducer = (state, action) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     buttonContainer: {
-      marginHorizontal: 16,
+      // marginHorizontal: 16,
       marginTop: 12,
     },
     container: {
@@ -344,6 +344,7 @@ const getStyles = (theme) =>
       flex: 1,
       height: "100%",
       paddingTop: Constants.statusBarHeight,
+      paddingHorizontal: 15
     },
     disabled: {
       fontSize: PICKER_BUTTON_FONT_SIZE,

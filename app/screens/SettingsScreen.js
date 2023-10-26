@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   StyleSheet,
@@ -7,17 +7,22 @@ import {
   Text,
   TouchableOpacity,
   Switch,
+  Linking
 } from "react-native";
-import Header from "../components/Header";
 import Constants from "expo-constants";
-
-import { useSettings } from "../contexts/SettingsContext";
 import { Feather } from "@expo/vector-icons";
+import Rate from "react-native-rate";
+import { useNavigation } from "@react-navigation/core";
+import routes from "../navigation/routes";
+
+import Header from "../components/Header";
+import { useSettings } from "../contexts/SettingsContext";
 
 // localize 'behaviour'?
 function SettingsScreen() {
   const { theme } = useSettings();
   const styles = getStyles(theme);
+  const navigation = useNavigation();
 
   const { soundOn, updateSound } = useSettings();
 
@@ -25,11 +30,56 @@ function SettingsScreen() {
     updateSound(!soundOn);
   };
 
+  const contactSupport = () => {
+    const url = "mailto:advait.c123@gmail.com";
+    Linking.canOpenURL(url)
+      .then(supported => {
+        if (supported) {
+          console.log("support is: ", supported);
+          return Linking.openURL(url);
+        } else {
+          console.log("Unable to open email client")
+          // throw new Error("Unable to open email client");
+        }
+      })
+      .catch(error => {
+        Alert.alert("Mail Error: \n", error.message);
+      });
+  };
+
+  const rateUs = () => {
+    const options = {
+      AppleAppID: "422689480", // Gmail ID
+      // GooglePackageName:"com.mywebsite.myapp",
+      // AmazonPackageName:"com.mywebsite.myapp",
+      // OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
+      // preferredAndroidMarket: AndroidMarket.Google,
+      preferInApp: true,
+      openAppStoreIfInAppFails: true,
+      fallbackPlatformURL: "http://www.google.com",
+    }
+    Rate.rate(options, (success, errorMessage) => {
+      if (success) {
+        // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
+        Alert.alert("Rate was a success");
+      }
+      if (errorMessage) {
+        // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
+        Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
+      }
+    })
+  }
+
+  const navPrivacyPolicy = () => {
+    navigation.navigate(routes.PRIVACY_POLICY_SCREEN);
+  }
+
+
   const behaviour = [
     {
       id: 1,
       title: "Sounds",
-      onTouchablePress: toggleSound,
+      onTouchablePress: () => null,
       Component: (
         <Switch
           style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
@@ -39,22 +89,23 @@ function SettingsScreen() {
       ),
     },
   ];
-
   const support = [
     {
       id: 4,
-      title: "Contact us",
+      title: "Contact The Developers",
+      onTouchablePress: contactSupport
     },
     {
       id: 5,
-      title: "Rate us",
+      title: "Rate This App",
+      onTouchablePress: rateUs
     },
   ];
-
   const privacy = [
     {
       id: 6,
-      title: "Privacy policy",
+      title: "Privacy Policy",
+      onTouchablePress: navPrivacyPolicy
     },
   ];
 
@@ -67,8 +118,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-                Alert.alert(item.title, item.title);
-              }
+              Alert.alert(item.title, item.title);
+            }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
@@ -81,7 +132,6 @@ function SettingsScreen() {
       {!isLast ? <View style={styles.separator} /> : null}
     </React.Fragment>
   );
-
   const renderSection = (title, data) => (
     <>
       <Text style={styles.sectionTitle}>{title}</Text>
