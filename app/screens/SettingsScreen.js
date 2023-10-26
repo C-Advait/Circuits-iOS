@@ -31,14 +31,15 @@ function SettingsScreen() {
   };
 
   const contactSupport = () => {
-    const url = "mailto:advait.c123@gmail.com";
+    const url = "mailto:circuit.timer@gmail.com";
     Linking.canOpenURL(url)
       .then(supported => {
         if (supported) {
           console.log("support is: ", supported);
           return Linking.openURL(url);
         } else {
-          console.log("Unable to open email client")
+          Alert.alert("Unable to open email client");
+          // console.log("Unable to open email client")
           // throw new Error("Unable to open email client");
         }
       })
@@ -48,26 +49,25 @@ function SettingsScreen() {
   };
 
   const rateUs = () => {
-    const options = {
-      AppleAppID: "422689480", // Gmail ID
-      // GooglePackageName:"com.mywebsite.myapp",
-      // AmazonPackageName:"com.mywebsite.myapp",
-      // OtherAndroidURL:"http://www.randomappstore.com/app/47172391",
-      // preferredAndroidMarket: AndroidMarket.Google,
-      preferInApp: false,
-      openAppStoreIfInAppFails: true,
-      fallbackPlatformURL: "http://www.google.com",
-    }
-    Rate.rate(options, (success, errorMessage) => {
-      if (success) {
-        // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
-        Alert.alert("Rate was a success");
-      }
-      if (errorMessage) {
-        // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
-        Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
-      }
-    })
+
+    Alert.alert("Thank you for your feedback");
+
+    // const options = {
+    //   AppleAppID: "422689480", // Gmail ID
+    //   preferInApp: true,
+    //   openAppStoreIfInAppFails: true,
+    //   // fallbackPlatformURL: "http://www.google.com",
+    // }
+    // Rate.rate(options, (success, errorMessage) => {
+    //   if (success) {
+    //     null;
+    //   }
+    //   if (errorMessage) {
+    //     null;
+    //     // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
+    //     // Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
+    //   }
+    // })
   }
 
   const navPrivacyPolicy = () => {
