@@ -24,18 +24,22 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   const createDescription = async () => {
     const exercises = await getExercisesForRoutine(routine.id);
 
+    // console.log(JSON.stringify(exercises, null, 2));
+
     const formattedExerciseString =
       exercises
         .map((exercise) => {
           if (exercise.tag === Tag.WORKING) {
-            return `${exercise.title} (${
-              exercise.numberOfRounds
-            } x ${formatDuration(exercise.workTime)})`;
+            return `${exercise.title} (${exercise.numberOfRounds
+              } x ${formatDuration(exercise.workTime)})`;
           } else {
             // Warmup / cooldown shouldnt't display number of rounds
-            return `${exercise.title} (${formatDuration(exercise.workTime)})`;
+            if (exercise.workTime)
+              return `${exercise.title} (${formatDuration(exercise.workTime)})`;
+            return "";
           }
         })
+        .filter(Boolean)
         .join("\n") + "\n";
 
     const formattedLoopString =

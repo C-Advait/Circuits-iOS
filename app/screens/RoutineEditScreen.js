@@ -33,7 +33,6 @@ import {
 } from "../config/appConstants";
 import AppTextButton from "../components/buttons/AppTextButton";
 import NavHeader from "../components/NavHeader";
-import { useTemplateContext } from "../contexts/TemplateContext";
 import formatExerciseInfo from "../utilities/formatExerciseInfo";
 import { useRoutineContext } from "../contexts/RoutineContext";
 import { BlurView } from "expo-blur";
@@ -94,12 +93,6 @@ function RoutineEditScreen({ route }) {
   // Setup Functionality
   const navigation = useNavigation();
   const { edit: isRoutineEditing } = route.params;
-  // const {
-  //   selectedTemplate,
-  //   selectedTemplateID,
-  //   setSelectedTemplateID,
-  //   setSelectedTemplate,
-  // } = useTemplateContext();
   const {
     contextExercises: exercises,
     contextRoutine: routine,
@@ -126,6 +119,8 @@ function RoutineEditScreen({ route }) {
         const [workTime, numExercises, maxExerciseOrder] =
           getExerciseInfo(exercises);
 
+        const isValidRoutine = ((workTime + warmup.workTime + cooldown.workTime) > 0);
+
         dispatch({
           type: routineEditActions.INIT,
           payload: {
@@ -137,6 +132,7 @@ function RoutineEditScreen({ route }) {
             maxExerciseOrder: maxExerciseOrder,
             routine: routine,
             numberOfLoops: routine.numberOfLoops,
+            isValidRoutine: isValidRoutine,
           },
         });
       } else {
@@ -148,12 +144,6 @@ function RoutineEditScreen({ route }) {
       };
     }, [exercises]), // Depend on exercises so the callback updates if exercises change
   );
-
-  // useEffect(() => {
-  //   console.log(
-  //     `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
-  //   );
-  // }, [selectedTemplate]);
 
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
@@ -367,12 +357,14 @@ function RoutineEditScreen({ route }) {
             }
             headerText={isRoutineEditing ? "Edit Routine" : "New Routine"}
             RightComponent={
-              <AppTextButton
-                onPress={() => handleSavePress()}
-                textStyle={{ fontWeight: "500" }}
-              >
-                {isRoutineEditing ? "Save" : "Create"}
-              </AppTextButton>
+              state.isValidRoutine ? (
+                <AppTextButton
+                  onPress={() => handleSavePress()}
+                  textStyle={{ fontWeight: "500" }}
+                >
+                  {isRoutineEditing ? "Save" : "Create"}
+                </AppTextButton>
+              ) : null
             }
           />
           <View style={styles.headingPanel}>
@@ -503,7 +495,11 @@ function RoutineEditScreen({ route }) {
           enablePanDownToClose={true}
           enableContentPanningGesture={false}
           backdropComponent={BottomSheetBackdrop}
-          backgroundStyle={{ backgroundColor: theme.tertiaryBackground }}
+          backgroundStyle={{
+            backgroundColor: theme.tertiaryBackground,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20
+          }}
           handleComponent={() => (
             <BottomSheetHandle title={modalContent.title} />
           )}
@@ -519,6 +515,7 @@ function RoutineEditScreen({ route }) {
                   payload: data,
                 })
               }
+              increment5Seconds={true}
             />
           )}
           {modalContent.key === ROUTINE_EDIT_MODAL.COOLDOWN.key && (
@@ -531,6 +528,7 @@ function RoutineEditScreen({ route }) {
                   payload: data,
                 })
               }
+              increment5Seconds={true}
             />
           )}
           {modalContent.key === ROUTINE_EDIT_MODAL.LOOPS.key && (
@@ -619,6 +617,7 @@ const initialState = {
   maxExerciseOrder: 0,
   exerciseBeingDragged: false,
   routine: new Routine({}),
+  isValidRoutine: false
 };
 
 const reducer = (state, action) => {
@@ -639,12 +638,14 @@ const reducer = (state, action) => {
       return {
         ...state,
         warmup: { ...state.warmup, workTime: action.payload },
+        isValidRoutine: ((action.payload + state.workTime + state.cooldown.workTime) > 0)
       };
 
     case routineEditActions.SET_COOLDOWN:
       return {
         ...state,
         cooldown: { ...state.cooldown, workTime: action.payload },
+        isValidRoutine: ((state.warmup.workTime + state.workTime + action.payload) > 0),
       };
 
     case routineEditActions.SET_LOOPS:
@@ -661,7 +662,11 @@ const reducer = (state, action) => {
       return { ...state, exerciseBeingDragged: action.payload };
 
     case routineEditActions.SET_WORKING_SET:
-      return { ...state, workingSet: action.payload };
+      return {
+        ...state,
+        workingSet: action.payload,
+        isValidRoutine: ((state.warmup.workTime + state.workTime + state.cooldown.workTime) > 0)
+      };
 
     case routineEditActions.UPDATE_ROUTINE_TITLE:
       return { ...state, routine: { ...state.routine, title: action.payload } };
@@ -670,7 +675,12 @@ const reducer = (state, action) => {
 
       const [newWorkingSet, removedTime] = action.payload;
       const newWorkTime = state.workTime - removedTime;
-      return { ...state, workingSet: newWorkingSet, workTime: newWorkTime };
+      return {
+        ...state,
+        workingSet: newWorkingSet,
+        workTime: newWorkTime,
+        isValidRoutine: ((state.warmup.workTime + newWorkTime + state.cooldown.workTime) > 0)
+      };
 
     default:
       console.log("Invalid action.type detected in RoutineEditScreen reducer.");

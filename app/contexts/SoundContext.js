@@ -48,14 +48,17 @@ export const SoundProvider = ({ children }) => {
   }, []);
 
   const playSound = async (key) => {
+    console.log("Inside playSound");
     if (isPlaying) return;
 
     if (sounds[key] && soundOn) {
+      console.log(`About to play sound for key ${key}`);
       try {
         setIsPlaying(true);
         await sounds[key].playAsync();
         sounds[key].setOnPlaybackStatusUpdate(async (status) => {
           if (status.didJustFinish) {
+            console.log(`Just played sound for key ${key}`);
             setIsPlaying(false);
             await sounds[key].setPositionAsync(0);
           }

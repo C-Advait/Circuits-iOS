@@ -22,6 +22,7 @@ import { Routine } from "../classes/Routine";
 
 const resetDB = async () => {
   dropTable("Exercise")
+    .then(dropTable("Routine"))
     .then(dropTable("Setting"))
     .then(initTables())
     .then(Alert.alert("All tables dropped and recreated!"));
@@ -29,10 +30,7 @@ const resetDB = async () => {
 
 const dumpDB = async () => {
   const settings = await getSettings();
-  console.log(
-    "All settings",
-    JSON.stringify(settings, null, 2),
-  );
+  console.log("All settings", JSON.stringify(settings, null, 2));
 };
 
 const createDummyRoutine = async () => {
@@ -301,10 +299,7 @@ function DebugScreen() {
         title="Create dummy exercises"
         onPress={() => createDummyExercises()}
       />
-      <Button
-        title="Dump settings"
-        onPress={() => dumpDB()}
-      />
+      <Button title="Dump settings" onPress={() => dumpDB()} />
       <Button title="Reset DB" onPress={() => resetDB()} />
     </Screen>
   );

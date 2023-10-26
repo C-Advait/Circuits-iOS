@@ -16,7 +16,7 @@ const MINIMUM_SECONDS = 5;
 // is only ever consumed by components wrapped
 // in <Portal>. <Portal> is known to not work
 // with context.
-const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
+const TimeWheelPicker = ({ startingTime = 60, onValueChange, increment5Seconds = false }) => {
   const { theme } = useSettings();
   const styles = getStyles(theme);
 
@@ -27,7 +27,8 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
   );
   const [selectedSecond, setSelectedSecond] = useState(startingTime % 60);
   const [filteredSeconds, setFilteredSeconds] = useState(
-    startingTime >= 60 ? items : items.slice(5),
+    increment5Seconds ? items.filter(value => value % 5 === 0) :
+      startingTime >= 60 ? items : items.slice(5),
   );
   const key = filteredSeconds.length;
 
@@ -43,7 +44,7 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
             onValueChange(itemValue * 60 + selectedSecond);
             setSelectedMinute(itemValue);
 
-            if (itemValue === 0) {
+            if (itemValue === 0 && !increment5Seconds) { // Min 5s requirement if incrementFiveSeconds === false
               setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
 
               if (selectedSecond < MINIMUM_SECONDS) {
@@ -51,8 +52,6 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange }) => {
                 setSelectedSecond(MINIMUM_SECONDS);
                 onValueChange(itemValue * 60 + MINIMUM_SECONDS);
               }
-            } else {
-              setFilteredSeconds(items); // reset to the full range
             }
           }}
           color={theme.primary}

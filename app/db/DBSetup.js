@@ -49,13 +49,13 @@ export const initTables = async () => {
       `INSERT OR IGNORE INTO Setting
       (id, key, value)
       VALUES ( ?, ?, ? );`,
-      [1, SETTINGS_KEYS.SOUND, 'true'],
+      [1, SETTINGS_KEYS.SOUND, "true"],
       (_tx, resultSet) => {
         return;
       },
       (error) => {
-        console.error("Error setting defaults in `Setting` table.", error)
-      }
+        console.error("Error setting defaults in `Setting` table.", error);
+      },
     );
 
     tx.executeSql(

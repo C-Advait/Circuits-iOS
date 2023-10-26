@@ -37,9 +37,7 @@ export const getSettings = () => {
         "SELECT * FROM Setting",
         [],
         (_tx: any, results: any) => {
-          resolve(
-            results.rows.raw()
-          );
+          resolve(results.rows.raw());
         },
         (error: any) => {
           console.log(`Couldn't retrieve all userSettings.`);
@@ -48,7 +46,7 @@ export const getSettings = () => {
       );
     });
   });
-}
+};
 
 const updateSetting = (key: String, value: String) => {
   const db = getDBInstance();

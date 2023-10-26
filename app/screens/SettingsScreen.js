@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Switch,
-  Linking
+  Linking,
 } from "react-native";
 import Constants from "expo-constants";
 import { Feather } from "@expo/vector-icons";
@@ -33,16 +33,16 @@ function SettingsScreen() {
   const contactSupport = () => {
     const url = "mailto:advait.c123@gmail.com";
     Linking.canOpenURL(url)
-      .then(supported => {
+      .then((supported) => {
         if (supported) {
           console.log("support is: ", supported);
           return Linking.openURL(url);
         } else {
-          console.log("Unable to open email client")
+          console.log("Unable to open email client");
           // throw new Error("Unable to open email client");
         }
       })
-      .catch(error => {
+      .catch((error) => {
         Alert.alert("Mail Error: \n", error.message);
       });
   };
@@ -57,7 +57,7 @@ function SettingsScreen() {
       preferInApp: false,
       openAppStoreIfInAppFails: true,
       fallbackPlatformURL: "http://www.google.com",
-    }
+    };
     Rate.rate(options, (success, errorMessage) => {
       if (success) {
         // this technically only tells us if the user successfully went to the Review Page. Whether they actually did anything, we do not know.
@@ -65,15 +65,14 @@ function SettingsScreen() {
       }
       if (errorMessage) {
         // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
-        Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
+        Alert.alert(`Example page Rate.rate() error: ${errorMessage}`);
       }
-    })
-  }
+    });
+  };
 
   const navPrivacyPolicy = () => {
     navigation.navigate(routes.PRIVACY_POLICY_SCREEN);
-  }
-
+  };
 
   const behaviour = [
     {
@@ -93,19 +92,19 @@ function SettingsScreen() {
     {
       id: 4,
       title: "Contact The Developers",
-      onTouchablePress: contactSupport
+      onTouchablePress: contactSupport,
     },
     {
       id: 5,
       title: "Rate This App",
-      onTouchablePress: rateUs
+      onTouchablePress: rateUs,
     },
   ];
   const privacy = [
     {
       id: 6,
       title: "Privacy Policy",
-      onTouchablePress: navPrivacyPolicy
+      onTouchablePress: navPrivacyPolicy,
     },
   ];
 
@@ -118,8 +117,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-              Alert.alert(item.title, item.title);
-            }
+                Alert.alert(item.title, item.title);
+              }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
