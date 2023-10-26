@@ -21,7 +21,7 @@ function AppNavigator() {
     >
       <Tab.Screen name={routes.ROUTINES} component={RoutineNavigator} />
       <Tab.Screen name={routes.SETTINGS} component={SettingsNavigator} />
-      <Tab.Screen name={routes.DEBUG_SCREEN} component={DebugScreen} />
+      {/* <Tab.Screen name={routes.DEBUG_SCREEN} component={DebugScreen} /> */}
     </Tab.Navigator>
   );
 }
