@@ -163,13 +163,15 @@ function ExerciseEditScreen({ route }) {
             <EditableText
               ref={nameFieldRef}
               original={state.title}
-              placeholder="Exercise Name"
+              originalPlaceholder="Exercise Name"
               onSubmit={(text) => {
                 dispatch({
                   type: exerciseEditActions.SET_TITLE,
                   payload: text,
                 });
               }}
+              rightFlush={true}
+              maxLength={24}
             />
           </AuxiliaryCard>
         </View>

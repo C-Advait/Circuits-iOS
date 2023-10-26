@@ -60,6 +60,7 @@ import {
   NestableScrollContainer,
 } from "react-native-draggable-flatlist";
 import { Routine } from "../classes/Routine";
+import EditableText from "../components/EditableText";
 
 const MODAL_HEIGHT = 350;
 
@@ -93,12 +94,12 @@ function RoutineEditScreen({ route }) {
   // Setup Functionality
   const navigation = useNavigation();
   const { edit: isRoutineEditing } = route.params;
-  const {
-    selectedTemplate,
-    selectedTemplateID,
-    setSelectedTemplateID,
-    setSelectedTemplate,
-  } = useTemplateContext();
+  // const {
+  //   selectedTemplate,
+  //   selectedTemplateID,
+  //   setSelectedTemplateID,
+  //   setSelectedTemplate,
+  // } = useTemplateContext();
   const {
     contextExercises: exercises,
     contextRoutine: routine,
@@ -109,6 +110,7 @@ function RoutineEditScreen({ route }) {
   const styles = getStyles(theme);
 
   const modalRef = useRef(null);
+  const routineTitleRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
   const [exerciseIDsToDelete, setExerciseIDsToDelete] = useState([]);
@@ -147,11 +149,11 @@ function RoutineEditScreen({ route }) {
     }, [exercises]), // Depend on exercises so the callback updates if exercises change
   );
 
-  useEffect(() => {
-    console.log(
-      `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
-    );
-  }, [selectedTemplate]);
+  // useEffect(() => {
+  //   console.log(
+  //     `New template selected: ${selectedTemplate} id: ${selectedTemplateID}`,
+  //   );
+  // }, [selectedTemplate]);
 
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
@@ -374,20 +376,21 @@ function RoutineEditScreen({ route }) {
             }
           />
           <View style={styles.headingPanel}>
-            <TextInput
-              style={styles.title}
-              onChangeText={updateRoutineTitle}
-              multiline={false}
-              keyboardType="default"
-              onpre
-              placeholder={routine ? routine.title : "Loading"}
-              placeholderTextColor={styles.title.color}
-              spellCheck={false}
-              enterKeyHint="done"
-              onSubmitEditing={(item) => {
-                updateRoutineTitle(item.nativeEvent.text);
-              }}
-            />
+            <TouchableOpacity
+              style={{ width: '100%' }}
+              onPress={() => routineTitleRef.current.activate()}
+            >
+              <EditableText
+                ref={routineTitleRef}
+                original={state.routine.title}
+                originalPlaceholder={state.routine.title}
+                onSubmit={(text) => updateRoutineTitle(text)}
+                rightFlush={false}
+                maxLength={28}
+                overwriteStyle={styles.title}
+                size="large"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         <NestableScrollContainer contentContainerStyle={styles.scrollContainer}>
