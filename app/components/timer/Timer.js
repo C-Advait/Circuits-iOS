@@ -120,8 +120,6 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
   };
 
   const handleAppToForeground = () => {
-    console.log("App has come back to the foreground!");
-
     const currentTime = new Date().getTime();
 
     if (backgroundTime) {
@@ -139,7 +137,6 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
     if (Array.isArray(timerIDs) && timerIDs.length > 0) {
       timerIDs.forEach((id) => {
         BackgroundTimer.clearTimeout(id);
-        console.log(`Clearing timeout for id ${id}`);
       });
       setTimerIDs([]);
     }
@@ -148,9 +145,10 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
   };
 
   const handleAppLeavingForeground = () => {
-    console.log("Preparing to move away from foreground");
-
     dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
+
+    // Don't schedule sounds if timer's paused.
+    if (!state.isPlaying) return;
 
     BackgroundTimer.start();
 
@@ -184,12 +182,6 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
           playSound(soundKey);
         },
         MILLIS_IN_SECOND * (interval.startTime - state.totalElapsedTime),
-      );
-
-      console.log(
-        `Scheduling a timer with id ${id} in `,
-        interval.startTime - COUNTDOWN_DURATION - state.totalElapsedTime,
-        " seconds.",
       );
       newIDs.push(id);
     });
