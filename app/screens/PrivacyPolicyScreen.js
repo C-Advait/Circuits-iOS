@@ -37,12 +37,12 @@ const PrivacyPolicyScreen = () => {
 
                 <Text style={styles.sectionTitle}>1. Introduction</Text>
                 <Text style={styles.text}>
-                    At [Your App Name], we prioritize your privacy. This policy explains our practices concerning the personal data we collect from you or about you on this app or via our services.
+                    At Circuits, we prioritize your privacy. This policy explains our practices concerning the personal data we collect from you or about you on this app or via our services.
                 </Text>
 
                 <Text style={styles.sectionTitle}>2. No Data Collection</Text>
                 <Text style={styles.text}>
-                    [Your App Name] does not collect or store any personal or non-personal data from its users. We do not require any form of registration, login or user input to provide our services.
+                    Circuits does not collect or store any personal or non-personal data from its users. We do not require any form of registration, login or user input to provide our services.
                 </Text>
 
                 <Text style={styles.sectionTitle}>3. No Internet Connection Required</Text>
@@ -62,7 +62,7 @@ const PrivacyPolicyScreen = () => {
 
                 <Text style={styles.sectionTitle}>6. Contact Us</Text>
                 <Text style={styles.text}>
-                    If you have any questions regarding this privacy policy, you can contact us at: advait.c123@gmail.com
+                    If you have any questions regarding this privacy policy, you can contact us at: circuit.timer@gmail.com
                 </Text>
             </ScrollView>
         </Screen>
