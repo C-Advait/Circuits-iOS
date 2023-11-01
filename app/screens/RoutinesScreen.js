@@ -1,12 +1,5 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useContext,
-} from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, FlatList } from "react-native";
-import Constants from "expo-constants";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
@@ -16,44 +9,31 @@ import { View } from "react-native";
 import {
   DEFAULT_COOLDOWN,
   DEFAULT_WARMUP,
-  DEFAULT_EXERCISE,
   DEFAULT_ROUTINE,
   TAB_BAR_HEIGHT,
 } from "../config/appConstants";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
-import LabelledIconButton from "../components/buttons/LabelledIconButton";
 import routes from "../navigation/routes";
 import { getAllUserCreatedRoutines, getNewRoutineID } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import { useRoutineContext } from "../contexts/RoutineContext";
-import SortModal from "../components/SortModal";
-import { SortCriteria } from "../classes/SortCriteria";
-import { naturalCompare } from "../utilities/naturalCompare";
-import { useTemplateContext } from "../contexts/TemplateContext";
 import Screen from "../components/Screen";
-import { routineAccentColors } from '../config/colors';
+import { routineAccentColors } from "../config/colors";
 
 function RoutinesScreen() {
   const navigation = useNavigation();
   const { theme } = useSettings();
   const styles = getStyles(theme);
 
-  const sortModalRef = useRef(null);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { sortOption, setSortOption } = useTemplateContext();
-
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
 
   const loadRoutines = async () => {
     const routines = await getAllUserCreatedRoutines();
-    const sortedRoutines = [...routines].sort((x, y) =>
-      naturalCompare(x, y, sortOption),
-    );
-    setRoutines(sortedRoutines);
+    setRoutines(routines);
   };
 
   useFocusEffect(
@@ -61,14 +41,6 @@ function RoutinesScreen() {
       loadRoutines();
     }, [routines]),
   );
-
-  useEffect(() => {
-    if (!routines) return;
-    const sortedRoutines = [...routines].sort((x, y) =>
-      naturalCompare(x, y, sortOption),
-    );
-    setRoutines(sortedRoutines);
-  }, [sortOption]);
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -110,13 +82,14 @@ function RoutinesScreen() {
       const routineID = await getNewRoutineID();
 
       const accentColorsArray = Object.values(routineAccentColors);
-      const randomAccentColor = accentColorsArray[Math.floor(Math.random() * accentColorsArray.length)];
+      const randomAccentColor =
+        accentColorsArray[Math.floor(Math.random() * accentColorsArray.length)];
 
       const routine = new Routine({
         ...DEFAULT_ROUTINE,
         id: routineID,
         title: `My Routine #${routineID}`,
-        color: randomAccentColor
+        color: randomAccentColor,
       });
 
       const warmup = new Exercise({
@@ -154,16 +127,6 @@ function RoutinesScreen() {
         />
       </View>
       <View style={styles.middlePanel}>
-        <LabelledIconButton
-          iconName="sort-ascending"
-          IconFamily={MaterialCommunityIcons}
-          foregroundColor={theme.text87}
-          title={sortOption}
-          onPress={() => {
-            setIsSheetOpen(true);
-            sortModalRef.current?.expand();
-          }}
-        />
         <IconButton
           iconName={
             expandedCount === routines.length ? "minimize-2" : "maximize-2"
@@ -197,11 +160,6 @@ function RoutinesScreen() {
         ListFooterComponent={() => <View style={{ height: TAB_BAR_HEIGHT }} />}
         ListEmptyComponent={EmptyRoutinesListComponent}
       />
-      <SortModal
-        isSheetOpen={isSheetOpen}
-        setIsSheetOpen={setIsSheetOpen}
-        ref={sortModalRef}
-      />
     </Screen>
   );
 }
@@ -223,7 +181,7 @@ const getStyles = (theme) =>
       marginLeft: 16,
       marginBottom: 12,
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "flex-end",
       alignItems: "center",
     },
   });
