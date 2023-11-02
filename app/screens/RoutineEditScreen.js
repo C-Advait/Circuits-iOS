@@ -314,19 +314,26 @@ function RoutineEditScreen({ route }) {
       duration: finalTime, // or however you need to structure the updated routine object
     });
     // Make backend call
-    let newRoutineID;
     if (isRoutineEditing) {
-      newRoutineID = await updateRoutine(updatedRoutine);
+      await updateRoutine(updatedRoutine);
     } else {
+      let newRoutineID;
       newRoutineID = await createRoutine(updatedRoutine);
     }
 
     // Save exercises to backend
-    finalExercises.forEach((exercise, index) => {
+    if (isRoutineEditing) {
       // Update exerciseOrder + routineID to correct data
-      exercise.exerciseOrder = index;
-      exercise.routineID = newRoutineID;
-    });
+      finalExercises.forEach((exercise, index) => {
+        exercise.exerciseOrder = index;
+      });
+    } else {
+      finalExercises.forEach((exercise, index) => {
+        // Update exerciseOrder + routineID to correct data
+        exercise.exerciseOrder = index;
+        exercise.routineID = newRoutineID;
+      });
+    }
 
     finalExercises.forEach((exercise) => {
       // Call backened to create/modify each exercise
