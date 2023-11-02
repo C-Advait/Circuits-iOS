@@ -79,7 +79,6 @@ function RoutinesScreen() {
 
   const handleNewRoutineOnpress = async () => {
     try {
-      const routineID = await getNewRoutineID();
 
       const accentColorsArray = Object.values(routineAccentColors);
       const randomAccentColor =
@@ -87,21 +86,19 @@ function RoutinesScreen() {
 
       const routine = new Routine({
         ...DEFAULT_ROUTINE,
-        id: routineID,
-        title: `My Routine #${routineID}`,
+        title: `New Routine`,
         color: randomAccentColor,
       });
 
       const warmup = new Exercise({
         ...DEFAULT_WARMUP,
-        routineID: routineID,
         exerciseOrder: 0,
       });
       const cooldown = new Exercise({
         ...DEFAULT_COOLDOWN,
-        routineID: routineID,
         exerciseOrder: 1,
       });
+
       const exercises = [warmup, cooldown];
 
       // Set the context variables for ROUTINE_EDIT_SCREEN
