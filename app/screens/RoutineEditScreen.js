@@ -291,11 +291,11 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleSavePress = async () => {
+
+    // Prepare exercises to be created in backend
     const finalExercises = [state.warmup, ...state.workingSet, state.cooldown];
-    finalExercises.forEach((exercise, index) => {
-      // Update ExerciseOrder of all exercises before saving
-      exercise.exerciseOrder = index;
-    });
+
+    // Calculate total time of routine
     const finalTime = finalExercises.reduce((sum, exercise, idx) => {
       let exerciseLength = getExerciseLength(exercise);
 
@@ -307,22 +307,32 @@ function RoutineEditScreen({ route }) {
       return sum + exerciseLength;
     }, 0);
 
+    // Create new Routines in backend
     const updatedRoutine = new Routine({
+      // New Routine Object to save
       ...state.routine,
       duration: finalTime, // or however you need to structure the updated routine object
     });
-
+    // Make backend call
+    let newRoutineID;
     if (isRoutineEditing) {
-      await updateRoutine(updatedRoutine);
+      newRoutineID = await updateRoutine(updatedRoutine);
     } else {
-      await createRoutine(updatedRoutine);
+      newRoutineID = await createRoutine(updatedRoutine);
     }
 
-    // Update the exercises
+    // Save exercises to backend
+    finalExercises.forEach((exercise, index) => {
+      // Update exerciseOrder + routineID to correct data
+      exercise.exerciseOrder = index;
+      exercise.routineID = newRoutineID;
+    });
+
     finalExercises.forEach((exercise) => {
+      // Call backened to create/modify each exercise
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
     });
-    console.log(isRoutineEditing ? "Routine Updated" : " Routine Created");
+
 
     // Delete removed exercises
     exerciseIDsToDelete.forEach((id) => {
