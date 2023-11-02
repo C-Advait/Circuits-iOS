@@ -91,7 +91,6 @@ const getExerciseInfo = (exercises) => {
   return [workTime, numExercises, greatestExerciseOrder];
 };
 function RoutineEditScreen({ route }) {
-
   // Region context + High-level setup
   const navigation = useNavigation();
   const { edit: isRoutineEditing } = route.params;
@@ -125,7 +124,8 @@ function RoutineEditScreen({ route }) {
         const [workTime, numExercises, maxExerciseOrder] =
           getExerciseInfo(exercises);
 
-        const isValidRoutine = ((workTime + warmup.workTime + cooldown.workTime) > 0);
+        const isValidRoutine =
+          workTime + warmup.workTime + cooldown.workTime > 0;
 
         dispatch({
           type: routineEditActions.INIT,
@@ -152,13 +152,13 @@ function RoutineEditScreen({ route }) {
   );
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      () => setKeyboardActive(true)
+      "keyboardWillShow",
+      () => setKeyboardActive(true),
     );
 
     const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      () => setKeyboardActive(false)
+      "keyboardWillHide",
+      () => setKeyboardActive(false),
     );
 
     return () => {
@@ -166,7 +166,6 @@ function RoutineEditScreen({ route }) {
       keyboardDidHideListener.remove();
     };
   }, []);
-
 
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
@@ -287,10 +286,8 @@ function RoutineEditScreen({ route }) {
 
     dispatch({
       type: routineEditActions.DELETE_EXERCISE,
-      payload: [newData, reducedExerciseLength]
+      payload: [newData, reducedExerciseLength],
     });
-
-
   };
 
   const handleSavePress = async () => {
@@ -385,7 +382,7 @@ function RoutineEditScreen({ route }) {
               state.isValidRoutine ? (
                 <AppTextButton
                   onPress={() => handleSavePress()}
-                  textStyle={{ fontWeight: "500" }}
+                  textStyle={{ fontWeight: "400" }}
                 >
                   {isRoutineEditing ? "Save" : "Create"}
                 </AppTextButton>
@@ -394,7 +391,7 @@ function RoutineEditScreen({ route }) {
           />
           <View style={styles.headingPanel}>
             <TouchableOpacity
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               onPress={() => routineTitleRef.current.activate()}
             >
               <EditableText
@@ -522,7 +519,7 @@ function RoutineEditScreen({ route }) {
           backgroundStyle={{
             backgroundColor: theme.tertiaryBackground,
             borderTopLeftRadius: 20,
-            borderTopRightRadius: 20
+            borderTopRightRadius: 20,
           }}
           handleComponent={() => (
             <BottomSheetHandle title={modalContent.title} />
@@ -603,8 +600,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-              state.cooldown.workTime +
-              state.numberOfLoops * state.workTime,
+                state.cooldown.workTime +
+                state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
@@ -641,7 +638,7 @@ const initialState = {
   maxExerciseOrder: 0,
   exerciseBeingDragged: false,
   routine: new Routine({}),
-  isValidRoutine: false
+  isValidRoutine: false,
 };
 
 const reducer = (state, action) => {
@@ -662,14 +659,16 @@ const reducer = (state, action) => {
       return {
         ...state,
         warmup: { ...state.warmup, workTime: action.payload },
-        isValidRoutine: ((action.payload + state.workTime + state.cooldown.workTime) > 0)
+        isValidRoutine:
+          action.payload + state.workTime + state.cooldown.workTime > 0,
       };
 
     case routineEditActions.SET_COOLDOWN:
       return {
         ...state,
         cooldown: { ...state.cooldown, workTime: action.payload },
-        isValidRoutine: ((state.warmup.workTime + state.workTime + action.payload) > 0),
+        isValidRoutine:
+          state.warmup.workTime + state.workTime + action.payload > 0,
       };
 
     case routineEditActions.SET_LOOPS:
@@ -689,21 +688,22 @@ const reducer = (state, action) => {
       return {
         ...state,
         workingSet: action.payload,
-        isValidRoutine: ((state.warmup.workTime + state.workTime + state.cooldown.workTime) > 0)
+        isValidRoutine:
+          state.warmup.workTime + state.workTime + state.cooldown.workTime > 0,
       };
 
     case routineEditActions.UPDATE_ROUTINE_TITLE:
       return { ...state, routine: { ...state.routine, title: action.payload } };
 
     case routineEditActions.DELETE_EXERCISE:
-
       const [newWorkingSet, removedTime] = action.payload;
       const newWorkTime = state.workTime - removedTime;
       return {
         ...state,
         workingSet: newWorkingSet,
         workTime: newWorkTime,
-        isValidRoutine: ((state.warmup.workTime + newWorkTime + state.cooldown.workTime) > 0)
+        isValidRoutine:
+          state.warmup.workTime + newWorkTime + state.cooldown.workTime > 0,
       };
 
     default:
@@ -717,13 +717,13 @@ const getStyles = (theme) =>
       backgroundColor: "rgba(28,28,30,0.8)",
     },
     backdrop: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',  // Semi-transparent backdrop
-      zIndex: 1,  // Ensures the backdrop is above other UI elements but below the keyboard
+      backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent backdrop
+      zIndex: 1, // Ensures the backdrop is above other UI elements but below the keyboard
     },
     buttonContainer: {
       marginHorizontal: 16,

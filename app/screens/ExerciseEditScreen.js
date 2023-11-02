@@ -6,7 +6,7 @@ import {
   Text,
   Button,
   ScrollView,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
@@ -62,13 +62,13 @@ function ExerciseEditScreen({ route }) {
   }, []);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      () => setKeyboardActive(true)
+      "keyboardWillShow",
+      () => setKeyboardActive(true),
     );
 
     const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardWillHide',
-      () => setKeyboardActive(false)
+      "keyboardWillHide",
+      () => setKeyboardActive(false),
     );
 
     return () => {
@@ -76,7 +76,6 @@ function ExerciseEditScreen({ route }) {
       keyboardDidHideListener.remove();
     };
   }, []);
-
 
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
@@ -97,16 +96,16 @@ function ExerciseEditScreen({ route }) {
         onPress={
           enabled
             ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              Keyboard.dismiss();
-              modalRef.current?.expand();
-            }
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+                Keyboard.dismiss();
+                modalRef.current?.expand();
+              }
             : () => null
         }
       >
@@ -167,13 +166,13 @@ function ExerciseEditScreen({ route }) {
               iconSize={52}
               foregroundColor={theme.blue}
               onPress={state.dirty ? confirmDiscard : goBack}
-              style={{ alignItems: 'flex-start', marginLeft: -5 }}
+              style={{ alignItems: "flex-start", marginLeft: -5 }}
             />
           }
           headerText={`Edit ${state.title}`}
           RightComponent={
             state.dirty || !isExerciseEditing ? (
-              <AppTextButton onPress={onSave} textStyle={{ fontWeight: 300 }}>
+              <AppTextButton onPress={onSave} textStyle={{ fontWeight: "400" }}>
                 {isExerciseEditing ? "Save" : "Create"}
               </AppTextButton>
             ) : null
@@ -367,13 +366,13 @@ const reducer = (state, action) => {
 const getStyles = (theme) =>
   StyleSheet.create({
     backdrop: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',  // Semi-transparent backdrop
-      zIndex: 1,  // Ensures the backdrop is above other UI elements but below the keyboard
+      backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent backdrop
+      zIndex: 1, // Ensures the backdrop is above other UI elements but below the keyboard
     },
     buttonContainer: {
       marginHorizontal: 16,
@@ -383,7 +382,7 @@ const getStyles = (theme) =>
       backgroundColor: theme.background,
       flex: 1,
       height: "100%",
-      paddingHorizontal: 15
+      paddingHorizontal: 15,
     },
     disabled: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
