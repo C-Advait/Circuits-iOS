@@ -52,6 +52,8 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange, increment5Seconds =
                 setSelectedSecond(MINIMUM_SECONDS);
                 onValueChange(itemValue * 60 + MINIMUM_SECONDS);
               }
+            } else {
+              increment5Seconds ? setFilteredSeconds(items.filter(value => value % 5 === 0)) : setFilteredSeconds(items) // reset to the full range
             }
           }}
           color={theme.primary}
