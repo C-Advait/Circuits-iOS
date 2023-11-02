@@ -98,7 +98,7 @@ function RoutinesScreen() {
         ...DEFAULT_COOLDOWN,
         exerciseOrder: 1,
       });
-      console.log("New Warmup is: \n", JSON.stringify(warmup, null, 2));
+
       const exercises = [warmup, cooldown];
 
       // Set the context variables for ROUTINE_EDIT_SCREEN

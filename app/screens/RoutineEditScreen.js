@@ -314,10 +314,10 @@ function RoutineEditScreen({ route }) {
       duration: finalTime, // or however you need to structure the updated routine object
     });
     // Make backend call
+    let newRoutineID;
     if (isRoutineEditing) {
       await updateRoutine(updatedRoutine);
     } else {
-      let newRoutineID;
       newRoutineID = await createRoutine(updatedRoutine);
     }
 
