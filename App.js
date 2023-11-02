@@ -8,6 +8,7 @@ import { SettingsProvider } from "./app/contexts/SettingsContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 import { Audio, InterruptionModeIOS } from "expo-av";
+import initIAP from "./app/purchases/initIAP";
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -22,6 +23,7 @@ export default function App() {
           playsInSilentModeIOS: true,
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
+        await initIAP();
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {

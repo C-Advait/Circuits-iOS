@@ -1,9 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Feather } from "@expo/vector-icons";
 
 import routes from "./routes";
-import SettingsScreen from "../screens/SettingsScreen";
 import RoutineNavigator from "./RoutineNavigator";
 import AppTabBar from "./AppTabBar";
 import DebugScreen from "../screens/DebugScreen";
@@ -21,7 +19,7 @@ function AppNavigator() {
     >
       <Tab.Screen name={routes.ROUTINES} component={RoutineNavigator} />
       <Tab.Screen name={routes.SETTINGS} component={SettingsNavigator} />
-      {/* <Tab.Screen name={routes.DEBUG_SCREEN} component={DebugScreen} /> */}
+      <Tab.Screen name={routes.DEBUG_SCREEN} component={DebugScreen} />
     </Tab.Navigator>
   );
 }

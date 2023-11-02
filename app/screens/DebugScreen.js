@@ -285,6 +285,10 @@ const updateSingleRoutine = async () => {
   console.log(rowsAffected);
 };
 
+const purchaseSubscription = async () => {
+
+}
+
 function DebugScreen() {
   return (
     <Screen>
@@ -301,6 +305,7 @@ function DebugScreen() {
       />
       <Button title="Dump settings" onPress={() => dumpDB()} />
       <Button title="Reset DB" onPress={() => resetDB()} />
+      {/* <Button title="Purchase Subscription" onPress={() => } */}
     </Screen>
   );
 }
