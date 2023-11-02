@@ -6,6 +6,7 @@ import {
   Text,
   Button,
   ScrollView,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
@@ -51,6 +52,7 @@ function ExerciseEditScreen({ route }) {
   const nameFieldRef = useRef(null);
   const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
   const { contextExercises, setContextExercises } = useRoutineContext();
+  const [keyboardActive, setKeyboardActive] = useState(false);
 
   useEffect(() => {
     dispatch({
@@ -58,6 +60,23 @@ function ExerciseEditScreen({ route }) {
       payload: { ...originalExercise },
     });
   }, []);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardWillShow",
+      () => setKeyboardActive(true),
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardWillHide",
+      () => setKeyboardActive(false),
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   const onModalChange = (isOpen) => {
     if (isOpen === 1) {
       // Opening modal; save value to which to possibly revert.
@@ -77,16 +96,16 @@ function ExerciseEditScreen({ route }) {
         onPress={
           enabled
             ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              Keyboard.dismiss();
-              modalRef.current?.expand();
-            }
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+                Keyboard.dismiss();
+                modalRef.current?.expand();
+              }
             : () => null
         }
       >
@@ -132,163 +151,169 @@ function ExerciseEditScreen({ route }) {
   const confirmDiscard = () => confirmedNavigate(goBack);
 
   return (
-    <Screen style={styles.container}>
-      <NavHeader
-        LeftComponent={
-          <IconButton
-            iconName={"chevron-left"}
-            IconFamily={Feather}
-            iconSize={52}
-            foregroundColor={theme.blue}
-            onPress={state.dirty ? confirmDiscard : goBack}
-            style={{ alignItems: 'flex-start', marginLeft: -5 }}
+    <>
+      {keyboardActive && (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.backdrop}></View>
+        </TouchableWithoutFeedback>
+      )}
+      <Screen style={styles.container}>
+        <NavHeader
+          LeftComponent={
+            <IconButton
+              iconName={"chevron-left"}
+              IconFamily={Feather}
+              iconSize={52}
+              foregroundColor={theme.blue}
+              onPress={state.dirty ? confirmDiscard : goBack}
+              style={{ alignItems: "flex-start", marginLeft: -5 }}
+            />
+          }
+          headerText={`Edit ${state.title}`}
+          RightComponent={
+            state.dirty || !isExerciseEditing ? (
+              <AppTextButton onPress={onSave} textStyle={{ fontWeight: "400" }}>
+                {isExerciseEditing ? "Save" : "Create"}
+              </AppTextButton>
+            ) : null
+          }
+        />
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ marginTop: 10 }}>
+            <AuxiliaryCard
+              title="Name"
+              onPress={() => nameFieldRef.current.activate()}
+            >
+              <EditableText
+                ref={nameFieldRef}
+                original={state.title}
+                onSubmit={(text) => {
+                  dispatch({
+                    type: exerciseEditActions.SET_TITLE,
+                    payload: text,
+                  });
+                }}
+                rightFlush={true}
+                maxLength={24}
+              />
+            </AuxiliaryCard>
+          </View>
+          <InputModalButton
+            title="Work time"
+            text={formatMinutesSeconds(state.workTime)}
+            contentKey="WORK_TIME"
           />
-        }
-        headerText={`Edit ${state.title}`}
-        RightComponent={
-          state.dirty || !isExerciseEditing ? (
-            <AppTextButton onPress={onSave} textStyle={{ fontWeight: 300 }}>
-              {isExerciseEditing ? "Save" : "Create"}
-            </AppTextButton>
-          ) : null
-        }
-      />
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ marginTop: 10 }}>
-          <AuxiliaryCard
-            title="Name"
-            onPress={() => nameFieldRef.current.activate()}
-          >
-            <EditableText
-              ref={nameFieldRef}
-              original={state.title}
-              originalPlaceholder="Exercise Name"
-              onSubmit={(text) => {
+          <InputModalButton
+            title="Number of rounds"
+            text={state.numberOfRounds}
+            contentKey="ROUNDS"
+          />
+          <InputModalButton
+            title="Rest between rounds"
+            text={formatMinutesSeconds(state.restBetweenRounds)}
+            contentKey="REST_TIME"
+            enabled={state.numberOfRounds > 1}
+          />
+          <InputModalButton
+            title="Break before next exercise"
+            text={formatMinutesSeconds(state.breakBeforeNext)}
+            contentKey="BREAK_TIME"
+          />
+        </ScrollView>
+        <BottomSheet
+          ref={modalRef}
+          index={-1}
+          snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
+          enablePanDownToClose={true}
+          enableContentPanningGesture={false}
+          backdropComponent={BottomSheetBackdrop}
+          handleComponent={() => (
+            <BottomSheetHandle
+              title={contentType.title}
+              subtitle={contentType.subtitle}
+            />
+          )}
+          backgroundStyle={{
+            backgroundColor: theme.tertiaryBackground,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          }}
+          onChange={onModalChange}
+        >
+          {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
+            <NumberWheelPicker
+              key={state.shouldRefreshPicker}
+              number={state.numberOfRounds}
+              onValueChange={(data) =>
                 dispatch({
-                  type: exerciseEditActions.SET_TITLE,
-                  payload: text,
-                });
-              }}
-              rightFlush={true}
-              maxLength={24}
+                  type: exerciseEditActions.SET_ROUNDS,
+                  payload: data,
+                })
+              }
             />
-          </AuxiliaryCard>
-        </View>
-        <InputModalButton
-          title="Work time"
-          text={formatMinutesSeconds(state.workTime)}
-          contentKey="WORK_TIME"
-        />
-        <InputModalButton
-          title="Number of rounds"
-          text={state.numberOfRounds}
-          contentKey="ROUNDS"
-        />
-        <InputModalButton
-          title="Rest between rounds"
-          text={formatMinutesSeconds(state.restBetweenRounds)}
-          contentKey="REST_TIME"
-          enabled={state.numberOfRounds > 1}
-        />
-        <InputModalButton
-          title="Break before next exercise"
-          text={formatMinutesSeconds(state.breakBeforeNext)}
-          contentKey="BREAK_TIME"
-        />
-      </ScrollView>
-      <BottomSheet
-        ref={modalRef}
-        index={-1}
-        snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
-        enablePanDownToClose={true}
-        enableContentPanningGesture={false}
-        backdropComponent={BottomSheetBackdrop}
-        handleComponent={() => (
-          <BottomSheetHandle
-            title={contentType.title}
-            subtitle={contentType.subtitle}
-          />
-        )}
-        backgroundStyle={{
-          backgroundColor: theme.tertiaryBackground,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-        }}
-        onChange={onModalChange}
-      >
-        {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
-          <NumberWheelPicker
-            key={state.shouldRefreshPicker}
-            number={state.numberOfRounds}
-            onValueChange={(data) =>
-              dispatch({
-                type: exerciseEditActions.SET_ROUNDS,
-                payload: data,
-              })
-            }
-          />
-        )}
-        {contentType.key === EXERCISE_EDIT_MODAL.WORK_TIME.key && (
-          <TimeWheelPicker
-            key={state.shouldRefreshPicker}
-            startingTime={state.workTime}
-            onValueChange={(data) =>
-              dispatch({
-                type: exerciseEditActions.SET_WORK_TIME,
-                payload: data,
-              })
-            }
-          />
-        )}
-        {contentType.key === EXERCISE_EDIT_MODAL.REST_TIME.key && (
-          <TimeWheelPicker
-            key={state.shouldRefreshPicker}
-            startingTime={state.restBetweenRounds}
-            onValueChange={(data) =>
-              dispatch({
-                type: exerciseEditActions.SET_REST,
-                payload: data,
-              })
-            }
-            increment5Seconds={true}
-          />
-        )}
-        {contentType.key === EXERCISE_EDIT_MODAL.BREAK_TIME.key && (
-          <TimeWheelPicker
-            key={state.shouldRefreshPicker}
-            startingTime={state.breakBeforeNext}
-            onValueChange={(data) =>
-              dispatch({
-                type: exerciseEditActions.SET_BREAK,
-                payload: data,
-              })
-            }
-            increment5Seconds={true}
-          />
-        )}
-        <View style={styles.footer}>
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Cancel"
-              onPress={() => {
-                dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
-                modalRef.current?.close();
-              }}
-              color={theme.primary}
+          )}
+          {contentType.key === EXERCISE_EDIT_MODAL.WORK_TIME.key && (
+            <TimeWheelPicker
+              key={state.shouldRefreshPicker}
+              startingTime={state.workTime}
+              onValueChange={(data) =>
+                dispatch({
+                  type: exerciseEditActions.SET_WORK_TIME,
+                  payload: data,
+                })
+              }
             />
+          )}
+          {contentType.key === EXERCISE_EDIT_MODAL.REST_TIME.key && (
+            <TimeWheelPicker
+              key={state.shouldRefreshPicker}
+              startingTime={state.restBetweenRounds}
+              onValueChange={(data) =>
+                dispatch({
+                  type: exerciseEditActions.SET_REST,
+                  payload: data,
+                })
+              }
+              increment5Seconds={true}
+            />
+          )}
+          {contentType.key === EXERCISE_EDIT_MODAL.BREAK_TIME.key && (
+            <TimeWheelPicker
+              key={state.shouldRefreshPicker}
+              startingTime={state.breakBeforeNext}
+              onValueChange={(data) =>
+                dispatch({
+                  type: exerciseEditActions.SET_BREAK,
+                  payload: data,
+                })
+              }
+              increment5Seconds={true}
+            />
+          )}
+          <View style={styles.footer}>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Cancel"
+                onPress={() => {
+                  dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
+                  modalRef.current?.close();
+                }}
+                color={theme.primary}
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Apply"
+                onPress={() => {
+                  modalRef.current?.close();
+                }}
+                color={theme.blue}
+              />
+            </View>
           </View>
-          <View style={styles.buttonContainer}>
-            <Button
-              title="Apply"
-              onPress={() => {
-                modalRef.current?.close();
-              }}
-              color={theme.blue}
-            />
-          </View>
-        </View>
-      </BottomSheet>
-    </Screen>
+        </BottomSheet>
+      </Screen>
+    </>
   );
 }
 
@@ -340,6 +365,15 @@ const reducer = (state, action) => {
 
 const getStyles = (theme) =>
   StyleSheet.create({
+    backdrop: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent backdrop
+      zIndex: 1, // Ensures the backdrop is above other UI elements but below the keyboard
+    },
     buttonContainer: {
       marginHorizontal: 16,
       marginTop: 12,
@@ -348,7 +382,7 @@ const getStyles = (theme) =>
       backgroundColor: theme.background,
       flex: 1,
       height: "100%",
-      paddingHorizontal: 15
+      paddingHorizontal: 15,
     },
     disabled: {
       fontSize: PICKER_BUTTON_FONT_SIZE,

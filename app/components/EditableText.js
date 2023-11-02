@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  Keyboard
 } from "react-native";
 
 import { useSettings } from "../contexts/SettingsContext";
@@ -23,9 +24,9 @@ import {
 
 const EditableText = forwardRef((props, ref) => {
   const { theme } = useSettings();
-  const { original, originalPlaceholder, onSubmit, maxLength, rightFlush, size = 'regular' } = props;
+  const { original, onSubmit, maxLength, rightFlush, size = 'regular' } = props;
 
-  const [placeholder, setPlaceholder] = useState(originalPlaceholder);
+  const [placeholder, setPlaceholder] = useState(original);
   const [text, setText] = useState(original);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef(null);
@@ -48,6 +49,7 @@ const EditableText = forwardRef((props, ref) => {
 
   useEffect(() => {
     setText(original);
+    setPlaceholder(original);
   }, [original]);
 
   const handleFocus = () => {
@@ -61,11 +63,23 @@ const EditableText = forwardRef((props, ref) => {
     if (text !== "") {
       onSubmit(text);
       setText(text);
+      setPlaceholder(text);
     } else {
       onSubmit(placeholder);
       setText(placeholder);
     }
   };
+
+  //When keyboard hides, call handleBlur
+  useEffect(() => {
+    // Attach the keyboard hide listener when the component mounts
+    const keyboardHideListener = Keyboard.addListener('keyboardDidHide', handleBlur);
+
+    // Cleanup the listener when the component unmounts
+    return () => {
+      keyboardHideListener.remove();
+    };
+  }, [text, placeholder]);
 
   // Expose 'editing' to wrapping AuxiliaryCard
   useImperativeHandle(ref, () => ({
