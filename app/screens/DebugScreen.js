@@ -3,6 +3,8 @@ import { View, StyleSheet, Button, Alert } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
 
+import { requestPurchase, useIAP } from "react-native-iap";
+
 import {
   dropTable,
   getExercisesForRoutine,
@@ -285,30 +287,57 @@ const updateSingleRoutine = async () => {
   console.log(rowsAffected);
 };
 
-const purchaseSubscription = async () => {
-
-}
+const purchaseSubscription = async () => {};
 
 function DebugScreen() {
+  const { getSubscriptions, requestSubscriptions, subscriptions } = useIAP();
+
+  const skus = ["com.circuits.timer.unlimited.routines"];
+
+  const handleGetSubs = async () => {
+    try {
+      // Note: getProducts takes an array directly, not an object with skus key
+      console.log("Skus: ", skus);
+      const _subs = await getSubscriptions({ skus: skus }).catch((err) =>
+        console.err("Couldn't get subs!!! ", err),
+      );
+      console.log("Caller received subs: ", subscriptions);
+      Alert.alert("subs: ", JSON.stringify(subscriptions, null, 2));
+    } catch (error) {
+      // Always good to handle and log errors
+      console.error("Failed to load products", error);
+    }
+  };
+
+  const handleSub = async () => {
+    try {
+      await requestSubscriptions({ skus: skus });
+    } catch (error) {
+      console.error("Failed to purchase product", error);
+    }
+  };
+
   return (
     <Screen>
       <View style={styles.topPanel}>
-        <Header>Settings</Header>
+        <Header>Debug</Header>
       </View>
-      <Button
-        title="Create dummy routines"
-        onPress={() => createDummyRoutine()}
-      />
-      <Button
-        title="Create dummy exercises"
-        onPress={() => createDummyExercises()}
-      />
-      <Button title="Dump settings" onPress={() => dumpDB()} />
       <Button title="Reset DB" onPress={() => resetDB()} />
-      {/* <Button title="Purchase Subscription" onPress={() => } */}
+      <Button title="Get Subscriptions" onPress={handleGetSubs} />
+      <Button title="Request Purchase" onPress={handleSub} />
     </Screen>
   );
 }
+
+// <Button
+//   title="Create dummy routines"
+//   onPress={() => createDummyRoutine()}
+// />
+// <Button
+//   title="Create dummy exercises"
+//   onPress={() => createDummyExercises()}
+// />
+// <Button title="Dump settings" onPress={() => dumpDB()} />
 
 // <Button title="Dump DB" onPress={() => dumpDB()} />
 // <Button title="Get RoutineNames" onPress={() => getNames()} />
