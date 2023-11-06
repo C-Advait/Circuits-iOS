@@ -15,6 +15,7 @@ import Rate from "react-native-rate";
 import { useNavigation } from "@react-navigation/core";
 import routes from "../navigation/routes";
 
+import Screen from "../components/Screen";
 import Header from "../components/Header";
 import { useSettings } from "../contexts/SettingsContext";
 
@@ -49,7 +50,6 @@ function SettingsScreen() {
   };
 
   const rateUs = () => {
-
     Alert.alert("Thank you for your feedback");
 
     // const options = {
@@ -68,7 +68,7 @@ function SettingsScreen() {
     //     // Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
     //   }
     // })
-  }
+  };
 
   const navPrivacyPolicy = () => {
     navigation.navigate(routes.PRIVACY_POLICY_SCREEN);
@@ -117,8 +117,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-              Alert.alert(item.title, item.title);
-            }
+                Alert.alert(item.title, item.title);
+              }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
@@ -143,7 +143,7 @@ function SettingsScreen() {
   // The IconButton here is purely a hack to
   // align the headers between Tab.Screens.
   return (
-    <View style={styles.container}>
+    <Screen>
       <View style={styles.topPanel}>
         <Header>Settings</Header>
       </View>
@@ -152,7 +152,7 @@ function SettingsScreen() {
         {renderSection("Support", support)}
         {renderSection("Privacy", privacy)}
       </ScrollView>
-    </View>
+    </Screen>
   );
 }
 
@@ -161,12 +161,6 @@ const getStyles = (theme) =>
     choiceText: {
       color: theme.primary,
       fontSize: 17,
-    },
-    container: {
-      backgroundColor: theme.background,
-      paddingTop: Constants.statusBarHeight,
-      flex: 1,
-      // height: "100%"
     },
     group: {
       borderRadius: 8,
