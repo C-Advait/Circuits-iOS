@@ -1,14 +1,39 @@
 // SubscriptionScreen.js
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
+import Screen from '../components/Screen';
+import NavHeader from '../components/NavHeader';
+import { IconButton } from '../components/buttons';
+import routes from '../navigation/routes';
+import { useSettings } from '../contexts/SettingsContext';
 
 const SubscriptionScreen = ({ isVisible }) => {
   // isVisible would typically be a prop passed down to control the modal's visibility
 
   // if (!isVisible) return null; // Renders nothing if not visible
 
+  const navigation = useNavigation();
+  const { theme } = useSettings();
+  const styles = getStyles(theme);
+
   return (
-    <View style={styles.container}>
+    <Screen style={styles.container}>
+      <NavHeader
+        LeftComponent={
+          <IconButton
+            iconName={"chevron-left"}
+            IconFamily={Feather}
+            iconSize={52}
+            foregroundColor={theme.blue}
+            onPress={() => navigation.navigate(routes.SETTINGS_SCREEN)}
+            style={{ alignItems: "flex-start", marginLeft: -5 }}
+          />
+        }
+        headerText={`Subscriptions`}
+      />
       <View style={styles.modalView}>
         <Text style={styles.modalTitle}>Circuits Premium Pass</Text>
 
@@ -40,85 +65,87 @@ const SubscriptionScreen = ({ isVisible }) => {
           {/* Add your full description here */}
         </Text>
       </View>
-    </View>
+    </Screen>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
+const getStyles = (theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      height: '100%',
+      backgroundColor: theme.background,
+      paddingHorizontal: 20,
+
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 15,
-  },
-  featuresList: {
-    alignSelf: 'stretch',
-    marginBottom: 15,
-  },
-  featureItem: {
-    fontSize: 16,
-    // Add more styling for the feature item text
-  },
-  plansContainer: {
-    alignSelf: 'stretch',
-    marginBottom: 15,
-  },
-  planButton: {
-    padding: 10,
-    marginVertical: 5,
-    backgroundColor: '#E0E0E0', // Change as per your design
-    borderRadius: 10,
-    // Add more styling for the plan button
-  },
-  planText: {
-    fontSize: 16,
-    // Add more styling for the plan text
-  },
-  continueButton: {
-    backgroundColor: '#0000FF', // Change as per your design
-    borderRadius: 10,
-    padding: 10,
-    elevation: 2,
-    // Add more styling for the continue button
-  },
-  continueText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    // Add more styling for the continue text
-  },
-  restoreText: {
-    marginTop: 15,
-    color: '#0000FF', // Change as per your design
-    textDecorationLine: 'underline',
-    // Add more styling for the restore purchase text
-  },
-  descriptionText: {
-    marginTop: 15,
-    fontSize: 12,
-    color: 'gray',
-    textAlign: 'center',
-    // Add more styling for the description text
-  },
-});
+    modalView: {
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 15,
+    },
+    featuresList: {
+      alignSelf: 'stretch',
+      marginBottom: 15,
+    },
+    featureItem: {
+      fontSize: 16,
+      // Add more styling for the feature item text
+    },
+    plansContainer: {
+      alignSelf: 'stretch',
+      marginBottom: 15,
+    },
+    planButton: {
+      padding: 10,
+      marginVertical: 5,
+      backgroundColor: '#E0E0E0', // Change as per your design
+      borderRadius: 10,
+      // Add more styling for the plan button
+    },
+    planText: {
+      fontSize: 16,
+      // Add more styling for the plan text
+    },
+    continueButton: {
+      backgroundColor: '#0000FF', // Change as per your design
+      borderRadius: 10,
+      padding: 10,
+      elevation: 2,
+      // Add more styling for the continue button
+    },
+    continueText: {
+      color: 'white',
+      fontWeight: 'bold',
+      textAlign: 'center',
+      // Add more styling for the continue text
+    },
+    restoreText: {
+      marginTop: 15,
+      color: '#0000FF', // Change as per your design
+      textDecorationLine: 'underline',
+      // Add more styling for the restore purchase text
+    },
+    descriptionText: {
+      marginTop: 15,
+      fontSize: 12,
+      color: 'gray',
+      textAlign: 'center',
+      // Add more styling for the description text
+    },
+  });
 
 export default SubscriptionScreen;
