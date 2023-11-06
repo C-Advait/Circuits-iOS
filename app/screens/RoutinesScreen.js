@@ -15,13 +15,24 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import routes from "../navigation/routes";
-import { getAllUserCreatedRoutines, getNewRoutineID } from "../db/DBActions";
+import { getAllUserCreatedRoutines } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import { useRoutineContext } from "../contexts/RoutineContext";
 import Screen from "../components/Screen";
 import { routineAccentColors } from "../config/colors";
+
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
 
 function RoutinesScreen() {
   const navigation = useNavigation();
@@ -30,16 +41,25 @@ function RoutinesScreen() {
 
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
+  const [isPremium, setIsPremium] = useState(false);
+  const [dataHash, setDataHash] = useState(null);
+
 
   const loadRoutines = async () => {
-    const routines = await getAllUserCreatedRoutines();
-    setRoutines(routines);
+    const newRoutines = await getAllUserCreatedRoutines();
+    const newHash = hashString(JSON.stringify(newRoutines));
+
+    if (newHash !== dataHash) {
+      setRoutines(newRoutines);
+      setDataHash(newHash);
+      console.log(newRoutines);
+    }
   };
 
   useFocusEffect(
-    useCallback(() => {
+    () => {
       loadRoutines();
-    }, [routines]),
+    }
   );
 
   // Initialize all items as not expanded.
@@ -149,6 +169,7 @@ function RoutinesScreen() {
                 new Array(Math.max(prev.length - 1, 0)).fill(false),
               );
             }}
+            isEnabled={isPremium ? true : (index <= 4)}
           />
         )}
         keyExtractor={(item) => item.id}
