@@ -92,7 +92,7 @@ function SettingsScreen() {
     {
       id: 1,
       title: "Subscription Plan",
-      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { isVisible: true }),
+      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.SETTINGS_SCREEN }),
     }
   ];
 
@@ -125,8 +125,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-                Alert.alert(item.title, item.title);
-              }
+              Alert.alert(item.title, item.title);
+            }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
