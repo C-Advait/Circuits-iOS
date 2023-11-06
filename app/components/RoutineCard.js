@@ -15,7 +15,7 @@ import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 import { useRoutineContext } from "../contexts/RoutineContext";
 import { Tag } from "../classes/Exercise";
 
-function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
+function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback, isEnabled = true }) {
   const navigation = useNavigation();
   const { theme } = useSettings();
   const styles = getStyles(theme);
@@ -66,7 +66,29 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
     }
   };
 
-  return (
+  return !(isEnabled) ? (
+    <View style={styles.container}>
+      <View style={[styles.accent, { backgroundColor: "#38383A" }]} />
+      <View style={styles.permanentInfoContainer}>
+        <View>
+          <View style={{ flexDirection: 'row', }}>
+            <Feather name="lock" size={20} color="#646464" />
+            <Text style={[styles.header, { fontWeight: '600', color: theme.textDisabled, marginLeft: 6 }]}>{routine.title}</Text>
+          </View>
+          <Text style={styles.duration}>
+            {formatDuration(routine.duration)}
+          </Text>
+        </View>
+        <IconButton
+          iconName={"chevron-down"}
+          IconFamily={Feather}
+          iconSize={52}
+          foregroundColor={"#646464"}
+          onPress={() => toggleExpand()}
+        />
+      </View>
+    </View>
+  ) : (
     <View style={styles.container}>
       {routine.color ? (
         <View style={[styles.accent, { backgroundColor: routine.color }]} />
@@ -189,6 +211,9 @@ const getStyles = (theme) =>
       color: theme.text60,
       fontSize: ROUTINE_PARAGRAPH_FONT_SIZE,
       fontWeight: 600,
+    },
+    disabled: {
+      color: "#121212",
     },
     header: {
       color: theme.primary,
