@@ -10,7 +10,8 @@ import { TemplateProvider } from "../contexts/TemplateContext";
 import TimerScreen from "../screens/TimerScreen";
 import TemplateSelectionScreen from "../screens/TemplateSelectionScreen";
 import { SoundProvider } from "../contexts/SoundContext";
-import PrivacyPolicyScreen from "../screens/PrivacyPolicyScreen";
+import SubscriptionScreen from "../screens/SubscriptionScreen";
+
 const Stack = createStackNavigator();
 
 function RoutineNavigator() {
@@ -40,6 +41,10 @@ function RoutineNavigator() {
             <Stack.Screen
               name={routes.TEMPLATE_SELECTION_SCREEN}
               component={TemplateSelectionScreen}
+            />
+            <Stack.Screen
+              name={routes.SUBSCRIPTION_SCREEN}
+              component={SubscriptionScreen}
             />
           </Stack.Navigator>
         </RoutineProvider>

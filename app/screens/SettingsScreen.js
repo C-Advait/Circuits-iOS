@@ -88,6 +88,14 @@ function SettingsScreen() {
       ),
     },
   ];
+  const account = [
+    {
+      id: 1,
+      title: "Subscription Plan",
+      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.SETTINGS_SCREEN }),
+    }
+  ];
+
   const support = [
     {
       id: 4,
@@ -117,8 +125,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-                Alert.alert(item.title, item.title);
-              }
+              Alert.alert(item.title, item.title);
+            }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
@@ -149,6 +157,7 @@ function SettingsScreen() {
       </View>
       <ScrollView style={styles.scrollContainer}>
         {renderSection("Behaviour", behaviour)}
+        {renderSection("My Account", account)}
         {renderSection("Support", support)}
         {renderSection("Privacy", privacy)}
       </ScrollView>

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, Alert } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
@@ -52,7 +52,6 @@ function RoutinesScreen() {
     if (newHash !== dataHash) {
       setRoutines(newRoutines);
       setDataHash(newHash);
-      console.log(newRoutines);
     }
   };
 
@@ -131,6 +130,30 @@ function RoutinesScreen() {
     }
   };
 
+  const handleBlockedRoutineCreation = () => {
+    Alert.alert(
+      "You are on the Free Tier.", // Alert Title
+      "Create unlimited routines and more with Circuits Premium.", // Alert Message
+      [
+        {
+          text: "View Circuits Premium", // First button text
+          onPress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.ROUTINES_SCREEN }), // Handler for button press
+          isPreferred: true
+        },
+        {
+          text: "Got it", // Second button text
+          onPress: () => null, // Handler for button press
+          // style: "cancel", // Style for the button, 'cancel' will make it the less prominent button
+        },
+      ],
+      {
+        cancelable: true, // Whether to close the dialog on tapping outside
+        onDismiss: () => null,
+        userInterfaceStyle: 'dark'
+      }
+    );
+  }
+
   return (
     <Screen>
       <View style={styles.topPanel}>
@@ -140,7 +163,10 @@ function RoutinesScreen() {
           IconFamily={Feather}
           iconSize={55}
           foregroundColor={theme.blue}
-          onPress={() => handleNewRoutineOnpress()}
+          onPress={() => {
+            isPremium ? handleNewRoutineOnpress() : (routines.length < 5) ?
+              handleNewRoutineOnpress() : handleBlockedRoutineCreation()
+          }}
         />
       </View>
       <View style={styles.middlePanel}>
