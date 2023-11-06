@@ -30,10 +30,11 @@ function RoutinesScreen() {
 
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
+  const [isPremium, setIsPremium] = useState(false);
 
   const loadRoutines = async () => {
     const routines = await getAllUserCreatedRoutines();
-    setRoutines(routines);
+    setRoutines(routines); // should we sort by ID here? Important for consistent locking/unlocking functionality
   };
 
   useFocusEffect(
@@ -149,6 +150,7 @@ function RoutinesScreen() {
                 new Array(Math.max(prev.length - 1, 0)).fill(false),
               );
             }}
+            isEnabled={isPremium ? true : (index > 4) ? false : true}
           />
         )}
         keyExtractor={(item) => item.id}

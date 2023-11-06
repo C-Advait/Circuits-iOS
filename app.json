@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Timer",
-    "slug": "Timer",
+    "name": "Circuits°",
+    "slug": "Circuits°",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./app/assets/icon.png",
@@ -18,7 +18,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.a99wang.Timer",
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
