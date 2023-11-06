@@ -3,7 +3,7 @@ import { View, StyleSheet, Button, Alert } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
 
-import { requestPurchase, useIAP } from "react-native-iap";
+import { useIAP } from "react-native-iap";
 
 import {
   dropTable,
@@ -290,17 +290,17 @@ const updateSingleRoutine = async () => {
 const purchaseSubscription = async () => {};
 
 function DebugScreen() {
-  const { getSubscriptions, requestSubscriptions, subscriptions } = useIAP();
+  const { getSubscriptions, subscriptions, requestSubscription } = useIAP();
 
-  const skus = ["com.circuits.timer.unlimited.routines"];
+  const sku = "com.circuits.timer.unlimited.routines";
 
   const handleGetSubs = async () => {
     try {
       // Note: getProducts takes an array directly, not an object with skus key
-      console.log("Skus: ", skus);
-      const _subs = await getSubscriptions({ skus: skus }).catch((err) =>
-        console.err("Couldn't get subs!!! ", err),
-      );
+      // console.log("Skus: ", skus);
+      const _subs = await getSubscriptions({ skus: [sku] });
+      //   console.err("Couldn't get subs!!! ", err),
+      // );
       console.log("Caller received subs: ", subscriptions);
       Alert.alert("subs: ", JSON.stringify(subscriptions, null, 2));
     } catch (error) {
@@ -309,11 +309,14 @@ function DebugScreen() {
     }
   };
 
-  const handleSub = async () => {
+  subscribe = async (sku, offerToken) => {
     try {
-      await requestSubscriptions({ skus: skus });
-    } catch (error) {
-      console.error("Failed to purchase product", error);
+      await requestSubscription({
+        sku,
+        ...(offerToken && { subscriptionOffers: [{ sku, offerToken }] }),
+      });
+    } catch (err) {
+      console.warn(err.code, err.message);
     }
   };
 
@@ -324,7 +327,10 @@ function DebugScreen() {
       </View>
       <Button title="Reset DB" onPress={() => resetDB()} />
       <Button title="Get Subscriptions" onPress={handleGetSubs} />
-      <Button title="Request Purchase" onPress={handleSub} />
+      <Button
+        title="Request Subscription"
+        onPress={() => subscribe(sku, null)}
+      />
     </Screen>
   );
 }
