@@ -15,6 +15,7 @@ import Rate from "react-native-rate";
 import { useNavigation } from "@react-navigation/core";
 import routes from "../navigation/routes";
 
+import AuxiliaryCard from "../components/AuxiliaryCard";
 import Header from "../components/Header";
 import { useSettings } from "../contexts/SettingsContext";
 
@@ -88,6 +89,14 @@ function SettingsScreen() {
       ),
     },
   ];
+  const account = [
+    {
+      id: 1,
+      title: "Subscription Plan",
+      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { isVisible: true }),
+    }
+  ];
+
   const support = [
     {
       id: 4,
@@ -149,6 +158,7 @@ function SettingsScreen() {
       </View>
       <ScrollView style={styles.scrollContainer}>
         {renderSection("Behaviour", behaviour)}
+        {renderSection("My Account", account)}
         {renderSection("Support", support)}
         {renderSection("Privacy", privacy)}
       </ScrollView>
