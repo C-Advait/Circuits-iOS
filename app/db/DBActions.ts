@@ -186,7 +186,7 @@ const getAllUserCreatedRoutines = async () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx: any) => {
       tx.executeSql(
-        "SELECT * FROM Routine WHERE userCreated = 1",
+        "SELECT * FROM Routine WHERE userCreated = 1 ORDER BY id",
         [],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Routine(row)));
