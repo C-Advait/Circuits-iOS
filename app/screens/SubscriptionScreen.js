@@ -10,14 +10,12 @@ import { IconButton } from '../components/buttons';
 import routes from '../navigation/routes';
 import { useSettings } from '../contexts/SettingsContext';
 
-const SubscriptionScreen = ({ isVisible }) => {
-  // isVisible would typically be a prop passed down to control the modal's visibility
-
-  // if (!isVisible) return null; // Renders nothing if not visible
+const SubscriptionScreen = ({ route }) => {
 
   const navigation = useNavigation();
   const { theme } = useSettings();
   const styles = getStyles(theme);
+  const { prevScreen } = route.params;
 
   return (
     <Screen style={styles.container}>
@@ -28,7 +26,7 @@ const SubscriptionScreen = ({ isVisible }) => {
             IconFamily={Feather}
             iconSize={52}
             foregroundColor={theme.blue}
-            onPress={() => navigation.navigate(routes.SETTINGS_SCREEN)}
+            onPress={() => navigation.navigate(prevScreen)}
             style={{ alignItems: "flex-start", marginLeft: -5 }}
           />
         }
