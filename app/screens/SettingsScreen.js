@@ -15,7 +15,6 @@ import Rate from "react-native-rate";
 import { useNavigation } from "@react-navigation/core";
 import routes from "../navigation/routes";
 
-import AuxiliaryCard from "../components/AuxiliaryCard";
 import Header from "../components/Header";
 import { useSettings } from "../contexts/SettingsContext";
 

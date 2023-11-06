@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 const SubscriptionScreen = ({ isVisible }) => {
   // isVisible would typically be a prop passed down to control the modal's visibility
 
-  if (!isVisible) return null; // Renders nothing if not visible
+  // if (!isVisible) return null; // Renders nothing if not visible
 
   return (
     <View style={styles.container}>
