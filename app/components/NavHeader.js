@@ -8,6 +8,7 @@ function NavHeader({
   LeftComponent,
   headerText = "Navigation Heading",
   RightComponent,
+  containerStyle = {},
 }) {
   LeftComponent = LeftComponent ? (
     LeftComponent
@@ -23,7 +24,7 @@ function NavHeader({
   const styles = getStyles(theme);
 
   return (
-    <View style={styles.navPanel}>
+    <View style={[styles.navPanel, containerStyle]}>
       <View style={styles.leftView}>{LeftComponent}</View>
       <View>
         <Header style={[styles.text]}>{headerText}</Header>

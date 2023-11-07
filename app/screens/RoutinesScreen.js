@@ -33,6 +33,7 @@ function hashString(str) {
   return hash;
 }
 
+
 function RoutinesScreen() {
   const navigation = useNavigation();
   const { theme } = useSettings();
@@ -42,6 +43,7 @@ function RoutinesScreen() {
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
   const [isPremium, setIsPremium] = useState(false);
   const [dataHash, setDataHash] = useState(null);
+
 
   const loadRoutines = async () => {
     const newRoutines = await getAllUserCreatedRoutines();
@@ -53,9 +55,11 @@ function RoutinesScreen() {
     }
   };
 
-  useFocusEffect(() => {
-    loadRoutines();
-  });
+  useFocusEffect(
+    () => {
+      loadRoutines();
+    }
+  );
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -94,6 +98,7 @@ function RoutinesScreen() {
 
   const handleNewRoutineOnpress = async () => {
     try {
+
       const accentColorsArray = Object.values(routineAccentColors);
       const randomAccentColor =
         accentColorsArray[Math.floor(Math.random() * accentColorsArray.length)];
@@ -165,8 +170,8 @@ function RoutinesScreen() {
             isPremium
               ? handleNewRoutineOnpress()
               : routines.length < 5
-              ? handleNewRoutineOnpress()
-              : handleBlockedRoutineCreation();
+                ? handleNewRoutineOnpress()
+                : handleBlockedRoutineCreation();
           }}
         />
       </View>
