@@ -33,7 +33,6 @@ function hashString(str) {
   return hash;
 }
 
-
 function RoutinesScreen() {
   const navigation = useNavigation();
   const { theme } = useSettings();
@@ -43,7 +42,6 @@ function RoutinesScreen() {
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
   const [isPremium, setIsPremium] = useState(false);
   const [dataHash, setDataHash] = useState(null);
-
 
   const loadRoutines = async () => {
     const newRoutines = await getAllUserCreatedRoutines();
@@ -55,11 +53,9 @@ function RoutinesScreen() {
     }
   };
 
-  useFocusEffect(
-    () => {
-      loadRoutines();
-    }
-  );
+  useFocusEffect(() => {
+    loadRoutines();
+  });
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -98,7 +94,6 @@ function RoutinesScreen() {
 
   const handleNewRoutineOnpress = async () => {
     try {
-
       const accentColorsArray = Object.values(routineAccentColors);
       const randomAccentColor =
         accentColorsArray[Math.floor(Math.random() * accentColorsArray.length)];
@@ -137,8 +132,11 @@ function RoutinesScreen() {
       [
         {
           text: "View Circuits Premium", // First button text
-          onPress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.ROUTINES_SCREEN }), // Handler for button press
-          isPreferred: true
+          onPress: () =>
+            navigation.navigate(routes.SUBSCRIPTION_SCREEN, {
+              prevScreen: routes.ROUTINES_SCREEN,
+            }), // Handler for button press
+          isPreferred: true,
         },
         {
           text: "Got it", // Second button text
@@ -149,10 +147,10 @@ function RoutinesScreen() {
       {
         cancelable: true, // Whether to close the dialog on tapping outside
         onDismiss: () => null,
-        userInterfaceStyle: 'dark'
-      }
+        userInterfaceStyle: "dark",
+      },
     );
-  }
+  };
 
   return (
     <Screen>
@@ -164,8 +162,11 @@ function RoutinesScreen() {
           iconSize={55}
           foregroundColor={theme.blue}
           onPress={() => {
-            isPremium ? handleNewRoutineOnpress() : (routines.length < 5) ?
-              handleNewRoutineOnpress() : handleBlockedRoutineCreation()
+            isPremium
+              ? handleNewRoutineOnpress()
+              : routines.length < 5
+              ? handleNewRoutineOnpress()
+              : handleBlockedRoutineCreation();
           }}
         />
       </View>
@@ -195,7 +196,7 @@ function RoutinesScreen() {
                 new Array(Math.max(prev.length - 1, 0)).fill(false),
               );
             }}
-            isEnabled={isPremium ? true : (index <= 4)}
+            isEnabled={isPremium ? true : index <= 4}
           />
         )}
         keyExtractor={(item) => item.id}
