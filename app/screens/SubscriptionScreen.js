@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useReducer, useState } from "react";
 import {
+  Alert,
   Image,
   ImageBackground,
   View,
@@ -20,6 +21,8 @@ import {
   PARAGRAPH_FONT_WEIGHT,
 } from "../config/appConstants";
 import { SubscriptionButton } from "../components/buttons";
+import subscriptionActions from "../actions/subscriptionActions";
+import { SKU } from "../config/skus";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -27,7 +30,59 @@ const SubscriptionScreen = ({ route }) => {
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
-  const [selectedPlan, setSelectedPlan] = useState(1);
+  const subscribe = async (sku) => {
+    try {
+      Alert.alert(`Subscribe`, `Subscribing to sku: ${sku}`);
+    } catch (err) {
+      console.warn(err.code, err.message);
+    }
+  };
+
+  const purchase = async (sku) => {
+    try {
+      Alert.alert(`Purchase`, `Purchasing sku: ${sku}`);
+    } catch (err) {
+      console.warn(err.code, err.message);
+    }
+  };
+
+  const restore = async () => {
+    try {
+      Alert.alert(`Restoring`, `Restoring`);
+    } catch (err) {
+      console.warn(err.code, err.message);
+    }
+  };
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case subscriptionActions.SET_PLAN:
+        switch (action.payload) {
+          case SKU.MONTHLY:
+            return {
+              ...state,
+              selectedPlan: SKU.MONTHLY,
+              continueFunction: () => subscribe(SKU.MONTHLY),
+            };
+          case SKU.LIFETIME:
+            return {
+              ...state,
+              selectedPlan: SKU.LIFETIME,
+              continueFunction: () => purchase(SKU.LIFETIME),
+            };
+          default:
+            console.error(`Unknown plan: ${action.payload}`);
+            return state;
+        }
+    }
+  };
+
+  const initialState = {
+    selectedPlan: SKU.MONTHLY,
+    continueFunction: () => subscribe(SKU.MONTHLY),
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <ImageBackground
@@ -84,26 +139,35 @@ const SubscriptionScreen = ({ route }) => {
           <Text style={styles.modalTitle}>Available Plans</Text>
           <View style={styles.plansContainer}>
             <SubscriptionButton
-              enabled={selectedPlan === 1}
+              enabled={state.selectedPlan === SKU.MONTHLY}
               titleText={"Monthly Pass"}
               priceText={"$0.99/month"}
-              onPress={() => {
-                setSelectedPlan(1);
-              }}
+              onPress={() =>
+                dispatch({
+                  type: subscriptionActions.SET_PLAN,
+                  payload: SKU.MONTHLY,
+                })
+              }
             />
             <SubscriptionButton
-              enabled={selectedPlan === 2}
+              enabled={state.selectedPlan === SKU.LIFETIME}
               titleText={"Lifetime Access"}
               priceText={"$9.99, one-time payment"}
-              onPress={() => {
-                setSelectedPlan(2);
-              }}
+              onPress={() =>
+                dispatch({
+                  type: subscriptionActions.SET_PLAN,
+                  payload: SKU.LIFETIME,
+                })
+              }
             />
           </View>
-          <TouchableOpacity style={styles.continueButton}>
+          <TouchableOpacity
+            style={styles.continueButton}
+            onPress={state.continueFunction}
+          >
             <Text style={styles.continueText}>Continue</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => null}>
+          <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 
