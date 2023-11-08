@@ -151,13 +151,19 @@ const SubscriptionScreen = ({ route }) => {
               enabled={selectedPlan === 1}
               titleText={"Monthly Pass"}
               priceText={"$0.99/month"}
-              onPress={() => setSelectedPlan(1)}
+              onPress={() => {
+                setSelectedPlan(1);
+                subscribe(SKU.MONTHLY);
+              }}
             />
             <SubscriptionButton
               enabled={selectedPlan === 2}
               titleText={"Lifetime Access"}
               priceText={"$9.99, one-time payment"}
-              onPress={() => setSelectedPlan(2)}
+              onPress={() => {
+                setSelectedPlan(2);
+                purchase(SKU.LIFETIME);
+              }}
             />
           </View>
           <TouchableOpacity style={styles.continueButton}>
