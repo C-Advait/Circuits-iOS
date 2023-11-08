@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Circuits°",
-    "slug": "Circuits°",
-    "version": "1.0.1",
+    "name": "Circuits",
+    "slug": "Circuits",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./app/assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,11 +32,11 @@
     "web": {
       "favicon": "./app/assets/favicon.png"
     },
+    "owner": "a99wang",
     "extra": {
       "eas": {
-        "projectId": "d3cdcaeb-1ced-4833-b6c6-14204ec51b88"
+        "projectId": "4d5d66e1-4dde-4610-8aa7-536816ab12a6"
       }
-    },
-    "owner": "a99wang"
+    }
   }
 }
