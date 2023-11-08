@@ -20,6 +20,8 @@ import {
   PARAGRAPH_FONT_WEIGHT,
 } from "../config/appConstants";
 import { SubscriptionButton } from "../components/buttons";
+import { SKU } from "../config/skus";
+import { useIAP } from "react-native-iap";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -28,6 +30,68 @@ const SubscriptionScreen = ({ route }) => {
   const { prevScreen } = route.params;
 
   const [selectedPlan, setSelectedPlan] = useState(1);
+
+  const {
+    requestSubscription,
+    requestPurchase,
+    getAvailablePurchases,
+    availablePurchases,
+  } = useIAP();
+
+  const subscribe = async (sku, offerToken = null) => {
+    try {
+      await requestSubscription({
+        sku,
+        ...(offerToken && { subscriptionOffers: [{ sku, offerToken }] }),
+      });
+    } catch (err) {
+      console.warn(err.code, err.message);
+    }
+  };
+
+  const purchase = async (sku) => {
+    try {
+      await requestPurchase({
+        sku,
+        andDangerouslyFinishTransactionAutomaticallyIOS: false,
+      });
+    } catch (err) {
+      console.warn(err.code, err.message);
+    }
+  };
+
+  const restore = async () => {
+    let titles = [];
+
+    try {
+      await getAvailablePurchases();
+
+      await Promise.all(
+        availablePurchases.map(async (purchase) => {
+          switch (purchase.productId) {
+            case SKU.MONTHLY:
+              titles.push("Monthly");
+              break;
+
+            case SKU.LIFETIME:
+              titles.push("Lifetime");
+              break;
+          }
+        }),
+      );
+    } catch (err) {
+      console.warn("Couldn't restore", err);
+    } finally {
+      if (titles.length > 0) {
+        Alert.alert(
+          "Restore Successful",
+          `You successfully restored the following purchases: ${titles.join(
+            ", ",
+          )}`,
+        );
+      }
+    }
+  };
 
   return (
     <ImageBackground
@@ -87,19 +151,25 @@ const SubscriptionScreen = ({ route }) => {
               enabled={selectedPlan === 1}
               titleText={"Monthly Pass"}
               priceText={"$0.99/month"}
-              onPress={() => setSelectedPlan(1)}
+              onPress={() => {
+                setSelectedPlan(1);
+                subscribe(SKU.MONTHLY);
+              }}
             />
             <SubscriptionButton
               enabled={selectedPlan === 2}
               titleText={"Lifetime Access"}
               priceText={"$9.99, one-time payment"}
-              onPress={() => setSelectedPlan(2)}
+              onPress={() => {
+                setSelectedPlan(2);
+                purchase(SKU.LIFETIME);
+              }}
             />
           </View>
           <TouchableOpacity style={styles.continueButton}>
             <Text style={styles.continueText}>Continue</Text>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 

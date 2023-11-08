@@ -3,13 +3,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
+import { withIAPContext } from "react-native-iap";
 
 import { SettingsProvider } from "./app/contexts/SettingsContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 import { Audio, InterruptionModeIOS } from "expo-av";
+import initIAP from "./app/purchases/initIAP";
 
-export default function App() {
+function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export default function App() {
           playsInSilentModeIOS: true,
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
+        await initIAP();
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {
@@ -45,3 +48,5 @@ export default function App() {
     </GestureHandlerRootView>
   ) : null;
 }
+
+export default withIAPContext(App);
