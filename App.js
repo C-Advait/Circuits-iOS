@@ -26,6 +26,7 @@ function App() {
         });
 
         Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+        Alert.alert("About to configure", `Api key: ${PUBLIC_IOS_SDK_KEY}`);
         Purchases.configure({ apiKey: PUBLIC_IOS_SDK_KEY });
       } catch (error) {
         console.error("Something went wrong during init.", error);

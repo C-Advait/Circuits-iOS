@@ -3,22 +3,9 @@ import { View, StyleSheet, Button, Alert } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
 
-import {
-  dropTable,
-  getExercisesForRoutine,
-  createExercise,
-  getAllRoutineNames,
-  createRoutine,
-  getRoutineByID,
-  deleteExercise,
-  deleteRoutine,
-  updateExercise,
-  updateRoutine,
-  getSettings,
-} from "../db/DBActions";
+import { dropTable } from "../db/DBActions";
 import { initTables } from "../db/DBSetup";
-import { Exercise, Tag } from "../classes/Exercise";
-import { Routine } from "../classes/Routine";
+import Purchases from "react-native-purchases";
 
 const resetDB = async () => {
   dropTable("Exercise")
@@ -28,264 +15,180 @@ const resetDB = async () => {
     .then(Alert.alert("All tables dropped and recreated!"));
 };
 
-const dumpDB = async () => {
-  const settings = await getSettings();
-  console.log("All settings", JSON.stringify(settings, null, 2));
+const getOfferings = async () => {
+  try {
+    const offerings = await Purchases.getOfferings();
+    if (offerings.current !== null) {
+      Alert.alert("Offerings: ", JSON.stringify(offerings, null, 2));
+    } else {
+      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+      Alert.alert("Offerings: ", JSON.stringify(offerings, null, 2));
+    }
+  } catch (err) {
+    const errorCode = err.code ? `Error Code: ${err.code}` : "";
+    const errorMessage = err.message
+      ? err.message
+      : "An unexpected error occurred.";
+    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+  }
 };
 
-const createDummyRoutine = async () => {
-  const routine0 = new Routine({
-    numberOfLoops: 5,
-    title: "Sample Routine",
-    duration: 1200, // e.g., 20 minutes
-    color: "#AABBCC",
-    userCreated: true,
-  });
-
-  const routine1 = new Routine({
-    numberOfLoops: 3,
-    title: "Morning Stretches",
-    duration: 600, // e.g., 10 minutes
-    color: "#FFDDAA",
-    userCreated: true,
-  });
-  const routinesList = [routine0];
-
-  Promise.all(routinesList.map((r) => createRoutine(r)));
+const getAvailablePackages = async () => {
+  try {
+    const offerings = await Purchases.getOfferings();
+    if (offerings.current !== null) {
+      const availablePackages = offerings.current.availablePackages;
+      Alert.alert("Packages: ", JSON.stringify(availablePackages, null, 2));
+    } else {
+      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+    }
+  } catch (err) {
+    const errorCode = err.code ? `Error Code: ${err.code}` : "";
+    const errorMessage = err.message
+      ? err.message
+      : "An unexpected error occurred.";
+    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+  }
 };
 
-const getNames = async () => {
-  const names = await getAllRoutineNames();
-  console.log("All routine names: ", JSON.stringify(names, null, 2));
+const purchaseMonthly = async () => {
+  try {
+    const offerings = await Purchases.getOfferings();
+    if (offerings.current !== null) {
+      // Get all packages.
+      const availablePackages = offerings.current.availablePackages;
+      Alert.alert("Packages: ", JSON.stringify(availablePackages, null, 2));
+
+      // Extract monthly package.
+      const monthlyPackage = offerings.current.monthly;
+      Alert.alert("Monthly package: ", JSON.stringify(monthlyPackage, null, 2));
+
+      // Purchase it.
+      Alert.alert("About to purchase monthly package");
+      const purchaseMade = await Purchases.purchasePackage(monthlyPackage);
+      if (
+        typeof purchaseMade.customerInfo.entitlements.active.Premium !==
+        "undefined"
+      ) {
+        Alert.alert("Purchase of monthly package successful!");
+        // Unlock premium.
+      } else {
+        Alert.alert("Purchase of monthly package failed.");
+      }
+    } else {
+      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+    }
+  } catch (err) {
+    const errorCode = err.code ? `Error Code: ${err.code}` : "";
+    const errorMessage = err.message
+      ? err.message
+      : "An unexpected error occurred.";
+    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+  }
 };
 
-const createDummyExercises = async () => {
-  const e1 = new Exercise({
-    routineID: 1,
-    title: "Warmup",
-    exerciseOrder: 0,
-    tag: Tag.PREROUTINE,
-    workTime: 60,
-    numberOfRounds: 3,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Warmup",
-  });
+const purchaseLifetime = async () => {
+  try {
+    const offerings = await Purchases.getOfferings();
+    if (offerings.current !== null) {
+      // Get all packages.
+      const availablePackages = offerings.current.availablePackages;
+      Alert.alert("Packages: ", JSON.stringify(availablePackages, null, 2));
 
-  const e2 = new Exercise({
-    routineID: 1,
-    title: "Dips",
-    exerciseOrder: 1,
-    tag: Tag.WORKING,
-    workTime: 45,
-    numberOfRounds: 5,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
+      // Extract monthly package.
+      const lifetimePackage = offerings.current.lifetime;
+      Alert.alert(
+        "Lifetime package: ",
+        JSON.stringify(lifetimePackage, null, 2),
+      );
 
-  const e3 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 2,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e4 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 3,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e5 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 4,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e6 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 5,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e7 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 6,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e8 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 7,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e9 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 8,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e10 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 9,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e11 = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 10,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const eNEW = new Exercise({
-    routineID: 1,
-    title: "Hammer Curls",
-    exerciseOrder: 11,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 1,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e12 = new Exercise({
-    routineID: 1,
-    title: "Biceps curls",
-    exerciseOrder: 12,
-    tag: Tag.WORKING,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const e13 = new Exercise({
-    routineID: 1,
-    title: "Cooldown",
-    exerciseOrder: 13,
-    tag: Tag.POSTROUTINE,
-    workTime: 30,
-    numberOfRounds: 4,
-    restBetweenRounds: 10,
-    breakBeforeNext: 15,
-    category: "Uncategorized",
-  });
-
-  const exercises = [
-    e1,
-    e2,
-    e3,
-    e4,
-    e5,
-    e6,
-    e7,
-    e8,
-    e9,
-    e10,
-    e11,
-    e12,
-    e13,
-    eNEW,
-  ];
-
-  Promise.all(exercises.map((e) => createExercise(e)));
+      // Purchase it.
+      Alert.alert("About to purchase lifetime package");
+      const purchaseMade = await Purchases.purchasePackage(lifetimePackage);
+      if (
+        typeof purchaseMade.customerInfo.entitlements.active.Premium !==
+        "undefined"
+      ) {
+        Alert.alert("Purchase of lifetime package successful!");
+        // Unlock premium.
+      } else {
+        Alert.alert("Purchase of lifetime package failed.");
+      }
+    } else {
+      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+    }
+  } catch (err) {
+    const errorCode = err.code ? `Error Code: ${err.code}` : "";
+    const errorMessage = err.message
+      ? err.message
+      : "An unexpected error occurred.";
+    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+  }
 };
 
-const getDummyExercises = async () => {
-  const exercises = await getExercisesForRoutine(1);
-  console.log("All exercises: ", JSON.stringify(exercises, null, 2));
+const checkSubscriptionStatus = async () => {
+  try {
+    Alert.alert("Getting info", "Getting customer info...");
+    const customerInfo = await Purchases.getCustomerInfo();
+
+    Alert.alert(
+      "Info received",
+      `Info: ${JSON.stringify(customerInfo, null, 2)}`,
+    );
+    Alert.alert(
+      "Entitlements: ",
+      `Entitlements: ${JSON.stringify(customerInfo?.entitlements, null, 2)}`,
+    );
+    Alert.alert(
+      "Active entitlements: ",
+      `Active entitlements: ${JSON.stringify(
+        customerInfo?.entitlements?.active,
+        null,
+        2,
+      )}`,
+    );
+  } catch (err) {
+    const errorCode = err.code ? `Error Code: ${err.code}` : "";
+    const errorMessage = err.message
+      ? err.message
+      : "An unexpected error occurred.";
+    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+  }
 };
 
-const getSingleRoutine = async () => {
-  const routine = await getRoutineByID(1);
-  console.log("Single routine: ", JSON.stringify(routine, null, 2));
-  return routine;
-};
+const restore = async () => {
+  try {
+    Alert.alert("Attempting restore", "Attempting restore...");
+    const restore = await Purchases.restorePurchases();
+    Alert.alert("Restore", `restore: ${JSON.stringify(restore, null, 2)}`);
 
-const deleteEx = async () => {
-  const rowsAffected = await deleteExercise(1);
-  console.log(rowsAffected);
-};
+    Alert.alert("Getting new customer info", "Getting new customer info...");
+    const customerInfo = await Purchases.getCustomerInfo();
 
-const deleteRo = async () => {
-  const rowsAffected = await deleteRoutine(1);
-  console.log(rowsAffected);
+    Alert.alert(
+      "Info received",
+      `Info: ${JSON.stringify(customerInfo, null, 2)}`,
+    );
+    Alert.alert(
+      "Entitlements: ",
+      `Entitlements: ${JSON.stringify(customerInfo?.entitlements, null, 2)}`,
+    );
+    Alert.alert(
+      "Active entitlements: ",
+      `Active entitlements: ${JSON.stringify(
+        customerInfo?.entitlements?.active,
+        null,
+        2,
+      )}`,
+    );
+  } catch (err) {
+    const errorCode = err.code ? `Error Code: ${err.code}` : "";
+    const errorMessage = err.message
+      ? err.message
+      : "An unexpected error occurred.";
+    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+  }
 };
-
-const updateSingleExercise = async () => {
-  // Important that we use 'let' instead of 'const'
-  let exercise = (await getExercisesForRoutine(1))[0];
-  exercise.title = "Modified Jumping Jacks";
-  const rowsAffected = await updateExercise(exercise);
-  console.log(rowsAffected);
-};
-
-const updateSingleRoutine = async () => {
-  // Important that we use 'let' instead of 'const'
-  let routine = await getSingleRoutine();
-  routine.title = "Modified Sample Routine";
-  const rowsAffected = await updateRoutine(routine);
-  console.log(rowsAffected);
-};
-
-const purchaseSubscription = async () => {};
 
 function DebugScreen() {
   return (
@@ -294,36 +197,21 @@ function DebugScreen() {
         <Header>Debug</Header>
       </View>
       <Button title="Reset DB" onPress={() => resetDB()} />
-      <Button title="Get Subscriptions" onPress={() => null} />
-      <Button title="Request Subscription" onPress={() => null} />
+      <Button title="Get offerings" onPress={() => getOfferings()} />
+      <Button
+        title="Get available packages"
+        onPress={() => getAvailablePackages()}
+      />
+      <Button title="Purchase monthly" onPress={() => purchaseMonthly()} />
+      <Button title="Purchase lifetime" onPress={() => purchaseLifetime()} />
+      <Button
+        title="Check subscription status"
+        onPress={() => checkSubscriptionStatus()}
+      />
+      <Button title="Restore" onPress={() => restore()} />
     </Screen>
   );
 }
-
-// <Button
-//   title="Create dummy routines"
-//   onPress={() => createDummyRoutine()}
-// />
-// <Button
-//   title="Create dummy exercises"
-//   onPress={() => createDummyExercises()}
-// />
-// <Button title="Dump settings" onPress={() => dumpDB()} />
-
-// <Button title="Dump DB" onPress={() => dumpDB()} />
-// <Button title="Get RoutineNames" onPress={() => getNames()} />
-// <Button title="Get exercises" onPress={() => getDummyExercises()} />
-// <Button title="Get single routine" onPress={() => getSingleRoutine()} />
-// <Button title="Delete exercise" onPress={() => deleteEx()} />
-// <Button title="Delete routine" onPress={() => deleteRo()} />
-// <Button
-//   title="Update exercise name"
-//   onPress={() => updateSingleExercise()}
-// />
-// <Button
-//   title="Update routine name"
-//   onPress={() => updateSingleRoutine()}
-// />
 
 const styles = StyleSheet.create({
   container: {},
