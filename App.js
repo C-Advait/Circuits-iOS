@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import { PUBLIC_IOS_SDK_KEY } from "@env";
 import * as SplashScreen from "expo-splash-screen";
 
 import { SettingsProvider } from "./app/contexts/SettingsContext";
@@ -22,6 +24,9 @@ function App() {
           playsInSilentModeIOS: true,
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
+
+        Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+        Purchases.configure({ apiKey: PUBLIC_IOS_SDK_KEY });
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {

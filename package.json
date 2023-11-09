@@ -37,6 +37,7 @@
     "react-native-background-timer": "^2.4.1",
     "react-native-collapsible": "^1.6.1",
     "react-native-config": "^1.5.1",
+    "react-native-dotenv": "^3.4.9",
     "react-native-draggable-flatlist": "^4.0.1",
     "react-native-gesture-handler": "^2.13.1",
     "react-native-linear-gradient": "^2.8.3",
