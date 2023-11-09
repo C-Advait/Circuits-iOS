@@ -3,8 +3,6 @@ import { View, StyleSheet, Button, Alert } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
 
-import { useIAP } from "react-native-iap";
-
 import {
   dropTable,
   getExercisesForRoutine,
@@ -290,47 +288,14 @@ const updateSingleRoutine = async () => {
 const purchaseSubscription = async () => {};
 
 function DebugScreen() {
-  const { getSubscriptions, subscriptions, requestSubscription } = useIAP();
-
-  const sku = "com.circuits.timer.unlimited.routines";
-
-  const handleGetSubs = async () => {
-    try {
-      // Note: getProducts takes an array directly, not an object with skus key
-      // console.log("Skus: ", skus);
-      const _subs = await getSubscriptions({ skus: [sku] });
-      //   console.err("Couldn't get subs!!! ", err),
-      // );
-      console.log("Caller received subs: ", subscriptions);
-      Alert.alert("subs: ", JSON.stringify(subscriptions, null, 2));
-    } catch (error) {
-      // Always good to handle and log errors
-      console.error("Failed to load products", error);
-    }
-  };
-
-  subscribe = async (sku, offerToken) => {
-    try {
-      await requestSubscription({
-        sku,
-        ...(offerToken && { subscriptionOffers: [{ sku, offerToken }] }),
-      });
-    } catch (err) {
-      console.warn(err.code, err.message);
-    }
-  };
-
   return (
     <Screen>
       <View style={styles.topPanel}>
         <Header>Debug</Header>
       </View>
       <Button title="Reset DB" onPress={() => resetDB()} />
-      <Button title="Get Subscriptions" onPress={handleGetSubs} />
-      <Button
-        title="Request Subscription"
-        onPress={() => subscribe(sku, null)}
-      />
+      <Button title="Get Subscriptions" onPress={() => null} />
+      <Button title="Request Subscription" onPress={() => null} />
     </Screen>
   );
 }
