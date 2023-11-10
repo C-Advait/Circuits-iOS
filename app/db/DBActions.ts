@@ -349,6 +349,7 @@ const getUserSubscriptionStatus = async () => {
             const subscription = results.rows.item(0);
             const currentDate = new Date();
             const expirationDate = new Date(subscription.expirationDate);
+            // TODO: Extract into GRACE_PERIOD_DAYS constant
             expirationDate.setDate(expirationDate.getDate() + 3); // Add 3 days to the expiration date
 
             if (

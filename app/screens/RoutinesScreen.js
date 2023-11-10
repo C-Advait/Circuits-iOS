@@ -22,7 +22,6 @@ import { Routine } from "../classes/Routine";
 import { useRoutineContext } from "../contexts/RoutineContext";
 import Screen from "../components/Screen";
 import { routineAccentColors } from "../config/colors";
-import Purchases from "react-native-purchases";
 
 function hashString(str) {
   let hash = 0;
@@ -36,14 +35,12 @@ function hashString(str) {
 
 function RoutinesScreen() {
   const navigation = useNavigation();
-  const { theme, isPremium, setIsPremium } = useAppContext();
+  const { theme, isPremium } = useAppContext();
   const styles = getStyles(theme);
 
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
   const [dataHash, setDataHash] = useState(null);
-
-  console.log("isPremium: ", isPremium);
 
   const loadRoutines = async () => {
     const newRoutines = await getAllUserCreatedRoutines();
@@ -154,32 +151,6 @@ function RoutinesScreen() {
     );
   };
 
-  const getUserDetails = async () => {
-    try {
-      const customerInfo = await Purchases.getCustomerInfo();
-      Alert.alert("Customer Info received:", customerInfo);
-
-    } catch (error) {
-      // If the promise is rejected, this code block will execute
-      // Handle the error
-      console.error("Error fetching customer info:", error);
-      // Add more code here to handle the error
-
-    }
-  }
-
-  useEffect(() => {
-    getUserDetails();
-  }, []);
-
-  useEffect(() => {
-    // Subscribe to purchaser updates
-    Purchases.addCustomerInfoUpdateListener(getUserDetails);
-    return () => {
-      Purchases.removeCustomerInfoUpdateListener(getUserDetails);
-    };
-  });
-
   return (
     <Screen>
       <View style={styles.topPanel}>
@@ -193,8 +164,8 @@ function RoutinesScreen() {
             isPremium
               ? handleNewRoutineOnpress()
               : routines.length < 5
-                ? handleNewRoutineOnpress()
-                : handleBlockedRoutineCreation();
+              ? handleNewRoutineOnpress()
+              : handleBlockedRoutineCreation();
           }}
         />
       </View>
