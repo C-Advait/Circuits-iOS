@@ -179,7 +179,10 @@ const logRoutineCompletion = async (routineID: number) => {
   });
 };
 
-const createUserSubscriptionOnSync = async (subscriptionData, activeEntitlement) => {
+const createUserSubscriptionOnSync = async (
+  subscriptionData,
+  activeEntitlement,
+) => {
   const db = getDBInstance();
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx: any) => {
@@ -315,7 +318,7 @@ const doesUserSubscriptionExist = async () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx: any) => {
       tx.executeSql(
-        "SELECT 1 from UserSubscription LIMIT 1",
+        "SELECT * from UserSubscription LIMIT 1",
         [],
         (_tx: any, results: any) => {
           if (results.rows.length === 1) {
@@ -324,11 +327,11 @@ const doesUserSubscriptionExist = async () => {
           } else {
             resolve(false);
           }
-        }
-      )
-    })
+        },
+      );
+    });
   });
-}
+};
 
 const getUserSubscriptionStatus = async () => {
   const db = getDBInstance();
@@ -348,7 +351,10 @@ const getUserSubscriptionStatus = async () => {
             const expirationDate = new Date(subscription.expirationDate);
             expirationDate.setDate(expirationDate.getDate() + 3); // Add 3 days to the expiration date
 
-            if (subscription.isActive === 'true' && currentDate <= expirationDate) {
+            if (
+              subscription.isActive === "true" &&
+              currentDate <= expirationDate
+            ) {
               resolve(true);
             } else {
               resolve(false);
@@ -360,7 +366,6 @@ const getUserSubscriptionStatus = async () => {
     });
   });
 };
-
 
 // UPDATE
 const updateExercise = async (exercise: Exercise) => {
@@ -502,7 +507,6 @@ const updateUserSubscriptionOnSync = (subscriptionData, activeEntitlement) => {
     });
   });
 };
-
 
 // DELETE
 const deleteExercise = async (exerciseID: number) => {

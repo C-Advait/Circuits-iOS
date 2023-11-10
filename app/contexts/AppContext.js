@@ -1,6 +1,10 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { lightTheme, darkTheme } from "../config/colors";
-import { getUserSubscriptionStatus, retrieveSetting, updateSetting } from "../db/DBActions";
+import {
+  getUserSubscriptionStatus,
+  retrieveSetting,
+  updateSetting,
+} from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
 
 export const AppContext = createContext();
@@ -9,15 +13,20 @@ export const AppContextProvider = ({ children }) => {
   // default theme
   const [theme, setTheme] = useState(darkTheme);
   const [soundOn, setSoundOn] = useState(true);
-  // Add useEffect to set this correctly at the start.
-
-  const premiumStatus = getUserSubscriptionStatus();
-  const [isPremium, setIsPremium] = useState(premiumStatus);
-  console.log("inside AppContextProvider", isPremium);
+  const [isPremium, setIsPremium] = useState(true);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
   };
+
+  useEffect(() => {
+    const loadPremium = async () => {
+      const premiumStatus = await getUserSubscriptionStatus();
+      setIsPremium(premiumStatus);
+    };
+
+    loadPremium();
+  }, []);
 
   useEffect(() => {
     const loadSettings = async () => {
