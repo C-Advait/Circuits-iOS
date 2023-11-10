@@ -1,6 +1,8 @@
 import { Tag, Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 
+export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 3;
+
 export const TAB_BAR_HEIGHT = 90;
 
 // Font

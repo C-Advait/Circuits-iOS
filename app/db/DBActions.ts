@@ -3,6 +3,7 @@ import { getDBInstance } from "./DBSetup";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
+import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
 // Settings
 const retrieveSetting = (key: String) => {
@@ -349,8 +350,9 @@ const getUserSubscriptionStatus = async () => {
             const subscription = results.rows.item(0);
             const currentDate = new Date();
             const expirationDate = new Date(subscription.expirationDate);
-            // TODO: Extract into GRACE_PERIOD_DAYS constant
-            expirationDate.setDate(expirationDate.getDate() + 3); // Add 3 days to the expiration date
+            expirationDate.setDate(
+              expirationDate.getDate() + SUBSCRIPTION_GRACE_PERIOD_DAYS,
+            );
 
             if (
               subscription.isActive === "true" &&
