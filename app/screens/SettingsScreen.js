@@ -17,15 +17,15 @@ import routes from "../navigation/routes";
 
 import Screen from "../components/Screen";
 import Header from "../components/Header";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 
 // localize 'behaviour'?
 function SettingsScreen() {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   const navigation = useNavigation();
 
-  const { soundOn, updateSound } = useSettings();
+  const { soundOn, updateSound } = useAppContext();
 
   const toggleSound = () => {
     updateSound(!soundOn);
@@ -92,8 +92,11 @@ function SettingsScreen() {
     {
       id: 1,
       title: "Subscription Plan",
-      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.SETTINGS_SCREEN }),
-    }
+      onTouchablePress: () =>
+        navigation.navigate(routes.SUBSCRIPTION_SCREEN, {
+          prevScreen: routes.SETTINGS_SCREEN,
+        }),
+    },
   ];
 
   const support = [
@@ -125,8 +128,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-              Alert.alert(item.title, item.title);
-            }
+                Alert.alert(item.title, item.title);
+              }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>

@@ -14,7 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import Screen from "../components/Screen";
 import NavHeader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import ImageText from "../components/ImageText";
 import {
   PARAGRAPH_FONT_SIZE,
@@ -26,7 +26,7 @@ import { SKU } from "../config/skus";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 

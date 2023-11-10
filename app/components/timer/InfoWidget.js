@@ -1,10 +1,10 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
-import { useSettings } from "../../contexts/SettingsContext";
+import { useAppContext } from "../../contexts/AppContext";
 import { Tag } from "../../classes/Exercise";
 
 function InfoWidget({ title, state }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   let current, total;

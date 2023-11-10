@@ -22,7 +22,7 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import AuxiliaryCard from "../components/AuxiliaryCard";
 import Screen from "../components/Screen";
 import routes from "../navigation/routes";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import ExerciseCard from "../components/ExerciseCard";
 import { Tag, Exercise } from "../classes/Exercise";
 import {
@@ -100,7 +100,7 @@ function RoutineEditScreen({ route }) {
     setContextRoutine,
     setContextExercises,
   } = useRoutineContext();
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   // end region
 
@@ -291,7 +291,6 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleSavePress = async () => {
-
     // Prepare exercises to be created in backend
     const finalExercises = [state.warmup, ...state.workingSet, state.cooldown];
 
@@ -339,7 +338,6 @@ function RoutineEditScreen({ route }) {
       // Call backened to create/modify each exercise
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
     });
-
 
     // Delete removed exercises
     exerciseIDsToDelete.forEach((id) => {
@@ -617,8 +615,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-              state.cooldown.workTime +
-              state.numberOfLoops * state.workTime,
+                state.cooldown.workTime +
+                state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>

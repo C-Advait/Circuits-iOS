@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { useSettings } from "../../contexts/SettingsContext";
+import { useAppContext } from "../../contexts/AppContext";
 import {
   PARAGRAPH_FONT_SIZE,
   PARAGRAPH_FONT_WEIGHT,
@@ -15,7 +15,7 @@ function SubscriptionButton({
   titleText,
   priceText,
 }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStylesActive(theme);
 
   return (

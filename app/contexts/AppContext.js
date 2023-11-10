@@ -3,12 +3,15 @@ import { lightTheme, darkTheme } from "../config/colors";
 import { retrieveSetting, updateSetting } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
 
-export const SettingsContext = createContext();
+export const AppContext = createContext();
 
-export const SettingsProvider = ({ children }) => {
+export const AppContextProvider = ({ children }) => {
   // default theme
   const [theme, setTheme] = useState(darkTheme);
   const [soundOn, setSoundOn] = useState(true);
+  // Add useEffect to set this correctly at the start.
+  const [isPremium, setIsPremium] = useState(true);
+  console.log("inside AppContextProvider", isPremium);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
@@ -33,20 +36,22 @@ export const SettingsProvider = ({ children }) => {
   };
 
   return (
-    <SettingsContext.Provider
+    <AppContext.Provider
       value={{
         theme,
         toggleTheme,
         soundOn,
         setSoundOn,
         updateSound,
+        isPremium,
+        setIsPremium,
       }}
     >
       {children}
-    </SettingsContext.Provider>
+    </AppContext.Provider>
   );
 };
 
-export const useSettings = () => {
-  return useContext(SettingsContext);
+export const useAppContext = () => {
+  return useContext(AppContext);
 };

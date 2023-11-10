@@ -6,7 +6,7 @@ import { useNavigation } from "@react-navigation/core";
 import routes from "../navigation/routes";
 
 import LabelledIconButton from "../components/buttons/LabelledIconButton";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import { PlayPause, SkipButton, Timer } from "../components/timer";
 import InfoWidget from "../components/timer/InfoWidget";
 import ProgressSlider from "../components/timer/ProgressSlider";
@@ -22,7 +22,7 @@ import CountdownModal from "../components/timer/CountdownModal";
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   const [state, dispatch] = useReducer(reducer, initialState);

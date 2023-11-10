@@ -11,10 +11,10 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Keyboard
+  Keyboard,
 } from "react-native";
 
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import {
   EDITABLE_TEXT_FONT_SIZE,
   EDITABLE_TEXT_FONT_WEIGHT,
@@ -23,8 +23,8 @@ import {
 } from "../config/appConstants";
 
 const EditableText = forwardRef((props, ref) => {
-  const { theme } = useSettings();
-  const { original, onSubmit, maxLength, rightFlush, size = 'regular' } = props;
+  const { theme } = useAppContext();
+  const { original, onSubmit, maxLength, rightFlush, size = "regular" } = props;
 
   const [placeholder, setPlaceholder] = useState(original);
   const [text, setText] = useState(original);
@@ -41,11 +41,10 @@ const EditableText = forwardRef((props, ref) => {
     fontSize = TITLE_FONT_SIZE;
     fontWeight = TITLE_FONT_WEIGHT;
   } else {
-    throw Error("size prop got an unexpected value: ", size)
+    throw Error("size prop got an unexpected value: ", size);
   }
 
   const styles = getStyles(theme, fontSize, fontWeight);
-
 
   useEffect(() => {
     setText(original);
@@ -73,7 +72,10 @@ const EditableText = forwardRef((props, ref) => {
   //When keyboard hides, call handleBlur
   useEffect(() => {
     // Attach the keyboard hide listener when the component mounts
-    const keyboardHideListener = Keyboard.addListener('keyboardDidHide', handleBlur);
+    const keyboardHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      handleBlur,
+    );
 
     // Cleanup the listener when the component unmounts
     return () => {
@@ -95,10 +97,14 @@ const EditableText = forwardRef((props, ref) => {
       style={styles.touchableArea}
     >
       {isEditing ? (
-        <View style={[
-          styles.inputContainer,
-          rightFlush ? { justifyContent: "flex-end" } : { justifyContent: "flex-start" }
-        ]}>
+        <View
+          style={[
+            styles.inputContainer,
+            rightFlush
+              ? { justifyContent: "flex-end" }
+              : { justifyContent: "flex-start" },
+          ]}
+        >
           <Text style={[styles.text, styles.fadedSuggestion]} numberOfLines={1}>
             {text === "" ? placeholder : null}
           </Text>
@@ -109,9 +115,9 @@ const EditableText = forwardRef((props, ref) => {
             onBlur={handleBlur}
             onFocus={handleFocus}
             onSubmitEditing={(event) => {
-              event.nativeEvent.text !== "" ?
-                setPlaceholder(event.nativeEvent.text) :
-                null
+              event.nativeEvent.text !== ""
+                ? setPlaceholder(event.nativeEvent.text)
+                : null;
             }}
             style={[styles.textInput, textStyle]}
             autoFocus={true}
@@ -121,10 +127,14 @@ const EditableText = forwardRef((props, ref) => {
           />
         </View>
       ) : (
-        <View style={[
-          styles.inputContainer,
-          rightFlush ? { justifyContent: "flex-end" } : { justifyContent: "flex-start" }
-        ]}>
+        <View
+          style={[
+            styles.inputContainer,
+            rightFlush
+              ? { justifyContent: "flex-end" }
+              : { justifyContent: "flex-start" },
+          ]}
+        >
           <Text style={textStyle} numberOfLines={1}>
             {text || placeholder}
           </Text>
