@@ -3,16 +3,22 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { EvilIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-import { useSettings } from "../contexts/SettingsContext";
-import {
-  INFO_FONT_SIZE,
-} from "../config/appConstants";
+import { useAppContext } from "../contexts/AppContext";
+import { INFO_FONT_SIZE } from "../config/appConstants";
 
-function ExerciseCard({ title, subTitle, accentColor, drag, style, contentOnpress, deleteOnpress }) {
-  const { theme } = useSettings();
+function ExerciseCard({
+  title,
+  subTitle,
+  accentColor,
+  drag,
+  style,
+  contentOnpress,
+  deleteOnpress,
+}) {
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
-  accentColor = accentColor ? accentColor : "transparent"
+  accentColor = accentColor ? accentColor : "transparent";
 
   return (
     <View style={[styles.container, style]}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
@@ -6,11 +6,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import * as SplashScreen from "expo-splash-screen";
 
-import { SettingsProvider } from "./app/contexts/SettingsContext";
+import { AppContextProvider } from "./app/contexts/AppContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 import { Audio, InterruptionModeIOS } from "expo-av";
 import { createUserSubscriptionOnSync, doesUserSubscriptionExist, updateUserSubscriptionOnSync } from "./app/db/DBActions"
+
+SplashScreen.preventAutoHideAsync();
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -18,7 +20,6 @@ function App() {
   useEffect(() => {
     const init = async () => {
       try {
-        SplashScreen.preventAutoHideAsync();
         await initializeDB();
         await Audio.setAudioModeAsync({
           staysActiveInBackground: true,
@@ -36,7 +37,6 @@ function App() {
         console.error("Something went wrong during init.", error);
       } finally {
         setReady(true);
-        await SplashScreen.hideAsync();
       }
     };
 
@@ -64,20 +64,22 @@ function App() {
     Purchases.addCustomerInfoUpdateListener(handleCustomerInfoUpdate);
 
     init();
-
-    return () => {
-      Purchases.removeCustomerInfoUpdateListener(handleCustomerInfoUpdate);
-    };
   }, []);
 
+  const onLayoutRootView = useCallback(async () => {
+    if (ready) {
+      await SplashScreen.hideAsync();
+    }
+  }, [ready]);
+
   return ready ? (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Host>
-        <SettingsProvider>
+        <AppContextProvider>
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>
-        </SettingsProvider>
+        </AppContextProvider>
       </Host>
     </GestureHandlerRootView>
   ) : null;
