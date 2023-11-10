@@ -155,11 +155,18 @@ function RoutinesScreen() {
   };
 
   const getUserDetails = async () => {
-    const customerInfo = await Purchases.getCustomerInfo();
-    setIsPremium(
-      typeof customerInfo.entitlements.active.Premium !== "undefined",
-    );
-  };
+    try {
+      const customerInfo = await Purchases.getCustomerInfo();
+      Alert.alert("Customer Info received:", customerInfo);
+
+    } catch (error) {
+      // If the promise is rejected, this code block will execute
+      // Handle the error
+      console.error("Error fetching customer info:", error);
+      // Add more code here to handle the error
+
+    }
+  }
 
   useEffect(() => {
     getUserDetails();
@@ -186,8 +193,8 @@ function RoutinesScreen() {
             isPremium
               ? handleNewRoutineOnpress()
               : routines.length < 5
-              ? handleNewRoutineOnpress()
-              : handleBlockedRoutineCreation();
+                ? handleNewRoutineOnpress()
+                : handleBlockedRoutineCreation();
           }}
         />
       </View>
