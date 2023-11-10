@@ -53,7 +53,7 @@ const getStylesActive = (theme) =>
     priceText: {
       marginTop: 4,
       fontSize: 15,
-      fontWeight: 500,
+      fontWeight: "500",
       color: theme.secondary,
     },
     gradientBorder: {

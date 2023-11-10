@@ -291,7 +291,6 @@ function RoutineEditScreen({ route }) {
   };
 
   const handleSavePress = async () => {
-
     // Prepare exercises to be created in backend
     const finalExercises = [state.warmup, ...state.workingSet, state.cooldown];
 
@@ -339,7 +338,6 @@ function RoutineEditScreen({ route }) {
       // Call backened to create/modify each exercise
       exercise.id ? updateExercise(exercise) : createExercise(exercise);
     });
-
 
     // Delete removed exercises
     exerciseIDsToDelete.forEach((id) => {
@@ -617,8 +615,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-              state.cooldown.workTime +
-              state.numberOfLoops * state.workTime,
+                state.cooldown.workTime +
+                state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
@@ -833,7 +831,7 @@ const getStyles = (theme) =>
     title: {
       color: theme.foreground,
       fontSize: 30,
-      fontWeight: 600,
+      fontWeight: "600",
     },
     scrollContainer: {
       paddingBottom: TAB_BAR_HEIGHT,

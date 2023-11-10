@@ -53,7 +53,7 @@ const getStyles = (theme) =>
     },
     text: {
       fontSize: 17,
-      fontWeight: 500,
+      fontWeight: "500",
     },
     textView: {
       position: "center",
