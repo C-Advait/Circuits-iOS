@@ -200,15 +200,15 @@ const getNewRoutineID = async () => {
   const db = getDBInstance();
 
   return new Promise<number>((resolve, reject) => {
-    db.transaction((tx) => {
+    db.transaction((tx: any) => {
       tx.executeSql(
         "SELECT MAX(id) as maxID FROM Routine",
         [],
-        (_tx, results) => {
+        (_tx: any, results: any) => {
           const maxID = results.rows.item(0).maxID || 0;
           resolve(maxID + 1);
         },
-        (error) => reject(error),
+        (error: any) => reject(error),
       );
     });
   });
@@ -258,6 +258,22 @@ const getExercisesForRoutine = async (routineID: number) => {
         [routineID],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Exercise(row)));
+        },
+      );
+    }, reject);
+  });
+};
+
+const getAllRoutineCompletions = async (routineID: number) => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM RoutineCompletion",
+        [routineID],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw());
         },
       );
     }, reject);
@@ -404,6 +420,7 @@ export {
   getRoutineByID,
   getExercisesForRoutine,
   getNewRoutineID,
+  getAllRoutineCompletions,
   updateExercise,
   updateRoutine,
   deleteExercise,
