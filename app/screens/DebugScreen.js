@@ -15,6 +15,7 @@ import {
   updateExercise,
   updateRoutine,
   getSettings,
+  getAllRoutineCompletions,
 } from "../db/DBActions";
 import { initTables } from "../db/DBSetup";
 import { Exercise, Tag } from "../classes/Exercise";
@@ -24,6 +25,7 @@ const resetDB = async () => {
   dropTable("Exercise")
     .then(dropTable("Routine"))
     .then(dropTable("Setting"))
+    .then(dropTable("RoutineCompletion"))
     .then(initTables())
     .then(Alert.alert("All tables dropped and recreated!"));
 };
@@ -285,7 +287,10 @@ const updateSingleRoutine = async () => {
   console.log(rowsAffected);
 };
 
-const purchaseSubscription = async () => {};
+const dumpCompletions = async () => {
+  const completions = await getAllRoutineCompletions();
+  console.log(JSON.stringify(completions, null, 2));
+};
 
 function DebugScreen() {
   return (
@@ -296,6 +301,7 @@ function DebugScreen() {
       <Button title="Reset DB" onPress={() => resetDB()} />
       <Button title="Get Subscriptions" onPress={() => null} />
       <Button title="Request Subscription" onPress={() => null} />
+      <Button title="Dump completions" onPress={() => dumpCompletions()} />
     </Screen>
   );
 }

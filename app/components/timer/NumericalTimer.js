@@ -14,7 +14,7 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
     state.intervals[state.currentIndex]?.duration,
   );
 
-  const EPS = 0.01; // Tolerance for elapsedTime === 1.
+  const EPS = 0.015; // Tolerance for elapsedTime === 1.
 
   useEffect(() => {
     setExerciseSecondsRemaining(state.exerciseSecondsRemaining);
@@ -50,6 +50,11 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
             elapsedTime -= 1;
           } else {
             rafID = requestAnimationFrame(frame);
+
+            // For the very rare case that elapsedTime misses [1 - EPS, 1 + EPS]
+            if (elapsedTime > 1 + 2 * EPS) {
+              dispatch({ type: timerActions.SKIP_FORWARD });
+            }
           }
         }
       } else if (exerciseSecondsRemaining > 0) {
