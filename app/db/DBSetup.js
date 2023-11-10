@@ -1,7 +1,87 @@
 import SQLite from "react-native-sqlite-storage";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
+import { defaultExercises, defaultRoutines } from "../config/defaultRoutines";
+
 
 let db;
+
+const createDefaultRoutine = (tx, routine) => {
+  const query = `INSERT OR IGNORE INTO Routine (
+      numberOfLoops, 
+      title, 
+      duration, 
+      color, 
+      userCreated,
+      timeMostRecentlyCompleted
+    ) VALUES (?, ?, ?, ?, ?, ?)`;
+
+  tx.executeSql(
+    query,
+    [
+      routine.numberOfLoops,
+      routine.title,
+      routine.duration,
+      routine.color,
+      routine.userCreated ? 1 : 0, // converting boolean to integer
+      routine.timeMostRecentlyCompleted,
+    ],
+    (_txObj, resultSet) => {
+      return;
+    },
+    (error) => console.log(error),
+  );
+};
+
+const createDefaultExercise = (tx, exercise) => {
+  const query = `INSERT OR IGNORE INTO Exercise (
+      routineID, 
+      title, 
+      exerciseOrder,
+      tag, 
+      workTime, 
+      numberOfRounds, 
+      restBetweenRounds, 
+      breakBeforeNext, 
+      category,
+      color
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  tx.executeSql(
+    query,
+    [
+      exercise.routineID,
+      exercise.title,
+      exercise.exerciseOrder,
+      exercise.tag,
+      exercise.workTime,
+      exercise.numberOfRounds,
+      exercise.restBetweenRounds,
+      exercise.breakBeforeNext,
+      exercise.category,
+      exercise.color,
+    ],
+    (_txObj, resultSet) => {
+      return;
+    },
+    (error) => console.log(error),
+  );
+};
+
+const createDefaults = (tx) => {
+  try {
+    // Insert all routines first
+    for (const routine of defaultRoutines) {
+      createDefaultRoutine(tx, routine);
+    }
+
+    // Insert all exercises next
+    for (const exercise of defaultExercises) {
+      createDefaultExercise(tx, exercise);
+    }
+  } catch (error) {
+    console.error("Error creating defaults:", error);
+  }
+};
 
 export const initializeDB = async () => {
   return new Promise((resolve, reject) => {
@@ -115,6 +195,30 @@ export const initTables = async () => {
       (error) => {
         console.error("Error creating `Routine` table.", error);
       },
+    );
+
+    tx.executeSql(
+      `SELECT COUNT(*) AS count FROM Routine`,
+      [],
+      (_txObj, routineResult) => {
+        // Check if the Exercise table has any entries
+        tx.executeSql(
+          `SELECT COUNT(*) AS count FROM Exercise`,
+          [],
+          (_txObj, exerciseResult) => {
+            // If no entries in both tables, call createDefaults
+            if (routineResult.rows.item(0).count === 0 && exerciseResult.rows.item(0).count === 0) {
+              createDefaults(tx);
+            }
+          },
+          (error) => {
+            console.error("Error querying `Exercise` table.", error);
+          }
+        );
+      },
+      (error) => {
+        console.error("Error querying `Routine` table.", error);
+      }
     );
   });
 };
