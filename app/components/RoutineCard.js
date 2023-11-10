@@ -15,7 +15,13 @@ import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 import { useRoutineContext } from "../contexts/RoutineContext";
 import { Tag } from "../classes/Exercise";
 
-function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback, isEnabled = true }) {
+function RoutineCard({
+  routine,
+  isExpanded,
+  toggleExpand,
+  deleteCallback,
+  isEnabled = true,
+}) {
   const navigation = useNavigation();
   const { theme } = useSettings();
   const styles = getStyles(theme);
@@ -30,8 +36,9 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback, isEnab
       exercises
         .map((exercise) => {
           if (exercise.tag === Tag.WORKING) {
-            return `${exercise.title} (${exercise.numberOfRounds
-              } x ${formatDuration(exercise.workTime)})`;
+            return `${exercise.title} (${
+              exercise.numberOfRounds
+            } x ${formatDuration(exercise.workTime)})`;
           } else {
             // Warmup / cooldown shouldnt't display number of rounds
             if (exercise.workTime)
@@ -66,14 +73,21 @@ function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback, isEnab
     }
   };
 
-  return !(isEnabled) ? (
+  return !isEnabled ? (
     <View style={styles.container}>
       <View style={[styles.accent, { backgroundColor: "#38383A" }]} />
       <View style={styles.permanentInfoContainer}>
         <View>
-          <View style={{ flexDirection: 'row', }}>
+          <View style={{ flexDirection: "row" }}>
             <Feather name="lock" size={20} color="#646464" />
-            <Text style={[styles.header, { fontWeight: '600', color: theme.textDisabled, marginLeft: 6 }]}>{routine.title}</Text>
+            <Text
+              style={[
+                styles.header,
+                { fontWeight: "600", color: theme.textDisabled, marginLeft: 6 },
+              ]}
+            >
+              {routine.title}
+            </Text>
           </View>
           <Text style={styles.duration}>
             {formatDuration(routine.duration)}
@@ -210,7 +224,7 @@ const getStyles = (theme) =>
     duration: {
       color: theme.text60,
       fontSize: ROUTINE_PARAGRAPH_FONT_SIZE,
-      fontWeight: 600,
+      fontWeight: "600",
     },
     disabled: {
       color: "#121212",
@@ -218,7 +232,7 @@ const getStyles = (theme) =>
     header: {
       color: theme.primary,
       fontSize: ROUTINE_TITLE_FONT_SIZE,
-      fontWeight: 700,
+      fontWeight: "700",
       marginBottom: 8,
     },
     permanentInfoContainer: {

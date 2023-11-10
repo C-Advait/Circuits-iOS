@@ -92,8 +92,11 @@ function SettingsScreen() {
     {
       id: 1,
       title: "Subscription Plan",
-      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.SETTINGS_SCREEN }),
-    }
+      onTouchablePress: () =>
+        navigation.navigate(routes.SUBSCRIPTION_SCREEN, {
+          prevScreen: routes.SETTINGS_SCREEN,
+        }),
+    },
   ];
 
   const support = [
@@ -125,8 +128,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-              Alert.alert(item.title, item.title);
-            }
+                Alert.alert(item.title, item.title);
+              }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
@@ -193,7 +196,7 @@ const getStyles = (theme) =>
     sectionTitle: {
       color: theme.secondary,
       fontSize: 14,
-      fontWeight: 500,
+      fontWeight: "500",
       marginLeft: 16,
       marginBottom: 8,
     },

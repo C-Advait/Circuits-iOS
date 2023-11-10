@@ -69,7 +69,7 @@ const getStyles = (theme) =>
     done: {
       color: theme.successGreen,
       fontSize: 16,
-      fontWeight: 500,
+      fontWeight: "500",
     },
     overlay: {
       flex: 1,

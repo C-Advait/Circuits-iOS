@@ -183,7 +183,7 @@ const getStyles = (theme) =>
     },
     descriptionText: {
       fontSize: 13,
-      fontWeight: 400,
+      fontWeight: "400",
       color: "gray",
       alignSelf: "stretch",
       marginBottom: 10,

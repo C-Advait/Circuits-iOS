@@ -4,15 +4,21 @@ import { EvilIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
 import { useSettings } from "../contexts/SettingsContext";
-import {
-  INFO_FONT_SIZE,
-} from "../config/appConstants";
+import { INFO_FONT_SIZE } from "../config/appConstants";
 
-function ExerciseCard({ title, subTitle, accentColor, drag, style, contentOnpress, deleteOnpress }) {
+function ExerciseCard({
+  title,
+  subTitle,
+  accentColor,
+  drag,
+  style,
+  contentOnpress,
+  deleteOnpress,
+}) {
   const { theme } = useSettings();
   const styles = getStyles(theme);
 
-  accentColor = accentColor ? accentColor : "transparent"
+  accentColor = accentColor ? accentColor : "transparent";
 
   return (
     <View style={[styles.container, style]}>
@@ -102,7 +108,7 @@ const getStyles = (theme) =>
     title: {
       color: theme.primary,
       fontSize: 17,
-      fontWeight: 500,
+      fontWeight: "500",
       marginBottom: 7,
     },
     subTitle: {

@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   title: {
     color: "white",
     fontSize: 27,
-    fontWeight: 500,
+    fontWeight: "500",
     textAlign: "center",
   },
   timer: {
