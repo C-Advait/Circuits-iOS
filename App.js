@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import { Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
-import { PUBLIC_IOS_SDK_KEY } from "@env";
 import * as SplashScreen from "expo-splash-screen";
 
 import { SettingsProvider } from "./app/contexts/SettingsContext";
@@ -26,8 +26,11 @@ function App() {
         });
 
         Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-        Alert.alert("About to configure", `Api key: ${PUBLIC_IOS_SDK_KEY}`);
-        Purchases.configure({ apiKey: PUBLIC_IOS_SDK_KEY });
+        Alert.alert(
+          "About to configure",
+          `Api key: ${process.env.PUBLIC_IOS_SDK_KEY}`,
+        );
+        Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY });
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {
@@ -36,8 +39,21 @@ function App() {
       }
     };
 
+    const handleCustomerInfoUpdate = (info) => {
+      Alert.alert(
+        "Purchaser info updated",
+        `info: ${JSON.stringify(info, null, 2)}`,
+      );
+    };
+
+    Purchases.addCustomerInfoUpdateListener(handleCustomerInfoUpdate);
+
     init();
-  });
+
+    return () => {
+      Purchases.removeCustomerInfoUpdateListener(handleCustomerInfoUpdate);
+    };
+  }, []);
 
   return ready ? (
     <GestureHandlerRootView style={{ flex: 1 }}>
