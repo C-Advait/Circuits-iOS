@@ -116,6 +116,31 @@ export const initTables = async () => {
         console.error("Error creating `Routine` table.", error);
       },
     );
+
+    tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS UserSubscription (
+        id TEXT,
+        requestDate TEXT,
+        entitlementId TEXT,
+        isActive TEXT,
+        productId TEXT,
+        periodType Text,
+        expirationDate TEXT,
+        purchaseDate TEXT,
+        originalPurchaseDate TEXT,
+        store TEXT,
+        isSandbox TEXT,
+        unsubscribeDetectedAt TEXT,
+        billingIssueDetectedAt TEXT
+      );`,
+      [],
+      (_tx, _resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error("Error creating `UserSubscription` table.", error);
+      },
+    );
   });
 };
 

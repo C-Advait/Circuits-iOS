@@ -10,6 +10,7 @@ import { SettingsProvider } from "./app/contexts/SettingsContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 import { Audio, InterruptionModeIOS } from "expo-av";
+import { createUserSubscriptionOnSync, doesUserSubscriptionExist, updateUserSubscriptionOnSync } from "./app/db/DBActions"
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -39,7 +40,21 @@ function App() {
       }
     };
 
-    const handleCustomerInfoUpdate = (info) => {
+    const handleCustomerInfoUpdate = async (info) => {
+
+      //guard against empty customerInfo object?
+      const activeEntitlements = info.entitlements.active["Premium"];
+      if (typeof activeEntitlements !== "undefined") {
+        const userSubEntryExists = await doesUserSubscriptionExist();
+        if (userSubEntryExists) {
+          const updateResponse = await updateUserSubscriptionOnSync(info, activeEntitlements);
+          Alert.alert("Status subscription update", updateResponse);
+        } else {
+          const createResponse = await createUserSubscriptionOnSync(info, activeEntitlements);
+          Alert.alert("Status subscription creation", createResponse);
+        }
+      }
+
       Alert.alert(
         "Purchaser info updated",
         `info: ${JSON.stringify(info, null, 2)}`,

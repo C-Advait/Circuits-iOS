@@ -179,6 +179,51 @@ const logRoutineCompletion = async (routineID: number) => {
   });
 };
 
+const createUserSubscriptionOnSync = async (subscriptionData, activeEntitlement) => {
+  const db = getDBInstance();
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `INSERT INTO UserSubscription
+          requestDate = ?,
+          entitlementId = ?,
+          isActive = ?,
+          productId = ?,
+          periodType = ?,
+          expirationDate = ?,
+          purchaseDate = ?,
+          originalPurchaseDate = ?,
+          store = ?,
+          isSandbox = ?,
+          unsubscribeDetectedAt = ?,
+          billingIssueDetectedAt = ?
+          id = ?`;
+
+      tx.executeSql(
+        query,
+        [
+          subscriptionData.requestDate,
+          activeEntitlement.entitlementId,
+          activeEntitlement.isActive,
+          activeEntitlement.productId,
+          activeEntitlement.periodType,
+          activeEntitlement.expirationDate,
+          activeEntitlement.purchaseDate,
+          activeEntitlement.originalPurchaseDate,
+          activeEntitlement.store,
+          activeEntitlement.isSandbox,
+          activeEntitlement.unsubscribeDetectedAt,
+          activeEntitlement.billingIssueDetectedAt,
+          activeEntitlement.originalAppUserId.$RCAnonymousID,
+        ],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
 // READ
 const getAllUserCreatedRoutines = async () => {
   const db = getDBInstance();
@@ -263,6 +308,59 @@ const getExercisesForRoutine = async (routineID: number) => {
     }, reject);
   });
 };
+
+const doesUserSubscriptionExist = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT 1 from UserSubscription LIMIT 1",
+        [],
+        (_tx: any, results: any) => {
+          if (results.rows.length === 1) {
+            // No entry exists
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }
+      )
+    })
+  });
+}
+
+const getUserSubscriptionStatus = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM UserSubscription LIMIT 1", // Assuming there's only one entry per user
+        [],
+        (_tx: any, results: any) => {
+          if (results.rows.length === 0) {
+            // No entry exists
+            resolve(false);
+          } else {
+            const subscription = results.rows.item(0);
+            const currentDate = new Date();
+            const expirationDate = new Date(subscription.expirationDate);
+            expirationDate.setDate(expirationDate.getDate() + 3); // Add 3 days to the expiration date
+
+            if (subscription.isActive === 'true' && currentDate <= expirationDate) {
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          }
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
 
 // UPDATE
 const updateExercise = async (exercise: Exercise) => {
@@ -360,6 +458,52 @@ const updateMostRecentRoutineCompletion = async (routineID: number) => {
   });
 };
 
+const updateUserSubscriptionOnSync = (subscriptionData, activeEntitlement) => {
+  const db = getDBInstance();
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscription SET
+          requestDate = ?,
+          entitlementId = ?,
+          isActive = ?,
+          productId = ?,
+          periodType = ?,
+          expirationDate = ?,
+          purchaseDate = ?,
+          originalPurchaseDate = ?,
+          store = ?,
+          isSandbox = ?,
+          unsubscribeDetectedAt = ?,
+          billingIssueDetectedAt = ?
+        WHERE id = ?`;
+
+      tx.executeSql(
+        query,
+        [
+          subscriptionData.requestDate,
+          activeEntitlement.entitlementId,
+          activeEntitlement.isActive,
+          activeEntitlement.productId,
+          activeEntitlement.periodType,
+          activeEntitlement.expirationDate,
+          activeEntitlement.purchaseDate,
+          activeEntitlement.originalPurchaseDate,
+          activeEntitlement.store,
+          activeEntitlement.isSandbox,
+          activeEntitlement.unsubscribeDetectedAt,
+          activeEntitlement.billingIssueDetectedAt,
+          activeEntitlement.originalAppUserId.$RCAnonymousID,
+        ],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+
 // DELETE
 const deleteExercise = async (exerciseID: number) => {
   const db = getDBInstance();
@@ -399,13 +543,17 @@ export {
   createExercise,
   createRoutine,
   logRoutineCompletion,
+  createUserSubscriptionOnSync,
   getAllUserCreatedRoutines,
   getAllRoutineNames,
   getRoutineByID,
   getExercisesForRoutine,
   getNewRoutineID,
+  doesUserSubscriptionExist,
+  getUserSubscriptionStatus,
   updateExercise,
   updateRoutine,
+  updateUserSubscriptionOnSync,
   deleteExercise,
   deleteRoutine,
 };
