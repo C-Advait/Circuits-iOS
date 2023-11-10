@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import {
   Alert,
   Image,
@@ -30,6 +30,25 @@ const SubscriptionScreen = ({ route }) => {
   const { theme } = useAppContext();
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
+
+  useEffect(() => {
+    const localizePrices = async () => {
+      const offerings = await Purchases.getOfferings();
+      const { monthly, annual } = offerings?.current;
+      dispatch({
+        type: subscriptionActions.SET_PRICE,
+        plan: PREMIUM_PLANS.MONTHLY,
+        price: monthly?.product?.priceString,
+      });
+      dispatch({
+        type: subscriptionActions.SET_PRICE,
+        plan: PREMIUM_PLANS.ANNUAL,
+        price: annual?.product?.priceString,
+      });
+    };
+
+    localizePrices();
+  }, []);
 
   const buy = async (subscriptionDuration) => {
     try {
@@ -98,10 +117,16 @@ const SubscriptionScreen = ({ route }) => {
             console.error(`Unknown plan: ${action.payload}`);
             return state;
         }
+
+      case subscriptionActions.SET_PRICE:
+        if (typeof action.price !== undefined)
+          return { ...state, [action.plan]: [action.price] };
     }
   };
 
   const initialState = {
+    monthly: "$0.99",
+    annual: "$4.99",
     selectedPlan: PREMIUM_PLANS.MONTHLY,
     continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
   };
@@ -161,7 +186,7 @@ const SubscriptionScreen = ({ route }) => {
             <SubscriptionButton
               enabled={state.selectedPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
-              priceText={"$0.99 monthly"}
+              priceText={`${state.monthly} monthly`}
               onPress={() =>
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
@@ -172,7 +197,7 @@ const SubscriptionScreen = ({ route }) => {
             <SubscriptionButton
               enabled={state.selectedPlan === PREMIUM_PLANS.ANNUAL}
               titleText={"Annual Pass"}
-              priceText={"$5.99 annually"}
+              priceText={`${state.annual} annually`}
               onPress={() =>
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
