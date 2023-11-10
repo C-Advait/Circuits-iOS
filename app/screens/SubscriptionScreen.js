@@ -22,7 +22,8 @@ import {
 } from "../config/appConstants";
 import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
-import { SKU } from "../config/skus";
+import { PREMIUM_PLANS } from "../config/premiumPlans";
+import Purchases from "react-native-purchases";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -30,27 +31,50 @@ const SubscriptionScreen = ({ route }) => {
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
-  const subscribe = async (sku) => {
+  const buy = async (subscriptionDuration) => {
     try {
-      Alert.alert(`Subscribe`, `Subscribing to sku: ${sku}`);
-    } catch (err) {
-      console.warn(err.code, err.message);
-    }
-  };
+      const offerings = await Purchases.getOfferings();
+      if (offerings.current !== null) {
+        const packageToBuy = offerings.current[`${subscriptionDuration}`];
+        Alert.alert("packageToBuy: ", JSON.stringify(packageToBuy, null, 2));
 
-  const purchase = async (sku) => {
-    try {
-      Alert.alert(`Purchase`, `Purchasing sku: ${sku}`);
+        // Purchase it.
+        Alert.alert(`About to purchase package (${subscriptionDuration})`);
+        const purchaseMade = await Purchases.purchasePackage(packageToBuy);
+        if (
+          typeof purchaseMade.customerInfo.entitlements.active.Premium !==
+          "undefined"
+        ) {
+          Alert.alert(
+            `Purchase of ${subscriptionDuration} package successful!`,
+          );
+          // Unlock premium. Probably need to write DB, but don't need to update context (handled by listener).
+        } else {
+          Alert.alert(`Purchase of ${subscriptionDuration} package failed!`);
+        }
+      } else {
+        Alert.alert("WEIRD BRANCH", "offerings.current was null");
+      }
     } catch (err) {
-      console.warn(err.code, err.message);
+      const errorCode = err.code ? `Error Code: ${err.code}` : "";
+      const errorMessage = err.message
+        ? err.message
+        : "An unexpected error occurred.";
+      Alert.alert("Error", `${errorCode}\n${errorMessage}`);
     }
   };
 
   const restore = async () => {
     try {
-      Alert.alert(`Restoring`, `Restoring`);
+      Alert.alert("Attempting restore", "Attempting restore...");
+      const restore = await Purchases.restorePurchases();
+      Alert.alert("Restore", `restore: ${JSON.stringify(restore, null, 2)}`);
     } catch (err) {
-      console.warn(err.code, err.message);
+      const errorCode = err.code ? `Error Code: ${err.code}` : "";
+      const errorMessage = err.message
+        ? err.message
+        : "An unexpected error occurred.";
+      Alert.alert("Error", `${errorCode}\n${errorMessage}`);
     }
   };
 
@@ -58,17 +82,17 @@ const SubscriptionScreen = ({ route }) => {
     switch (action.type) {
       case subscriptionActions.SET_PLAN:
         switch (action.payload) {
-          case SKU.MONTHLY:
+          case PREMIUM_PLANS.MONTHLY:
             return {
               ...state,
-              selectedPlan: SKU.MONTHLY,
-              continueFunction: () => subscribe(SKU.MONTHLY),
+              selectedPlan: PREMIUM_PLANS.MONTHLY,
+              continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
             };
-          case SKU.ANNUAL:
+          case PREMIUM_PLANS.ANNUAL:
             return {
               ...state,
-              selectedPlan: SKU.ANNUAL,
-              continueFunction: () => purchase(SKU.ANNUAL),
+              selectedPlan: PREMIUM_PLANS.ANNUAL,
+              continueFunction: () => buy(PREMIUM_PLANS.ANNUAL),
             };
           default:
             console.error(`Unknown plan: ${action.payload}`);
@@ -78,8 +102,8 @@ const SubscriptionScreen = ({ route }) => {
   };
 
   const initialState = {
-    selectedPlan: SKU.MONTHLY,
-    continueFunction: () => subscribe(SKU.MONTHLY),
+    selectedPlan: PREMIUM_PLANS.MONTHLY,
+    continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -135,24 +159,24 @@ const SubscriptionScreen = ({ route }) => {
           <Text style={styles.modalTitle}>Available Plans</Text>
           <View style={styles.plansContainer}>
             <SubscriptionButton
-              enabled={state.selectedPlan === SKU.MONTHLY}
+              enabled={state.selectedPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
               priceText={"$0.99 monthly"}
               onPress={() =>
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
-                  payload: SKU.MONTHLY,
+                  payload: PREMIUM_PLANS.MONTHLY,
                 })
               }
             />
             <SubscriptionButton
-              enabled={state.selectedPlan === SKU.ANNUAL}
+              enabled={state.selectedPlan === PREMIUM_PLANS.ANNUAL}
               titleText={"Annual Pass"}
               priceText={"$5.99 annually"}
               onPress={() =>
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
-                  payload: SKU.ANNUAL,
+                  payload: PREMIUM_PLANS.ANNUAL,
                 })
               }
             />
