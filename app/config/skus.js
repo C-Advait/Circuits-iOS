@@ -1,4 +1,5 @@
 export const SKU = {
-  LIFETIME: "com.circuits.lifetime.premium.user",
-  MONTHLY: "com.circuits.timer.unlimited.routines",
+  LIFETIME: "com.circuits.lifetime",
+  MONTHLY: "com.circuits.monthly",
+  ANNUAL: "com.circuits.annual",
 };

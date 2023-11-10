@@ -64,11 +64,11 @@ const SubscriptionScreen = ({ route }) => {
               selectedPlan: SKU.MONTHLY,
               continueFunction: () => subscribe(SKU.MONTHLY),
             };
-          case SKU.LIFETIME:
+          case SKU.ANNUAL:
             return {
               ...state,
-              selectedPlan: SKU.LIFETIME,
-              continueFunction: () => purchase(SKU.LIFETIME),
+              selectedPlan: SKU.ANNUAL,
+              continueFunction: () => purchase(SKU.ANNUAL),
             };
           default:
             console.error(`Unknown plan: ${action.payload}`);
@@ -126,10 +126,6 @@ const SubscriptionScreen = ({ route }) => {
             />
             <ImageText
               image={require("../assets/zap.png")}
-              text="Enjoy extensive premium routines"
-            />
-            <ImageText
-              image={require("../assets/zap.png")}
               text="Access new features early"
             />
           </View>
@@ -141,7 +137,7 @@ const SubscriptionScreen = ({ route }) => {
             <SubscriptionButton
               enabled={state.selectedPlan === SKU.MONTHLY}
               titleText={"Monthly Pass"}
-              priceText={"$0.99/month"}
+              priceText={"$0.99 monthly"}
               onPress={() =>
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
@@ -150,13 +146,13 @@ const SubscriptionScreen = ({ route }) => {
               }
             />
             <SubscriptionButton
-              enabled={state.selectedPlan === SKU.LIFETIME}
-              titleText={"Lifetime Access"}
-              priceText={"$9.99, one-time payment"}
+              enabled={state.selectedPlan === SKU.ANNUAL}
+              titleText={"Annual Pass"}
+              priceText={"$5.99 annually"}
               onPress={() =>
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
-                  payload: SKU.LIFETIME,
+                  payload: SKU.ANNUAL,
                 })
               }
             />
@@ -243,11 +239,11 @@ const getStyles = (theme) =>
     titlePanel: {
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 28,
+      marginBottom: 45,
     },
     descriptionText: {
       fontSize: 13,
-      fontWeight: 400,
+      fontWeight: "400",
       color: "gray",
       alignSelf: "stretch",
       marginBottom: 10,

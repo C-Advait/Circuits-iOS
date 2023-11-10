@@ -26,7 +26,7 @@ export const AppContextProvider = ({ children }) => {
     const loadPremium = async () => {
       try {
         const customerInfo = await Purchases.getCustomerInfo();
-        await handleCustomerInfoUpdate(customerInfo);
+        await handleCustomerInfoUpdate(customerInfo, "useEffect");
       } catch (err) {
         Alert.alert(
           "Couldn't load premium from revenue cat.",
@@ -58,7 +58,7 @@ export const AppContextProvider = ({ children }) => {
     setSoundOn(value);
   };
 
-  const handleCustomerInfoUpdate = async (customerInfo) => {
+  const handleCustomerInfoUpdate = async (customerInfo, caller) => {
     const activeEntitlements = customerInfo?.entitlements?.active?.Premium;
     const userSubEntryExists = await doesUserSubscriptionExist();
 
@@ -69,13 +69,19 @@ export const AppContextProvider = ({ children }) => {
           customerInfo,
           activeEntitlements,
         );
-        Alert.alert("Status subscription update", updateResponse);
+        Alert.alert(
+          `From ${caller}: Status subscription update`,
+          updateResponse,
+        );
       } else {
         const createResponse = await createUserSubscriptionOnSync(
           customerInfo,
           activeEntitlements,
         );
-        Alert.alert("Status subscription creation", createResponse);
+        Alert.alert(
+          `From ${caller}: Status subscription creation`,
+          createResponse,
+        );
       }
     }
 
@@ -88,17 +94,13 @@ export const AppContextProvider = ({ children }) => {
     }
 
     Alert.alert(
-      "Purchaser info updated",
+      `From ${caller}: Purchaser info updated`,
       `info: ${JSON.stringify(customerInfo, null, 2)}`,
     );
   };
 
-  Purchases.addCustomerInfoUpdateListener(() => {
-    Alert.alert(
-      "Calling handler from listener",
-      "Calling handler from listener",
-    );
-    handleCustomerInfoUpdate();
+  Purchases.addCustomerInfoUpdateListener((info) => {
+    handleCustomerInfoUpdate(info, "listener");
   });
 
   return (
