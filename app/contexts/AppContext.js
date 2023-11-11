@@ -42,21 +42,24 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const handleCustomerInfoUpdate = async (customerInfo, caller) => {
-
     console.log(JSON.stringify(customerInfo, null, 2));
 
-    const activeEntitlements = customerInfo?.entitlements?.active?.Premium;
-    if (typeof activeEntitlements !== "undefined") {
-      const updateResponse = await updateUserSubscriptionOnSync(
-        customerInfo,
-        activeEntitlements,
+    const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
+    if (typeof premiumEntitlement !== "undefined") {
+      setPremiumPlan(
+        extractPlanFromProductIdentifier(premiumEntitlement?.productIdentifier),
       );
+
+      await updateUserSubscriptionOnSync(customerInfo, premiumEntitlement);
     }
     // Update context
     const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
     setIsPremium(premiumStatus);
     if (isInGracePeriod) {
-      Alert.alert("Your subscription will expire soon", "To keep access to premium features, please go online and verify subscription status");
+      Alert.alert(
+        "Subscription expiring soon",
+        "To keep access to premium features, please go online and verify subscription status.",
+      );
     }
 
     console.log(
@@ -72,7 +75,6 @@ export const AppContextProvider = ({ children }) => {
       Purchases.removeCustomerInfoUpdateListener(handleCustomerInfoUpdate);
     };
   });
-
 
   // Return from after second occurrence of '.' to end.
   const extractPlanFromProductIdentifier = (identifier) => {

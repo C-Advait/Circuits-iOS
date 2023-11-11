@@ -11,8 +11,6 @@ function PurchaseContinueButton({ active, onPress }) {
   const { theme } = useAppContext();
   const styles = active ? getActiveStyles(theme) : getPassiveStyles(theme);
 
-  console.log(JSON.stringify(styles.background, null, 2));
-
   return (
     <View style={{ width: "100%" }}>
       <TouchableOpacity
