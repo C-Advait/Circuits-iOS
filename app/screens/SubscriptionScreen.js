@@ -24,11 +24,6 @@ import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
-import { setIsPremium } from "../contexts/AppContext";
-import {
-  getUserSubscriptionStatus,
-  updateUserSubscriptionOnSync,
-} from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -96,22 +91,14 @@ const SubscriptionScreen = ({ route }) => {
 
   const restore = async () => {
     try {
-      console.log("Attempting restore", "Attempting restore...");
+      Alert.alert("Attempting restore", "Just a moment");
       const customerInfo = await Purchases.restorePurchases();
       if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
-        console.log(
-          `Restored Subscription`,
-          `${JSON.stringify(
-            customerInfo.entitlements.active.productIdentifier,
-            null,
-            2,
-          )}`,
+        Alert.alert(
+          `Restore of ${customerInfo.entitlements.active.Premium.identifier} package successful!`,
         );
       } else {
-        console.log(
-          `Restore failed!`,
-          `${JSON.stringify(customerInfo, null, 2)}`,
-        );
+        Alert.alert(`Restore unsuccessful`);
       }
     } catch (err) {
       if (!err.userCancelled) {
