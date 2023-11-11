@@ -92,7 +92,6 @@ export const AppContextProvider = ({ children }) => {
         updateSound,
         isPremium,
         setIsPremium,
-        handleCustomerInfoUpdate,
         premiumPlan,
         setPremiumPlan,
       }}

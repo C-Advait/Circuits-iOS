@@ -32,7 +32,7 @@ import {
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme, handleCustomerInfoUpdate, premiumPlan } = useAppContext();
+  const { theme, premiumPlan } = useAppContext();
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
@@ -79,7 +79,6 @@ const SubscriptionScreen = ({ route }) => {
           console.log(
             `Purchase of ${subscriptionDuration} package successful!`,
           );
-          handleCustomerInfoUpdate(customerInfo, "buy block");
         } else {
           console.log(`Purchase of ${subscriptionDuration} package failed!`);
         }
@@ -108,10 +107,6 @@ const SubscriptionScreen = ({ route }) => {
             2,
           )}`,
         );
-
-        // // Unlock Premium
-        // handleCustomerInfoUpdate(customerInfo, "restore");
-
       } else {
         console.log(
           `Restore failed!`,
@@ -164,10 +159,6 @@ const SubscriptionScreen = ({ route }) => {
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  // Purchases.addCustomerInfoUpdateListener((info) => {
-  //   handleCustomerInfoUpdate(info, "listener SubscriptionScreen");
-  // });
 
   return (
     <ImageBackground
