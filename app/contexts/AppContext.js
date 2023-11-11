@@ -64,6 +64,10 @@ export const AppContextProvider = ({ children }) => {
     const activeEntitlements = customerInfo?.entitlements?.active?.Premium;
     const userSubEntryExists = await doesUserSubscriptionExist();
 
+    console.log("caller: ", caller);
+    console.log("activeEntitlements: ", activeEntitlements);
+    console.log("userSubEntryExists: ", userSubEntryExists);
+
     // Data is there.
     if (typeof activeEntitlements !== "undefined") {
       if (userSubEntryExists) {
@@ -88,12 +92,8 @@ export const AppContextProvider = ({ children }) => {
     }
 
     // Update context regardless
-    if (userSubEntryExists) {
-      const userSubscriptionStatus = await getUserSubscriptionStatus();
-      setIsPremium(userSubscriptionStatus);
-    } else {
-      setIsPremium(false);
-    }
+    const hasPremium = await getUserSubscriptionStatus();
+    setIsPremium(hasPremium);
 
     console.log(
       `From ${caller}: Purchaser info updated`,
@@ -115,6 +115,7 @@ export const AppContextProvider = ({ children }) => {
         updateSound,
         isPremium,
         setIsPremium,
+        handleCustomerInfoUpdate,
       }}
     >
       {children}

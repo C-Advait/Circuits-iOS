@@ -181,31 +181,33 @@ const logRoutineCompletion = async (routineID: number) => {
 };
 
 const createUserSubscriptionOnSync = async (
-  subscriptionData,
-  activeEntitlement,
+  customerInfo: any,
+  activeEntitlement: any,
 ) => {
   const db = getDBInstance();
+
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx: any) => {
-      const query = `INSERT INTO UserSubscription
-          requestDate = ?,
-          entitlementId = ?,
-          isActive = ?,
-          productId = ?,
-          periodType = ?,
-          expirationDate = ?,
-          purchaseDate = ?,
-          originalPurchaseDate = ?,
-          store = ?,
-          isSandbox = ?,
-          unsubscribeDetectedAt = ?,
-          billingIssueDetectedAt = ?
-          id = ?`;
+      const query = `INSERT INTO UserSubscription (
+          requestDate,
+          entitlementId,
+          isActive,
+          productId,
+          periodType,
+          expirationDate,
+          purchaseDate,
+          originalPurchaseDate,
+          store,
+          isSandbox,
+          unsubscribeDetectedAt,
+          billingIssueDetectedAt,
+          revenueCatID 
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
       tx.executeSql(
         query,
         [
-          subscriptionData.requestDate,
+          customerInfo.requestDate,
           activeEntitlement.entitlementId,
           activeEntitlement.isActive,
           activeEntitlement.productId,
@@ -217,7 +219,7 @@ const createUserSubscriptionOnSync = async (
           activeEntitlement.isSandbox,
           activeEntitlement.unsubscribeDetectedAt,
           activeEntitlement.billingIssueDetectedAt,
-          activeEntitlement.originalAppUserId.$RCAnonymousID,
+          customerInfo.originalAppUserId,
         ],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);
@@ -329,16 +331,15 @@ const getUserSubscriptionTable = async () => {
           for (let i = 0; i < results.rows.length; i++) {
             rows.push(results.rows.item(i));
           }
-          resolve(rows);  // Resolves with the array of rows
+          resolve(rows); // Resolves with the array of rows
         },
         (error: any) => {
-          reject(error);  // Rejects with the error if there's any
-        }
+          reject(error); // Rejects with the error if there's any
+        },
       );
     });
   });
 };
-
 
 const getUserSubscriptionStatus = async () => {
   const db = getDBInstance();
@@ -488,7 +489,10 @@ const updateMostRecentRoutineCompletion = async (routineID: number) => {
   });
 };
 
-const updateUserSubscriptionOnSync = (subscriptionData, activeEntitlement) => {
+const updateUserSubscriptionOnSync = (
+  customerInfo: any,
+  activeEntitlement: any,
+) => {
   const db = getDBInstance();
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx: any) => {
@@ -504,13 +508,14 @@ const updateUserSubscriptionOnSync = (subscriptionData, activeEntitlement) => {
           store = ?,
           isSandbox = ?,
           unsubscribeDetectedAt = ?,
-          billingIssueDetectedAt = ?
+          billingIssueDetectedAt = ?,
+          revenueCatID = ? 
         WHERE id = ?`;
 
       tx.executeSql(
         query,
         [
-          subscriptionData.requestDate,
+          customerInfo.requestDate,
           activeEntitlement.entitlementId,
           activeEntitlement.isActive,
           activeEntitlement.productId,
@@ -522,7 +527,7 @@ const updateUserSubscriptionOnSync = (subscriptionData, activeEntitlement) => {
           activeEntitlement.isSandbox,
           activeEntitlement.unsubscribeDetectedAt,
           activeEntitlement.billingIssueDetectedAt,
-          activeEntitlement.originalAppUserId.$RCAnonymousID,
+          customerInfo.originalAppUserId,
         ],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);

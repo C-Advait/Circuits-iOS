@@ -13,6 +13,7 @@ const resetDB = async () => {
     .then(dropTable("Routine"))
     .then(dropTable("Setting"))
     .then(dropTable("RoutineCompletion"))
+    .then(dropTable("UserSubscription"))
     .then(initTables())
     .then(Alert.alert("All tables dropped and recreated!"));
 };
@@ -199,9 +200,16 @@ const dumpCompletions = async () => {
 
 const logSubscriptions = async () => {
   getUserSubscriptionTable()
-    .then((tableRows) => console.log("UserSubscription Table Rows:\n", JSON.stringify(tableRows, null, 2)))
-    .catch((error) => console.error("Error fetching UserSubscription table:", error));
-}
+    .then((tableRows) =>
+      console.log(
+        "UserSubscription Table Rows:\n",
+        JSON.stringify(tableRows, null, 2),
+      ),
+    )
+    .catch((error) =>
+      console.error("Error fetching UserSubscription table:", error),
+    );
+};
 
 function DebugScreen() {
   return (
@@ -213,7 +221,10 @@ function DebugScreen() {
       <Button title="Get Subscriptions" onPress={() => null} />
       <Button title="Request Subscription" onPress={() => null} />
       <Button title="Dump completions" onPress={() => dumpCompletions()} />
-      <Button title="Log Subscriptions table" onPress={() => logSubscriptions()} />
+      <Button
+        title="Log Subscriptions table"
+        onPress={() => logSubscriptions()}
+      />
     </Screen>
   );
 }

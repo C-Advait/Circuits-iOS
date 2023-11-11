@@ -24,18 +24,17 @@ import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
-import { setIsPremium } from "../contexts/AppContext"
+import { setIsPremium } from "../contexts/AppContext";
 import {
   doesUserSubscriptionExist,
   getUserSubscriptionStatus,
   updateUserSubscriptionOnSync,
-  createUserSubscriptionOnSync
+  createUserSubscriptionOnSync,
 } from "../db/DBActions";
-
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme } = useAppContext();
+  const { theme, handleCustomerInfoUpdate } = useAppContext();
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
@@ -172,48 +171,6 @@ const SubscriptionScreen = ({ route }) => {
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const handleCustomerInfoUpdate = async (customerInfo, caller) => {
-    const activeEntitlements = customerInfo?.entitlements?.active?.Premium;
-    const userSubEntryExists = await doesUserSubscriptionExist();
-
-    console.log("userSubEntryExists: ", userSubEntryExists);
-    // Data is there.
-    if (typeof activeEntitlements !== "undefined") {
-      if (userSubEntryExists) {
-        const updateResponse = await updateUserSubscriptionOnSync(
-          customerInfo,
-          activeEntitlements,
-        );
-        console.log(
-          `From ${caller}: Status subscription update`,
-          updateResponse,
-        );
-      } else {
-        const createResponse = await createUserSubscriptionOnSync(
-          customerInfo,
-          activeEntitlements,
-        );
-        console.log(
-          `From ${caller}: Status subscription creation`,
-          createResponse,
-        );
-      }
-    }
-
-    // Update context regardless
-    if (userSubEntryExists) {
-      const userSubscriptionStatus = await getUserSubscriptionStatus();
-      setIsPremium(userSubscriptionStatus);
-    } else {
-      setIsPremium(false);
-    }
-
-    console.log(
-      `From ${caller}: Purchaser info updated`,
-      `info: ${JSON.stringify(customerInfo, null, 2)}`,
-    );
-  };
 
   Purchases.addCustomerInfoUpdateListener((info) => {
     handleCustomerInfoUpdate(info, "listener SubscriptionScreen");

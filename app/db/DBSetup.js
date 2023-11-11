@@ -119,19 +119,20 @@ export const initTables = async () => {
 
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS UserSubscription (
-        id TEXT,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         requestDate TEXT,
         entitlementId TEXT,
-        isActive TEXT,
+        isActive INTEGER,
         productId TEXT,
         periodType Text,
         expirationDate TEXT,
         purchaseDate TEXT,
         originalPurchaseDate TEXT,
         store TEXT,
-        isSandbox TEXT,
+        isSandbox INTEGER,
         unsubscribeDetectedAt TEXT,
-        billingIssueDetectedAt TEXT
+        billingIssueDetectedAt TEXT,
+        revenueCatID TEXT
       );`,
       [],
       (_tx, _resultSet) => {
@@ -139,6 +140,22 @@ export const initTables = async () => {
       },
       (error) => {
         console.error("Error creating `UserSubscription` table.", error);
+      },
+    );
+
+    tx.executeSql(
+      `INSERT OR IGNORE INTO UserSubscription
+      (id, isActive)
+      VALUES ( ?, ? );`,
+      [1, 0],
+      (_tx, _resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error(
+          "Error setting defaults in `UserSubscription` table.",
+          error,
+        );
       },
     );
   });
