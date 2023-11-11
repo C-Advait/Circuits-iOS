@@ -180,56 +180,6 @@ const logRoutineCompletion = async (routineID: number) => {
   });
 };
 
-const createUserSubscriptionOnSync = async (
-  customerInfo: any,
-  activeEntitlement: any,
-) => {
-  const db = getDBInstance();
-
-  return new Promise<number>((resolve, reject) => {
-    db.transaction((tx: any) => {
-      const query = `INSERT INTO UserSubscription (
-          requestDate,
-          entitlementId,
-          isActive,
-          productId,
-          periodType,
-          expirationDate,
-          purchaseDate,
-          originalPurchaseDate,
-          store,
-          isSandbox,
-          unsubscribeDetectedAt,
-          billingIssueDetectedAt,
-          revenueCatID 
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-      tx.executeSql(
-        query,
-        [
-          customerInfo.requestDate,
-          activeEntitlement.entitlementId,
-          activeEntitlement.isActive,
-          activeEntitlement.productId,
-          activeEntitlement.periodType,
-          activeEntitlement.expirationDate,
-          activeEntitlement.purchaseDate,
-          activeEntitlement.originalPurchaseDate,
-          activeEntitlement.store,
-          activeEntitlement.isSandbox,
-          activeEntitlement.unsubscribeDetectedAt,
-          activeEntitlement.billingIssueDetectedAt,
-          customerInfo.originalAppUserId,
-        ],
-        (_txObj: any, resultSet: any) => {
-          resolve(resultSet.rowsAffected);
-        },
-        (error: any) => reject(error),
-      );
-    });
-  });
-};
-
 // READ
 const getAllUserCreatedRoutines = async () => {
   const db = getDBInstance();
@@ -518,10 +468,10 @@ const updateUserSubscriptionOnSync = (
           customerInfo.requestDate,
           activeEntitlement.identifier,
           activeEntitlement.isActive,
-          activeEntitlement.productId,
+          activeEntitlement.productIdentifier,
           activeEntitlement.periodType,
           activeEntitlement.expirationDate,
-          activeEntitlement.purchaseDate,
+          activeEntitlement.latestPurchaseDate,
           activeEntitlement.originalPurchaseDate,
           activeEntitlement.store,
           activeEntitlement.isSandbox,
@@ -578,7 +528,6 @@ export {
   createExercise,
   createRoutine,
   logRoutineCompletion,
-  // createUserSubscriptionOnSync,
   getAllUserCreatedRoutines,
   getAllRoutineNames,
   getRoutineByID,
