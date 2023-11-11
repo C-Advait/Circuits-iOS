@@ -61,13 +61,18 @@ export const AppContextProvider = ({ children }) => {
 
     console.log(
       `From ${caller}: UserSubscription info updated`,
-      // `info: ${JSON.stringify(customerInfo, null, 2)}`,
+      `info: ${JSON.stringify(customerInfo, null, 2)}`,
     );
   };
 
-  Purchases.addCustomerInfoUpdateListener((info) => {
-    handleCustomerInfoUpdate(info, "listener AppContext");
+  useEffect(() => {
+    // Subscribe to purchaser updates
+    Purchases.addCustomerInfoUpdateListener(handleCustomerInfoUpdate);
+    return () => {
+      Purchases.removeCustomerInfoUpdateListener(handleCustomerInfoUpdate);
+    };
   });
+
 
   // Return from after second occurrence of '.' to end.
   const extractPlanFromProductIdentifier = (identifier) => {
