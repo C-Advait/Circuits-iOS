@@ -17,26 +17,11 @@ export const AppContextProvider = ({ children }) => {
   const [theme, setTheme] = useState(darkTheme);
   const [soundOn, setSoundOn] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const [premiumPlan, setPremiumPlan] = useState();
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
   };
-
-  // useEffect(() => {
-  //   const loadPremium = async () => {
-  //     try {
-  //       const customerInfo = await Purchases.getCustomerInfo();
-  //       // await handleCustomerInfoUpdate(customerInfo, "useEffect");
-  //     } catch (err) {
-  //       console.log(
-  //         "Couldn't load premium from revenue cat.",
-  //         "Defaulting to database",
-  //       );
-  //     }
-  //   };
-
-  //   loadPremium();
-  // }, []);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -84,6 +69,14 @@ export const AppContextProvider = ({ children }) => {
     handleCustomerInfoUpdate(info, "listener AppContext");
   });
 
+  // Return from after second occurrence of '.' to end.
+  const extractPlanFromProductIdentifier = (identifier) => {
+    const _ = identifier.indexOf(".");
+    const idx = identifier.indexOf(".", _ + 1);
+    if (idx === -1) return "";
+    return identifier.substring(idx + 1);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -95,6 +88,8 @@ export const AppContextProvider = ({ children }) => {
         isPremium,
         setIsPremium,
         handleCustomerInfoUpdate,
+        premiumPlan,
+        setPremiumPlan,
       }}
     >
       {children}

@@ -13,7 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 
 import Screen from "../components/Screen";
 import NavHeader from "../components/NavHeader";
-import { IconButton } from "../components/buttons";
+import { IconButton, PurchaseContinueButton } from "../components/buttons";
 import { useAppContext } from "../contexts/AppContext";
 import ImageText from "../components/ImageText";
 import {
@@ -32,7 +32,7 @@ import {
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme, handleCustomerInfoUpdate } = useAppContext();
+  const { theme, handleCustomerInfoUpdate, premiumPlan } = useAppContext();
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
@@ -79,7 +79,6 @@ const SubscriptionScreen = ({ route }) => {
           console.log(
             `Purchase of ${subscriptionDuration} package successful!`,
           );
-          // Unlock Premium
           handleCustomerInfoUpdate(customerInfo, "buy block");
         } else {
           console.log(`Purchase of ${subscriptionDuration} package failed!`);
@@ -88,13 +87,11 @@ const SubscriptionScreen = ({ route }) => {
         console.log("WEIRD BRANCH", "offerings.current was null");
       }
     } catch (err) {
-      // if (!err.userCancelled) {
-      const errorCode = err.code ? `Code: ${err.code}` : "";
+      const errorCode = err.code ? `Error Code: ${err.code}` : "";
       const errorMessage = err.message
         ? err.message
         : "An unexpected error occurred.";
       console.log("Error", `${errorCode}\n${errorMessage}`);
-      // }
     }
   };
 
@@ -224,6 +221,7 @@ const SubscriptionScreen = ({ route }) => {
           <View style={styles.plansContainer}>
             <SubscriptionButton
               enabled={state.selectedPlan === PREMIUM_PLANS.MONTHLY}
+              purchased={premiumPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
               priceText={`${state.monthly} monthly`}
               onPress={() =>
@@ -235,6 +233,7 @@ const SubscriptionScreen = ({ route }) => {
             />
             <SubscriptionButton
               enabled={state.selectedPlan === PREMIUM_PLANS.ANNUAL}
+              purchased={premiumPlan === PREMIUM_PLANS.ANNUAL}
               titleText={"Annual Pass"}
               priceText={`${state.annual} annually`}
               onPress={() =>
@@ -245,12 +244,10 @@ const SubscriptionScreen = ({ route }) => {
               }
             />
           </View>
-          <TouchableOpacity
-            style={styles.continueButton}
+          <PurchaseContinueButton
+            active={typeof premiumPlan === "undefined"}
             onPress={state.continueFunction}
-          >
-            <Text style={styles.continueText}>Continue</Text>
-          </TouchableOpacity>
+          />
           <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
@@ -303,20 +300,6 @@ const getStyles = (theme) =>
       alignSelf: "stretch",
       gap: 16,
       marginBottom: 17,
-    },
-    continueButton: {
-      backgroundColor: theme.accentDarkBlue,
-      width: "100%",
-      borderRadius: 10,
-      height: 58,
-      justifyContent: "center",
-      marginBottom: 20,
-    },
-    continueText: {
-      color: theme.primary,
-      fontWeight: PARAGRAPH_FONT_WEIGHT,
-      fontSize: PARAGRAPH_FONT_SIZE,
-      textAlign: "center",
     },
     restoreText: {
       color: theme.blue,

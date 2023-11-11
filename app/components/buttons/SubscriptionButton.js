@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 import { useAppContext } from "../../contexts/AppContext";
@@ -8,9 +8,11 @@ import {
   PARAGRAPH_FONT_WEIGHT,
 } from "../../config/appConstants";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 function SubscriptionButton({
   enabled,
+  purchased,
   onPress = () => null,
   titleText,
   priceText,
@@ -29,7 +31,17 @@ function SubscriptionButton({
         style={[styles.planButton]}
         onPress={() => onPress()}
       >
-        <Text style={styles.planText}>{titleText}</Text>
+        <View style={styles.planView}>
+          <Text style={styles.planText}>{titleText}</Text>
+          {purchased ? (
+            <Ionicons
+              name="checkmark"
+              color={theme.blue}
+              size={20}
+              style={styles.checkmark}
+            />
+          ) : null}
+        </View>
         <Text style={styles.priceText}>{priceText}</Text>
       </TouchableWithoutFeedback>
     </LinearGradient>
@@ -49,6 +61,11 @@ const getStylesActive = (theme) =>
       fontSize: PARAGRAPH_FONT_SIZE,
       fontWeight: PARAGRAPH_FONT_WEIGHT,
       color: theme.primary,
+    },
+    planView: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
     },
     priceText: {
       marginTop: 4,
