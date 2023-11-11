@@ -41,9 +41,7 @@ export const AppContextProvider = ({ children }) => {
     setSoundOn(value);
   };
 
-  const handleCustomerInfoUpdate = async (customerInfo, caller) => {
-    console.log(JSON.stringify(customerInfo, null, 2));
-
+  const handleCustomerInfoUpdate = async (customerInfo) => {
     const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
     if (typeof premiumEntitlement !== "undefined") {
       setPremiumPlan(
@@ -51,7 +49,11 @@ export const AppContextProvider = ({ children }) => {
       );
 
       await updateUserSubscriptionOnSync(customerInfo, premiumEntitlement);
+    } else {
+      setPremiumPlan(undefined);
     }
+
+
     // Update context
     const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
     setIsPremium(premiumStatus);
@@ -63,8 +65,7 @@ export const AppContextProvider = ({ children }) => {
     }
 
     console.log(
-      `From ${caller}: UserSubscription info updated`,
-      `info: ${JSON.stringify(customerInfo, null, 2)}`,
+      `UserSubscription info updated`,
     );
   };
 
