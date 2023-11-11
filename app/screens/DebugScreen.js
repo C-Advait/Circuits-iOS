@@ -225,6 +225,10 @@ function DebugScreen() {
         title="Log Subscriptions table"
         onPress={() => logSubscriptions()}
       />
+      <Button
+        title="Check SubscriptionStatus"
+        onPress={() => checkSubscriptionStatus()}
+      />
     </Screen>
   );
 }

@@ -350,25 +350,25 @@ const getUserSubscriptionStatus = async () => {
         "SELECT * FROM UserSubscription LIMIT 1", // Assuming there's only one entry per user
         [],
         (_tx: any, results: any) => {
-          if (results.rows.length === 0) {
-            // No entry exists
-            resolve(false);
-          } else {
-            const subscription = results.rows.item(0);
+
+          const subscription = results.rows.item(0);
+
+          // Check if user has ever synced to RevenueCat
+          if (subscription.expirationDate) {
             const currentDate = new Date();
             const expirationDate = new Date(subscription.expirationDate);
-            expirationDate.setDate(
-              expirationDate.getDate() + SUBSCRIPTION_GRACE_PERIOD_DAYS,
-            );
+            const forcedDowngradeDate = new Date(expirationDate);
+            forcedDowngradeDate.setDate(forcedDowngradeDate.getDate() + SUBSCRIPTION_GRACE_PERIOD_DAYS);
 
-            if (
-              subscription.isActive === "true" &&
-              currentDate <= expirationDate
-            ) {
-              resolve(true);
-            } else {
-              resolve(false);
+            if (currentDate < expirationDate) { // User Subscription is fine
+              resolve([true, false]);
+            } else if (currentDate < forcedDowngradeDate) { // User is in grace period
+              resolve([true, true])
+            } else { // User has passed grace period
+              resolve([false, false])
             }
+          } else { // User has never synced
+            resolve([false, false]);
           }
         },
         (error: any) => reject(error),
@@ -516,7 +516,7 @@ const updateUserSubscriptionOnSync = (
         query,
         [
           customerInfo.requestDate,
-          activeEntitlement.entitlementId,
+          activeEntitlement.identifier,
           activeEntitlement.isActive,
           activeEntitlement.productId,
           activeEntitlement.periodType,
@@ -528,6 +528,7 @@ const updateUserSubscriptionOnSync = (
           activeEntitlement.unsubscribeDetectedAt,
           activeEntitlement.billingIssueDetectedAt,
           customerInfo.originalAppUserId,
+          1
         ],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);
@@ -577,7 +578,7 @@ export {
   createExercise,
   createRoutine,
   logRoutineCompletion,
-  createUserSubscriptionOnSync,
+  // createUserSubscriptionOnSync,
   getAllUserCreatedRoutines,
   getAllRoutineNames,
   getRoutineByID,

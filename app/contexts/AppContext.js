@@ -2,9 +2,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { Alert } from "react-native";
 import { lightTheme, darkTheme } from "../config/colors";
 import {
-  createUserSubscriptionOnSync,
   updateUserSubscriptionOnSync,
-  doesUserSubscriptionExist,
   getUserSubscriptionStatus,
   retrieveSetting,
   updateSetting,
@@ -24,23 +22,21 @@ export const AppContextProvider = ({ children }) => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
   };
 
-  useEffect(() => {
-    const loadPremium = async () => {
-      try {
-        const customerInfo = await Purchases.getCustomerInfo();
-        await handleCustomerInfoUpdate(customerInfo, "useEffect");
-      } catch (err) {
-        console.log(
-          "Couldn't load premium from revenue cat.",
-          "Defaulting to database",
-        );
-        const premiumStatus = await getUserSubscriptionStatus();
-        setIsPremium(premiumStatus);
-      }
-    };
+  // useEffect(() => {
+  //   const loadPremium = async () => {
+  //     try {
+  //       const customerInfo = await Purchases.getCustomerInfo();
+  //       // await handleCustomerInfoUpdate(customerInfo, "useEffect");
+  //     } catch (err) {
+  //       console.log(
+  //         "Couldn't load premium from revenue cat.",
+  //         "Defaulting to database",
+  //       );
+  //     }
+  //   };
 
-    loadPremium();
-  }, []);
+  //   loadPremium();
+  // }, []);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -61,49 +57,32 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const handleCustomerInfoUpdate = async (customerInfo, caller) => {
+
+    console.log(JSON.stringify(customerInfo, null, 2));
+
     const activeEntitlements = customerInfo?.entitlements?.active?.Premium;
-    const userSubEntryExists = await doesUserSubscriptionExist();
-
-    console.log("caller: ", caller);
-    console.log("activeEntitlements: ", activeEntitlements);
-    console.log("userSubEntryExists: ", userSubEntryExists);
-
-    // Data is there.
     if (typeof activeEntitlements !== "undefined") {
-      if (userSubEntryExists) {
-        const updateResponse = await updateUserSubscriptionOnSync(
-          customerInfo,
-          activeEntitlements,
-        );
-        console.log(
-          `From ${caller}: Status subscription update`,
-          updateResponse,
-        );
-      } else {
-        const createResponse = await createUserSubscriptionOnSync(
-          customerInfo,
-          activeEntitlements,
-        );
-        console.log(
-          `From ${caller}: Status subscription creation`,
-          createResponse,
-        );
-      }
+      const updateResponse = await updateUserSubscriptionOnSync(
+        customerInfo,
+        activeEntitlements,
+      );
+    }
+    // Update context
+    const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
+    setIsPremium(premiumStatus);
+    if (isInGracePeriod) {
+      Alert.alert("Your subscription will expire soon", "To keep access to premium features, please go online and verify subscription status");
     }
 
-    // Update context regardless
-    const hasPremium = await getUserSubscriptionStatus();
-    setIsPremium(hasPremium);
-
     console.log(
-      `From ${caller}: Purchaser info updated`,
-      `info: ${JSON.stringify(customerInfo, null, 2)}`,
+      `From ${caller}: UserSubscription info updated`,
+      // `info: ${JSON.stringify(customerInfo, null, 2)}`,
     );
   };
 
-  // Purchases.addCustomerInfoUpdateListener((info) => {
-  //   handleCustomerInfoUpdate(info, "listener");
-  // });
+  Purchases.addCustomerInfoUpdateListener((info) => {
+    handleCustomerInfoUpdate(info, "listener AppContext");
+  });
 
   return (
     <AppContext.Provider

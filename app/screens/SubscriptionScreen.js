@@ -26,10 +26,8 @@ import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
 import { setIsPremium } from "../contexts/AppContext";
 import {
-  doesUserSubscriptionExist,
   getUserSubscriptionStatus,
   updateUserSubscriptionOnSync,
-  createUserSubscriptionOnSync,
 } from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
@@ -91,7 +89,7 @@ const SubscriptionScreen = ({ route }) => {
       }
     } catch (err) {
       // if (!err.userCancelled) {
-      const errorCode = err.code ? `Error Code: ${err.code}` : "";
+      const errorCode = err.code ? `Code: ${err.code}` : "";
       const errorMessage = err.message
         ? err.message
         : "An unexpected error occurred.";
@@ -113,12 +111,10 @@ const SubscriptionScreen = ({ route }) => {
             2,
           )}`,
         );
-        // Unlock Premium
-        await updateUserSubscriptionOnSync(
-          customerInfo,
-          customerInfo.entitlements.active,
-        );
-        setIsPremium(true);
+
+        // // Unlock Premium
+        // handleCustomerInfoUpdate(customerInfo, "restore");
+
       } else {
         console.log(
           `Restore failed!`,
@@ -172,9 +168,9 @@ const SubscriptionScreen = ({ route }) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  Purchases.addCustomerInfoUpdateListener((info) => {
-    handleCustomerInfoUpdate(info, "listener SubscriptionScreen");
-  });
+  // Purchases.addCustomerInfoUpdateListener((info) => {
+  //   handleCustomerInfoUpdate(info, "listener SubscriptionScreen");
+  // });
 
   return (
     <ImageBackground
