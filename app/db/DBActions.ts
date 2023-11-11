@@ -245,24 +245,6 @@ const getAllUserCreatedRoutines = async () => {
   });
 };
 
-const getNewRoutineID = async () => {
-  const db = getDBInstance();
-
-  return new Promise<number>((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT MAX(id) as maxID FROM Routine",
-        [],
-        (_tx, results) => {
-          const maxID = results.rows.item(0).maxID || 0;
-          resolve(maxID + 1);
-        },
-        (error) => reject(error),
-      );
-    });
-  });
-};
-
 // Includes 'default' routines,
 // i.e., those with userCreated = false.
 const getAllRoutineNames = async () => {
@@ -367,6 +349,22 @@ const getUserSubscriptionStatus = async () => {
         (error: any) => reject(error),
       );
     });
+  });
+};
+
+const getAllRoutineCompletions = async (routineID: number) => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM RoutineCompletion",
+        [routineID],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw());
+        },
+      );
+    }, reject);
   });
 };
 
@@ -555,7 +553,6 @@ export {
   getAllRoutineNames,
   getRoutineByID,
   getExercisesForRoutine,
-  getNewRoutineID,
   doesUserSubscriptionExist,
   getUserSubscriptionStatus,
   updateExercise,

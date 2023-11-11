@@ -831,7 +831,7 @@ const getStyles = (theme) =>
     title: {
       color: theme.foreground,
       fontSize: 30,
-      fontWeight: 600,
+      fontWeight: "600",
     },
     scrollContainer: {
       paddingBottom: TAB_BAR_HEIGHT,

@@ -224,7 +224,7 @@ const getStyles = (theme) =>
     duration: {
       color: theme.text60,
       fontSize: ROUTINE_PARAGRAPH_FONT_SIZE,
-      fontWeight: 600,
+      fontWeight: "600",
     },
     disabled: {
       color: "#121212",
@@ -232,7 +232,7 @@ const getStyles = (theme) =>
     header: {
       color: theme.primary,
       fontSize: ROUTINE_TITLE_FONT_SIZE,
-      fontWeight: 700,
+      fontWeight: "700",
       marginBottom: 8,
     },
     permanentInfoContainer: {

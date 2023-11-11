@@ -234,7 +234,7 @@ const SubscriptionScreen = ({ route }) => {
           >
             <Text style={styles.continueText}>Continue</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => restore()}>
+          <TouchableOpacity onPress={() => null}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 

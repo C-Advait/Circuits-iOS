@@ -189,7 +189,7 @@ const getStyles = (theme) =>
     sectionTitle: {
       color: theme.secondary,
       fontSize: 14,
-      fontWeight: 500,
+      fontWeight: "500",
       marginLeft: 16,
       marginBottom: 8,
     },

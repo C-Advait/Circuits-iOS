@@ -19,6 +19,7 @@ function ExerciseCard({
   const styles = getStyles(theme);
 
   accentColor = accentColor ? accentColor : "transparent";
+  accentColor = accentColor ? accentColor : "transparent";
 
   return (
     <View style={[styles.container, style]}>
@@ -108,7 +109,7 @@ const getStyles = (theme) =>
     title: {
       color: theme.primary,
       fontSize: 17,
-      fontWeight: 500,
+      fontWeight: "500",
       marginBottom: 7,
     },
     subTitle: {

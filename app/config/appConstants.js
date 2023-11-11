@@ -6,18 +6,18 @@ export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 3;
 export const TAB_BAR_HEIGHT = 90;
 
 // Font
-export const PARAGRAPH_FONT_SIZE = 17;
-export const ROUTINE_TITLE_FONT_SIZE = 18;
-export const ROUTINE_PARAGRAPH_FONT_SIZE = 15;
-export const PARAGRAPH_FONT_WEIGHT = "600";
-export const INFO_FONT_SIZE = 14;
-export const TITLE_FONT_SIZE = 30;
-export const TITLE_FONT_WEIGHT = "600";
-
-export const PICKER_BUTTON_FONT_SIZE = 17;
-export const PICKER_BUTTON_FONT_WEIGHT = 400;
 export const EDITABLE_TEXT_FONT_SIZE = 17;
-export const EDITABLE_TEXT_FONT_WEIGHT = 400;
+export const INFO_FONT_SIZE = 14;
+export const PARAGRAPH_FONT_SIZE = 17;
+export const PICKER_BUTTON_FONT_SIZE = 17;
+export const ROUTINE_PARAGRAPH_FONT_SIZE = 15;
+export const ROUTINE_TITLE_FONT_SIZE = 18;
+export const TITLE_FONT_SIZE = 30;
+
+export const EDITABLE_TEXT_FONT_WEIGHT = "400";
+export const PARAGRAPH_FONT_WEIGHT = "600";
+export const PICKER_BUTTON_FONT_WEIGHT = "400";
+export const TITLE_FONT_WEIGHT = "600";
 
 export const DEFAULT_ROUTINE = new Routine({
   // missing routineID && Title incomplete

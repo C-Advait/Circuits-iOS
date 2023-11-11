@@ -19,7 +19,7 @@ function AuxiliaryCard({
   const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
   accentColor = accentColor || theme.backgroundFaded;
 
-  const fontWeight = bold ? 600 : 400;
+  const fontWeight = bold ? "600" : "400";
 
   return (
     <TouchableOpacity

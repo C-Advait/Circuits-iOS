@@ -105,8 +105,8 @@ export const initTables = async () => {
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS RoutineCompletion (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        routineID INTEGER REFERENCES Routine(id),
-        startTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        routineID INTEGER REFERENCES Routine(id) ON DELETE CASCADE,
+        completionTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );`,
       [],
       (_tx, _resultSet) => {

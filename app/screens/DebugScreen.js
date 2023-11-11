@@ -11,6 +11,7 @@ const resetDB = async () => {
   dropTable("Exercise")
     .then(dropTable("Routine"))
     .then(dropTable("Setting"))
+    .then(dropTable("RoutineCompletion"))
     .then(initTables())
     .then(Alert.alert("All tables dropped and recreated!"));
 };
@@ -190,6 +191,11 @@ const restore = async () => {
   }
 };
 
+const dumpCompletions = async () => {
+  const completions = await getAllRoutineCompletions();
+  console.log(JSON.stringify(completions, null, 2));
+};
+
 function DebugScreen() {
   return (
     <Screen>
@@ -197,18 +203,9 @@ function DebugScreen() {
         <Header>Debug</Header>
       </View>
       <Button title="Reset DB" onPress={() => resetDB()} />
-      <Button title="Get offerings" onPress={() => getOfferings()} />
-      <Button
-        title="Get available packages"
-        onPress={() => getAvailablePackages()}
-      />
-      <Button title="Purchase monthly" onPress={() => purchaseMonthly()} />
-      <Button title="Purchase lifetime" onPress={() => purchaseLifetime()} />
-      <Button
-        title="Check subscription status"
-        onPress={() => checkSubscriptionStatus()}
-      />
-      <Button title="Restore" onPress={() => restore()} />
+      <Button title="Get Subscriptions" onPress={() => null} />
+      <Button title="Request Subscription" onPress={() => null} />
+      <Button title="Dump completions" onPress={() => dumpCompletions()} />
     </Screen>
   );
 }

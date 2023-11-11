@@ -100,6 +100,7 @@ function TimerScreen({ route }) {
         />
       </View>
       <SuccessModal
+        routineID={state.id}
         routineTitle={state.title}
         visible={state.showSuccess}
         dispatch={dispatch}
