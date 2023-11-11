@@ -24,6 +24,7 @@ import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
+import { updateUserSubscriptionOnSync } from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -53,21 +54,26 @@ const SubscriptionScreen = ({ route }) => {
   const buy = async (subscriptionDuration) => {
     try {
       const offerings = await Purchases.getOfferings();
-      if (offerings.current !== null) {
+      if (
+        offerings.current !== null &&
+        offerings.current.availablePackages.length !== 0
+      ) {
         const packageToBuy = offerings.current[`${subscriptionDuration}`];
-        Alert.alert("packageToBuy: ", JSON.stringify(packageToBuy, null, 2));
 
         // Purchase it.
-        Alert.alert(`About to purchase package (${subscriptionDuration})`);
-        const purchaseMade = await Purchases.purchasePackage(packageToBuy);
-        if (
-          typeof purchaseMade.customerInfo.entitlements.active.Premium !==
-          "undefined"
-        ) {
+        Alert.alert(`About to purchase package (${packageToBuy})`);
+
+        const { customerInfo, productIdentifier } =
+          await Purchases.purchasePackage(packageToBuy);
+        if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
           Alert.alert(
             `Purchase of ${subscriptionDuration} package successful!`,
           );
-          // Unlock premium. Probably need to write DB, but don't need to update context (handled by listener).
+          // Unlock Premium
+          await updateUserSubscriptionOnSync(
+            customerInfo,
+            customerInfo.entitlements.active,
+          );
         } else {
           Alert.alert(`Purchase of ${subscriptionDuration} package failed!`);
         }
@@ -75,25 +81,41 @@ const SubscriptionScreen = ({ route }) => {
         Alert.alert("WEIRD BRANCH", "offerings.current was null");
       }
     } catch (err) {
-      const errorCode = err.code ? `Error Code: ${err.code}` : "";
-      const errorMessage = err.message
-        ? err.message
-        : "An unexpected error occurred.";
-      Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+      if (!err.userCancelled) {
+        const errorCode = err.code ? `Error Code: ${err.code}` : "";
+        const errorMessage = err.message
+          ? err.message
+          : "An unexpected error occurred.";
+        Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+      }
     }
   };
 
   const restore = async () => {
     try {
       Alert.alert("Attempting restore", "Attempting restore...");
-      const restore = await Purchases.restorePurchases();
-      Alert.alert("Restore", `restore: ${JSON.stringify(restore, null, 2)}`);
+      const customerInfo = await Purchases.restorePurchases();
+      if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
+        Alert.alert(
+          `Restored Subscription`,
+          `${customerInfo.entitlements.active.productIdentifier}`,
+        );
+        // Unlock Premium
+        await updateUserSubscriptionOnSync(
+          customerInfo,
+          customerInfo.entitlements.active,
+        );
+      } else {
+        Alert.alert(`Restore failed!`, `${customerInfo}`);
+      }
     } catch (err) {
-      const errorCode = err.code ? `Error Code: ${err.code}` : "";
-      const errorMessage = err.message
-        ? err.message
-        : "An unexpected error occurred.";
-      Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+      if (!err.userCancelled) {
+        const errorCode = err.code ? `Error Code: ${err.code}` : "";
+        const errorMessage = err.message
+          ? err.message
+          : "An unexpected error occurred.";
+        Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+      }
     }
   };
 
