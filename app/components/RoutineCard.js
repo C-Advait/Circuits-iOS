@@ -36,9 +36,8 @@ function RoutineCard({
       exercises
         .map((exercise) => {
           if (exercise.tag === Tag.WORKING) {
-            return `${exercise.title} (${
-              exercise.numberOfRounds
-            } x ${formatDuration(exercise.workTime)})`;
+            return `${exercise.title} (${exercise.numberOfRounds
+              } x ${formatDuration(exercise.workTime)})`;
           } else {
             // Warmup / cooldown shouldnt't display number of rounds
             if (exercise.workTime)

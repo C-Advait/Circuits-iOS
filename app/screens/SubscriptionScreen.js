@@ -24,7 +24,14 @@ import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
-import { updateUserSubscriptionOnSync } from "../db/DBActions";
+import { setIsPremium } from "../contexts/AppContext"
+import {
+  doesUserSubscriptionExist,
+  getUserSubscriptionStatus,
+  updateUserSubscriptionOnSync,
+  createUserSubscriptionOnSync
+} from "../db/DBActions";
+
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -61,7 +68,7 @@ const SubscriptionScreen = ({ route }) => {
         const packageToBuy = offerings.current[`${subscriptionDuration}`];
 
         // Purchase it.
-        Alert.alert(
+        console.log(
           `About to purchase package (${JSON.stringify(
             packageToBuy,
             null,
@@ -72,37 +79,34 @@ const SubscriptionScreen = ({ route }) => {
         const { customerInfo, productIdentifier } =
           await Purchases.purchasePackage(packageToBuy);
         if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
-          Alert.alert(
+          console.log(
             `Purchase of ${subscriptionDuration} package successful!`,
           );
           // Unlock Premium
-          await updateUserSubscriptionOnSync(
-            customerInfo,
-            customerInfo.entitlements.active,
-          );
+          handleCustomerInfoUpdate(customerInfo, "buy block");
         } else {
-          Alert.alert(`Purchase of ${subscriptionDuration} package failed!`);
+          console.log(`Purchase of ${subscriptionDuration} package failed!`);
         }
       } else {
-        Alert.alert("WEIRD BRANCH", "offerings.current was null");
+        console.log("WEIRD BRANCH", "offerings.current was null");
       }
     } catch (err) {
-      if (!err.userCancelled) {
-        const errorCode = err.code ? `Error Code: ${err.code}` : "";
-        const errorMessage = err.message
-          ? err.message
-          : "An unexpected error occurred.";
-        Alert.alert("Error", `${errorCode}\n${errorMessage}`);
-      }
+      // if (!err.userCancelled) {
+      const errorCode = err.code ? `Error Code: ${err.code}` : "";
+      const errorMessage = err.message
+        ? err.message
+        : "An unexpected error occurred.";
+      console.log("Error", `${errorCode}\n${errorMessage}`);
+      // }
     }
   };
 
   const restore = async () => {
     try {
-      Alert.alert("Attempting restore", "Attempting restore...");
+      console.log("Attempting restore", "Attempting restore...");
       const customerInfo = await Purchases.restorePurchases();
       if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
-        Alert.alert(
+        console.log(
           `Restored Subscription`,
           `${JSON.stringify(
             customerInfo.entitlements.active.productIdentifier,
@@ -115,8 +119,9 @@ const SubscriptionScreen = ({ route }) => {
           customerInfo,
           customerInfo.entitlements.active,
         );
+        setIsPremium(true);
       } else {
-        Alert.alert(
+        console.log(
           `Restore failed!`,
           `${JSON.stringify(customerInfo, null, 2)}`,
         );
@@ -127,7 +132,7 @@ const SubscriptionScreen = ({ route }) => {
         const errorMessage = err.message
           ? err.message
           : "An unexpected error occurred.";
-        Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+        console.log("Error", `${errorCode}\n${errorMessage}`);
       }
     }
   };
@@ -167,6 +172,52 @@ const SubscriptionScreen = ({ route }) => {
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const handleCustomerInfoUpdate = async (customerInfo, caller) => {
+    const activeEntitlements = customerInfo?.entitlements?.active?.Premium;
+    const userSubEntryExists = await doesUserSubscriptionExist();
+
+    console.log("userSubEntryExists: ", userSubEntryExists);
+    // Data is there.
+    if (typeof activeEntitlements !== "undefined") {
+      if (userSubEntryExists) {
+        const updateResponse = await updateUserSubscriptionOnSync(
+          customerInfo,
+          activeEntitlements,
+        );
+        console.log(
+          `From ${caller}: Status subscription update`,
+          updateResponse,
+        );
+      } else {
+        const createResponse = await createUserSubscriptionOnSync(
+          customerInfo,
+          activeEntitlements,
+        );
+        console.log(
+          `From ${caller}: Status subscription creation`,
+          createResponse,
+        );
+      }
+    }
+
+    // Update context regardless
+    if (userSubEntryExists) {
+      const userSubscriptionStatus = await getUserSubscriptionStatus();
+      setIsPremium(userSubscriptionStatus);
+    } else {
+      setIsPremium(false);
+    }
+
+    console.log(
+      `From ${caller}: Purchaser info updated`,
+      `info: ${JSON.stringify(customerInfo, null, 2)}`,
+    );
+  };
+
+  Purchases.addCustomerInfoUpdateListener((info) => {
+    handleCustomerInfoUpdate(info, "listener SubscriptionScreen");
+  });
 
   return (
     <ImageBackground
@@ -247,7 +298,7 @@ const SubscriptionScreen = ({ route }) => {
           >
             <Text style={styles.continueText}>Continue</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => null}>
+          <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 

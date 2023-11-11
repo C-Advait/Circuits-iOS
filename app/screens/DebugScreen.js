@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import { dropTable } from "../db/DBActions";
 import { initTables } from "../db/DBSetup";
 import Purchases from "react-native-purchases";
+import { getUserSubscriptionTable } from "../db/DBActions";
 
 const resetDB = async () => {
   dropTable("Exercise")
@@ -20,17 +21,17 @@ const getOfferings = async () => {
   try {
     const offerings = await Purchases.getOfferings();
     if (offerings.current !== null) {
-      Alert.alert("Offerings: ", JSON.stringify(offerings, null, 2));
+      console.log("Offerings: ", JSON.stringify(offerings, null, 2));
     } else {
-      Alert.alert("WEIRD BRANCH", "offerings.current was null");
-      Alert.alert("Offerings: ", JSON.stringify(offerings, null, 2));
+      console.log("WEIRD BRANCH", "offerings.current was null");
+      console.log("Offerings: ", JSON.stringify(offerings, null, 2));
     }
   } catch (err) {
     const errorCode = err.code ? `Error Code: ${err.code}` : "";
     const errorMessage = err.message
       ? err.message
       : "An unexpected error occurred.";
-    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+    console.log("Error", `${errorCode}\n${errorMessage}`);
   }
 };
 
@@ -39,16 +40,16 @@ const getAvailablePackages = async () => {
     const offerings = await Purchases.getOfferings();
     if (offerings.current !== null) {
       const availablePackages = offerings.current.availablePackages;
-      Alert.alert("Packages: ", JSON.stringify(availablePackages, null, 2));
+      console.log("Packages: ", JSON.stringify(availablePackages, null, 2));
     } else {
-      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+      console.log("WEIRD BRANCH", "offerings.current was null");
     }
   } catch (err) {
     const errorCode = err.code ? `Error Code: ${err.code}` : "";
     const errorMessage = err.message
       ? err.message
       : "An unexpected error occurred.";
-    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+    console.log("Error", `${errorCode}\n${errorMessage}`);
   }
 };
 
@@ -58,33 +59,33 @@ const purchaseMonthly = async () => {
     if (offerings.current !== null) {
       // Get all packages.
       const availablePackages = offerings.current.availablePackages;
-      Alert.alert("Packages: ", JSON.stringify(availablePackages, null, 2));
+      console.log("Packages: ", JSON.stringify(availablePackages, null, 2));
 
       // Extract monthly package.
       const monthlyPackage = offerings.current.monthly;
-      Alert.alert("Monthly package: ", JSON.stringify(monthlyPackage, null, 2));
+      console.log("Monthly package: ", JSON.stringify(monthlyPackage, null, 2));
 
       // Purchase it.
-      Alert.alert("About to purchase monthly package");
+      console.log("About to purchase monthly package");
       const purchaseMade = await Purchases.purchasePackage(monthlyPackage);
       if (
         typeof purchaseMade.customerInfo.entitlements.active.Premium !==
         "undefined"
       ) {
-        Alert.alert("Purchase of monthly package successful!");
+        console.log("Purchase of monthly package successful!");
         // Unlock premium.
       } else {
-        Alert.alert("Purchase of monthly package failed.");
+        console.log("Purchase of monthly package failed.");
       }
     } else {
-      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+      console.log("WEIRD BRANCH", "offerings.current was null");
     }
   } catch (err) {
     const errorCode = err.code ? `Error Code: ${err.code}` : "";
     const errorMessage = err.message
       ? err.message
       : "An unexpected error occurred.";
-    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+    console.log("Error", `${errorCode}\n${errorMessage}`);
   }
 };
 
@@ -94,53 +95,53 @@ const purchaseLifetime = async () => {
     if (offerings.current !== null) {
       // Get all packages.
       const availablePackages = offerings.current.availablePackages;
-      Alert.alert("Packages: ", JSON.stringify(availablePackages, null, 2));
+      console.log("Packages: ", JSON.stringify(availablePackages, null, 2));
 
       // Extract monthly package.
       const lifetimePackage = offerings.current.lifetime;
-      Alert.alert(
+      console.log(
         "Lifetime package: ",
         JSON.stringify(lifetimePackage, null, 2),
       );
 
       // Purchase it.
-      Alert.alert("About to purchase lifetime package");
+      console.log("About to purchase lifetime package");
       const purchaseMade = await Purchases.purchasePackage(lifetimePackage);
       if (
         typeof purchaseMade.customerInfo.entitlements.active.Premium !==
         "undefined"
       ) {
-        Alert.alert("Purchase of lifetime package successful!");
+        console.log("Purchase of lifetime package successful!");
         // Unlock premium.
       } else {
-        Alert.alert("Purchase of lifetime package failed.");
+        console.log("Purchase of lifetime package failed.");
       }
     } else {
-      Alert.alert("WEIRD BRANCH", "offerings.current was null");
+      console.log("WEIRD BRANCH", "offerings.current was null");
     }
   } catch (err) {
     const errorCode = err.code ? `Error Code: ${err.code}` : "";
     const errorMessage = err.message
       ? err.message
       : "An unexpected error occurred.";
-    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+    console.log("Error", `${errorCode}\n${errorMessage}`);
   }
 };
 
 const checkSubscriptionStatus = async () => {
   try {
-    Alert.alert("Getting info", "Getting customer info...");
+    console.log("Getting info", "Getting customer info...");
     const customerInfo = await Purchases.getCustomerInfo();
 
-    Alert.alert(
+    console.log(
       "Info received",
       `Info: ${JSON.stringify(customerInfo, null, 2)}`,
     );
-    Alert.alert(
+    console.log(
       "Entitlements: ",
       `Entitlements: ${JSON.stringify(customerInfo?.entitlements, null, 2)}`,
     );
-    Alert.alert(
+    console.log(
       "Active entitlements: ",
       `Active entitlements: ${JSON.stringify(
         customerInfo?.entitlements?.active,
@@ -153,28 +154,28 @@ const checkSubscriptionStatus = async () => {
     const errorMessage = err.message
       ? err.message
       : "An unexpected error occurred.";
-    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+    console.log("Error", `${errorCode}\n${errorMessage}`);
   }
 };
 
 const restore = async () => {
   try {
-    Alert.alert("Attempting restore", "Attempting restore...");
+    console.log("Attempting restore", "Attempting restore...");
     const restore = await Purchases.restorePurchases();
-    Alert.alert("Restore", `restore: ${JSON.stringify(restore, null, 2)}`);
+    console.log("Restore", `restore: ${JSON.stringify(restore, null, 2)}`);
 
-    Alert.alert("Getting new customer info", "Getting new customer info...");
+    console.log("Getting new customer info", "Getting new customer info...");
     const customerInfo = await Purchases.getCustomerInfo();
 
-    Alert.alert(
+    console.log(
       "Info received",
       `Info: ${JSON.stringify(customerInfo, null, 2)}`,
     );
-    Alert.alert(
+    console.log(
       "Entitlements: ",
       `Entitlements: ${JSON.stringify(customerInfo?.entitlements, null, 2)}`,
     );
-    Alert.alert(
+    console.log(
       "Active entitlements: ",
       `Active entitlements: ${JSON.stringify(
         customerInfo?.entitlements?.active,
@@ -187,7 +188,7 @@ const restore = async () => {
     const errorMessage = err.message
       ? err.message
       : "An unexpected error occurred.";
-    Alert.alert("Error", `${errorCode}\n${errorMessage}`);
+    console.log("Error", `${errorCode}\n${errorMessage}`);
   }
 };
 
@@ -195,6 +196,12 @@ const dumpCompletions = async () => {
   const completions = await getAllRoutineCompletions();
   console.log(JSON.stringify(completions, null, 2));
 };
+
+const logSubscriptions = async () => {
+  getUserSubscriptionTable()
+    .then((tableRows) => console.log("UserSubscription Table Rows:\n", JSON.stringify(tableRows, null, 2)))
+    .catch((error) => console.error("Error fetching UserSubscription table:", error));
+}
 
 function DebugScreen() {
   return (
@@ -206,6 +213,7 @@ function DebugScreen() {
       <Button title="Get Subscriptions" onPress={() => null} />
       <Button title="Request Subscription" onPress={() => null} />
       <Button title="Dump completions" onPress={() => dumpCompletions()} />
+      <Button title="Log Subscriptions table" onPress={() => logSubscriptions()} />
     </Screen>
   );
 }

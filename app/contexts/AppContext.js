@@ -2,6 +2,8 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { Alert } from "react-native";
 import { lightTheme, darkTheme } from "../config/colors";
 import {
+  createUserSubscriptionOnSync,
+  updateUserSubscriptionOnSync,
   doesUserSubscriptionExist,
   getUserSubscriptionStatus,
   retrieveSetting,
@@ -16,7 +18,7 @@ export const AppContextProvider = ({ children }) => {
   // default theme
   const [theme, setTheme] = useState(darkTheme);
   const [soundOn, setSoundOn] = useState(true);
-  const [isPremium, setIsPremium] = useState(true);
+  const [isPremium, setIsPremium] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
@@ -28,7 +30,7 @@ export const AppContextProvider = ({ children }) => {
         const customerInfo = await Purchases.getCustomerInfo();
         await handleCustomerInfoUpdate(customerInfo, "useEffect");
       } catch (err) {
-        Alert.alert(
+        console.log(
           "Couldn't load premium from revenue cat.",
           "Defaulting to database",
         );
@@ -69,7 +71,7 @@ export const AppContextProvider = ({ children }) => {
           customerInfo,
           activeEntitlements,
         );
-        Alert.alert(
+        console.log(
           `From ${caller}: Status subscription update`,
           updateResponse,
         );
@@ -78,7 +80,7 @@ export const AppContextProvider = ({ children }) => {
           customerInfo,
           activeEntitlements,
         );
-        Alert.alert(
+        console.log(
           `From ${caller}: Status subscription creation`,
           createResponse,
         );
@@ -93,15 +95,15 @@ export const AppContextProvider = ({ children }) => {
       setIsPremium(false);
     }
 
-    Alert.alert(
+    console.log(
       `From ${caller}: Purchaser info updated`,
       `info: ${JSON.stringify(customerInfo, null, 2)}`,
     );
   };
 
-  Purchases.addCustomerInfoUpdateListener((info) => {
-    handleCustomerInfoUpdate(info, "listener");
-  });
+  // Purchases.addCustomerInfoUpdateListener((info) => {
+  //   handleCustomerInfoUpdate(info, "listener");
+  // });
 
   return (
     <AppContext.Provider

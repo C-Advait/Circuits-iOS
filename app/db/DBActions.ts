@@ -316,6 +316,30 @@ const doesUserSubscriptionExist = async () => {
   });
 };
 
+const getUserSubscriptionTable = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM UserSubscription",
+        [],
+        (_tx: any, results: any) => {
+          let rows = [];
+          for (let i = 0; i < results.rows.length; i++) {
+            rows.push(results.rows.item(i));
+          }
+          resolve(rows);  // Resolves with the array of rows
+        },
+        (error: any) => {
+          reject(error);  // Rejects with the error if there's any
+        }
+      );
+    });
+  });
+};
+
+
 const getUserSubscriptionStatus = async () => {
   const db = getDBInstance();
 
@@ -555,6 +579,7 @@ export {
   getExercisesForRoutine,
   doesUserSubscriptionExist,
   getUserSubscriptionStatus,
+  getUserSubscriptionTable,
   updateExercise,
   updateRoutine,
   updateUserSubscriptionOnSync,

@@ -26,7 +26,6 @@ export const SoundProvider = ({ children }) => {
         try {
           await soundInstance.loadAsync(soundFiles[key].file);
           loadedSounds[key] = soundInstance;
-          console.log(`Successfully loaded the sound for key ${key}`);
         } catch (error) {
           console.error(`Couldn't load the sound for key ${key}`, error);
         }
