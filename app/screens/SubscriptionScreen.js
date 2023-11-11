@@ -61,7 +61,13 @@ const SubscriptionScreen = ({ route }) => {
         const packageToBuy = offerings.current[`${subscriptionDuration}`];
 
         // Purchase it.
-        Alert.alert(`About to purchase package (${packageToBuy})`);
+        Alert.alert(
+          `About to purchase package (${JSON.stringify(
+            packageToBuy,
+            null,
+            2,
+          )})`,
+        );
 
         const { customerInfo, productIdentifier } =
           await Purchases.purchasePackage(packageToBuy);
@@ -98,7 +104,11 @@ const SubscriptionScreen = ({ route }) => {
       if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
         Alert.alert(
           `Restored Subscription`,
-          `${customerInfo.entitlements.active.productIdentifier}`,
+          `${JSON.stringify(
+            customerInfo.entitlements.active.productIdentifier,
+            null,
+            2,
+          )}`,
         );
         // Unlock Premium
         await updateUserSubscriptionOnSync(
@@ -106,7 +116,10 @@ const SubscriptionScreen = ({ route }) => {
           customerInfo.entitlements.active,
         );
       } else {
-        Alert.alert(`Restore failed!`, `${customerInfo}`);
+        Alert.alert(
+          `Restore failed!`,
+          `${JSON.stringify(customerInfo, null, 2)}`,
+        );
       }
     } catch (err) {
       if (!err.userCancelled) {
