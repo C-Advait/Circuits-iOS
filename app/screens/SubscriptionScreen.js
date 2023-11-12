@@ -24,12 +24,40 @@ import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
+import OverlayLoader from "../components/OverlayLoader";
+import { getUserSubscriptionStatus } from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme, premiumPlan } = useAppContext();
+  const [subscriptionDetails, setSubscriptionDetails] = useState();
+  const { theme, premiumPlan, loading, setLoading } = useAppContext();
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
+
+  const generateSubscriptionDetails = async () => {
+    if (typeof premiumPlan === "undefined")
+      setSubscriptionDetails("You are currently on the free tier.");
+
+    const { expirationDate, unsubscribeDetectedAt } =
+      await getUserSubscriptionStatus({ returnSubscription: true });
+
+    const expiry = formatExpiry(expirationDate);
+    const isUnsubscribed = unsubscribeDetectedAt !== null;
+
+    if (!isUnsubscribed) {
+      setSubscriptionDetails(
+        `Your subscription to the ${premiumPlan} pass renews on ${expiry}.`,
+      );
+    } else if (isUnsubscribed) {
+      setSubscriptionDetails(
+        `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will revert to the free-tier.`,
+      );
+    } // Handle cross-upgrade.
+  };
+
+  useEffect(() => {
+    generateSubscriptionDetails();
+  }, []);
 
   useEffect(() => {
     const localizePrices = async () => {
@@ -52,6 +80,7 @@ const SubscriptionScreen = ({ route }) => {
 
   const buy = async (subscriptionDuration) => {
     try {
+      setLoading(true);
       const offerings = await Purchases.getOfferings();
       if (
         offerings.current !== null &&
@@ -68,8 +97,9 @@ const SubscriptionScreen = ({ route }) => {
           )})`,
         );
 
-        const { customerInfo, productIdentifier } =
+        const { customerInfo, _productIdentifier } =
           await Purchases.purchasePackage(packageToBuy);
+
         if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
           console.log(
             `Purchase of ${subscriptionDuration} package successful!`,
@@ -119,7 +149,10 @@ const SubscriptionScreen = ({ route }) => {
             return {
               ...state,
               selectedPlan: PREMIUM_PLANS.MONTHLY,
-              continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
+              continueFunction: () => {
+                console.log("loading: ", loading);
+                buy(PREMIUM_PLANS.MONTHLY);
+              },
             };
           case PREMIUM_PLANS.ANNUAL:
             return {
@@ -153,6 +186,7 @@ const SubscriptionScreen = ({ route }) => {
       style={styles.background}
       resizeMode="cover"
     >
+      <OverlayLoader isVisible={loading} />
       <Screen style={styles.container}>
         <View>
           <NavHeader
@@ -230,15 +264,23 @@ const SubscriptionScreen = ({ route }) => {
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 
-          <Text style={styles.descriptionText}>
-            Description of how purchases will be handled. Charged to your Apple
-            ID account ....
-          </Text>
+          <Text style={styles.descriptionText}>{subscriptionDetails}</Text>
         </View>
       </Screen>
     </ImageBackground>
   );
 };
+
+function formatExpiry(isoString) {
+  console.log("iso", isoString);
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  // Add 1 to the month because getMonth() returns 0-11
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 const getStyles = (theme) =>
   StyleSheet.create({

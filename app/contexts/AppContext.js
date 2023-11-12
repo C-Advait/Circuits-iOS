@@ -18,6 +18,7 @@ export const AppContextProvider = ({ children }) => {
   const [soundOn, setSoundOn] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const [premiumPlan, setPremiumPlan] = useState();
+  const [loading, setLoading] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
@@ -42,6 +43,8 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const handleCustomerInfoUpdate = async (customerInfo) => {
+    setLoading(false);
+
     const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
     if (typeof premiumEntitlement !== "undefined") {
       setPremiumPlan(
@@ -53,7 +56,6 @@ export const AppContextProvider = ({ children }) => {
       setPremiumPlan(undefined);
     }
 
-
     // Update context
     const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
     setIsPremium(premiumStatus);
@@ -64,9 +66,7 @@ export const AppContextProvider = ({ children }) => {
       );
     }
 
-    console.log(
-      `UserSubscription info updated`,
-    );
+    console.log(`UserSubscription info updated`);
   };
 
   useEffect(() => {
@@ -97,6 +97,8 @@ export const AppContextProvider = ({ children }) => {
         setIsPremium,
         premiumPlan,
         setPremiumPlan,
+        loading,
+        setLoading,
       }}
     >
       {children}

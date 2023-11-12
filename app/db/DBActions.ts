@@ -291,7 +291,9 @@ const getUserSubscriptionTable = async () => {
   });
 };
 
-const getUserSubscriptionStatus = async () => {
+const getUserSubscriptionStatus = async ({
+  returnSubscription = false,
+} = {}) => {
   const db = getDBInstance();
 
   return new Promise((resolve, reject) => {
@@ -300,8 +302,13 @@ const getUserSubscriptionStatus = async () => {
         "SELECT * FROM UserSubscription LIMIT 1", // Assuming there's only one entry per user
         [],
         (_tx: any, results: any) => {
-
           const subscription = results.rows.item(0);
+          console.log(
+            "Here's the subscription: ",
+            JSON.stringify(subscription, null, 2),
+          );
+          console.log("returnSub; ", returnSubscription);
+          if (returnSubscription) resolve(subscription);
 
           // Check if user has ever synced to RevenueCat
           if (subscription.expirationDate) {
@@ -310,14 +317,18 @@ const getUserSubscriptionStatus = async () => {
             const forcedDowngradeDate = new Date(expirationDate);
             forcedDowngradeDate.setDate(forcedDowngradeDate.getMinutes() + 1);
 
-            if (currentDate < expirationDate) { // User Subscription is fine
+            if (currentDate < expirationDate) {
+              // User Subscription is fine
               resolve([true, false]);
-            } else if (currentDate < forcedDowngradeDate) { // User is in grace period
-              resolve([true, true])
-            } else { // User has passed grace period
-              resolve([false, false])
+            } else if (currentDate < forcedDowngradeDate) {
+              // User is in grace period
+              resolve([true, true]);
+            } else {
+              // User has passed grace period
+              resolve([false, false]);
             }
-          } else { // User has never synced
+          } else {
+            // User has never synced
             resolve([false, false]);
           }
         },
@@ -478,7 +489,7 @@ const updateUserSubscriptionOnSync = (
           activeEntitlement.unsubscribeDetectedAt,
           activeEntitlement.billingIssueDetectedAt,
           customerInfo.originalAppUserId,
-          1
+          1,
         ],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);
