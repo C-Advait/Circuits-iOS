@@ -53,6 +53,8 @@ const SubscriptionScreen = ({ route }) => {
     const renew = willRenew !== null;
     const isCrossgrading = await getCrossgrade();
 
+    console.log("isCrossgrading: ", isCrossgrading);
+
     if (isCrossgrading) {
       setSubscriptionDetails(
         `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will be switched to the ${getOtherPlan(
@@ -312,7 +314,6 @@ function getOtherPlan(current) {
 }
 
 function formatExpiry(isoString) {
-  console.log("iso", isoString);
   const date = new Date(isoString);
   const year = date.getFullYear();
   // Add 1 to the month because getMonth() returns 0-11

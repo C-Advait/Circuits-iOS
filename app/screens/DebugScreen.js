@@ -4,15 +4,15 @@ import Screen from "../components/Screen";
 import Header from "../components/Header";
 
 import {
-  decrementExpiryNotificationCount,
   dropTable,
   getAuxiliary,
+  getCrossgrade,
   getExpiryNotificationCount,
-  setExpiryNotificationCount,
+  getUserSubscriptionStatus,
   toggleCrossgrade,
   updateExpiryNotificationCount,
 } from "../db/DBActions";
-import { initTables } from "../db/DBSetup";
+import { createTables, setDefaultValues } from "../db/DBSetup";
 import Purchases from "react-native-purchases";
 import { getUserSubscriptionTable } from "../db/DBActions";
 
@@ -22,7 +22,9 @@ const resetDB = async () => {
     .then(dropTable("Setting"))
     .then(dropTable("RoutineCompletion"))
     .then(dropTable("UserSubscription"))
-    .then(initTables())
+    .then(dropTable("UserSubscriptionAuxiliary"))
+    .then(createTables())
+    .then(setDefaultValues())
     .then(Alert.alert("All tables dropped and recreated!"));
 };
 
@@ -207,7 +209,7 @@ const dumpCompletions = async () => {
 };
 
 const logSubscriptions = async () => {
-  getUserSubscriptionTable()
+  getUserSubscriptionStatus({ returnSubscription: true })
     .then((tableRows) =>
       console.log(
         "UserSubscription Table Rows:\n",
@@ -221,6 +223,11 @@ const logSubscriptions = async () => {
 
 const logAuxiliary = async () => {
   const aux = await getAuxiliary();
+  console.log(JSON.stringify(aux, null, 2));
+};
+
+const getCross = async () => {
+  const aux = await getCrossgrade();
   console.log(JSON.stringify(aux, null, 2));
 };
 
@@ -251,6 +258,7 @@ function DebugScreen() {
         onPress={() => checkSubscriptionStatus()}
       />
       <Button title="Log aux" onPress={() => logAuxiliary()} />
+      <Button title="Log cross" onPress={() => getCross()} />
       <Button title="Toggle aux" onPress={() => toggleAux()} />
       <Button title="Set notif" onPress={() => setNotif()} />
       <Button

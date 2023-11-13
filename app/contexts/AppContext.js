@@ -10,9 +10,10 @@ import {
   setExpiryNotificationCount,
   decrementExpiryNotificationCount,
   getCachedProductID,
+  toggleCrossgrade,
 } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
-import NetInfo from "@react-native-community/netinfo";
+// import NetInfo from "@react-native-community/netinfo";
 import Purchases from "react-native-purchases";
 import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
@@ -48,11 +49,16 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const handleCustomerInfoUpdate = async (customerInfo) => {
+    console.log(
+      "Current customerInfo: ",
+      JSON.stringify(customerInfo, null, 2),
+    );
     const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
     if (typeof premiumEntitlement !== "undefined") {
       const cachedProductID = await getCachedProductID();
       // First time seeing crossgrade. Mark complete
       if (cachedProductID !== premiumEntitlement.productIdentifier) {
+        console.log("Detected crossgrade. Switching over");
         await toggleCrossgrade();
       }
 
@@ -71,13 +77,13 @@ export const AppContextProvider = ({ children }) => {
 
     if (!premiumStatus) setExpiryNotificationCount();
     else if (isInGracePeriod && (await getExpiryNotificationCount()) > 0) {
-      NetInfo.fetch().then((state) => {
-        if (state.isConnected) {
-          onlineGracePeriodAlert();
-        } else {
-          offlineGracePeriodAlert();
-        }
-      });
+      // NetInfo.fetch().then((state) => {
+      //   if (state.isConnected) {
+      //     onlineGracePeriodAlert();
+      //   } else {
+      //     offlineGracePeriodAlert();
+      //   }
+      // });
       decrementExpiryNotificationCount();
     }
 

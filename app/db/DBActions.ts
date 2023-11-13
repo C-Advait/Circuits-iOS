@@ -542,7 +542,7 @@ const getCrossgrade = async () => {
         query,
         [],
         (_txObj: any, resultSet: any) => {
-          resolve(resultSet.rowsAffected);
+          resolve(resultSet.rows.raw()[0]?.crossgrade);
         },
         (error: any) => reject(error),
       );

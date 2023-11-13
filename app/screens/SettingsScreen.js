@@ -102,12 +102,12 @@ function SettingsScreen() {
   const support = [
     {
       id: 4,
-      title: "Contact The Developers",
+      title: "Contact us",
       onTouchablePress: contactSupport,
     },
     {
       id: 5,
-      title: "Rate This App",
+      title: "Rate us",
       onTouchablePress: rateUs,
     },
   ];
