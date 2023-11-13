@@ -1,5 +1,5 @@
 import React from "react";
-import { Alert, View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useAppContext } from "../../contexts/AppContext";
 import {
@@ -7,23 +7,15 @@ import {
   PARAGRAPH_FONT_WEIGHT,
 } from "../../config/appConstants";
 
-function PurchaseContinueButton({ active, onPress }) {
+function PurchaseContinueButton({ onPress }) {
   const { theme } = useAppContext();
-  const styles = active ? getActiveStyles(theme) : getPassiveStyles(theme);
+  const styles = getStyles(theme);
 
   return (
     <View style={{ width: "100%" }}>
       <TouchableOpacity
         style={styles.background}
-        onPress={
-          active
-            ? onPress
-            : () =>
-                Alert.alert(
-                  "You're already subscribed.",
-                  "To change your current plan, please cancel your subscription in settings.",
-                )
-        }
+        onPress={onPress}
         activeOpacity={0.8}
       >
         <Text style={styles.text}>Continue</Text>
@@ -32,7 +24,7 @@ function PurchaseContinueButton({ active, onPress }) {
   );
 }
 
-const getActiveStyles = (theme) =>
+const getStyles = (theme) =>
   StyleSheet.create({
     background: {
       backgroundColor: theme.accentDarkBlue,
@@ -43,23 +35,6 @@ const getActiveStyles = (theme) =>
     },
     text: {
       color: theme.primary,
-      fontWeight: PARAGRAPH_FONT_WEIGHT,
-      fontSize: PARAGRAPH_FONT_SIZE,
-      textAlign: "center",
-    },
-  });
-
-const getPassiveStyles = (theme) =>
-  StyleSheet.create({
-    background: {
-      backgroundColor: theme.tertiaryBackground,
-      borderRadius: 10,
-      height: 58,
-      justifyContent: "center",
-      marginBottom: 20,
-    },
-    text: {
-      color: theme.tertiary,
       fontWeight: PARAGRAPH_FONT_WEIGHT,
       fontSize: PARAGRAPH_FONT_SIZE,
       textAlign: "center",

@@ -256,10 +256,7 @@ const SubscriptionScreen = ({ route }) => {
               }
             />
           </View>
-          <PurchaseContinueButton
-            active={typeof premiumPlan === "undefined"}
-            onPress={state.continueFunction}
-          />
+          <PurchaseContinueButton onPress={state.continueFunction} />
           <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
