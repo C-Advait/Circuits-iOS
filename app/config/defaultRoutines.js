@@ -7,35 +7,35 @@ export const defaultRoutines = [
     title: "Yoga Beginner Stretch",
     duration: 590, // e.g., 20 minutes
     color: "#AABBCC",
-    userCreated: true,
+    userCreated: false,
   }),
   new Routine({
     numberOfLoops: 1,
     title: "Hip Mobility",
     duration: 760, // e.g., 20 minutes
     color: "#AABBCC",
-    userCreated: true,
+    userCreated: false,
   }),
   new Routine({
     numberOfLoops: 1,
     title: "Shoulder Mobility",
     duration: 670, // e.g., 20 minutes
     color: "#AABBCC",
-    userCreated: true,
+    userCreated: false,
   }),
   new Routine({
     numberOfLoops: 1,
     title: "Knee/Ankle Mobility",
     duration: 720, // e.g., 20 minutes
     color: "#AABBCC",
-    userCreated: true,
+    userCreated: false,
   }),
   new Routine({
     numberOfLoops: 1,
     title: "Back Mobility",
     duration: 615, // e.g., 20 minutes
     color: "#AABBCC",
-    userCreated: true,
+    userCreated: false,
   }),
 ];
 
