@@ -247,21 +247,16 @@ const getExercisesForRoutine = async (routineID: number) => {
   });
 };
 
-// TODO: Remove. Written for debugging purposes.
-const getUserSubscriptionTable = async () => {
+const getCachedProductID = async () => {
   const db = getDBInstance();
 
   return new Promise((resolve, reject) => {
     db.transaction((tx: any) => {
       tx.executeSql(
-        "SELECT * FROM UserSubscription",
+        "SELECT productId FROM UserSubscription",
         [],
         (_tx: any, results: any) => {
-          let rows = [];
-          for (let i = 0; i < results.rows.length; i++) {
-            rows.push(results.rows.item(i));
-          }
-          resolve(rows); // Resolves with the array of rows
+          resolve(results.rows.item(0)?.productId);
         },
         (error: any) => {
           reject(error); // Rejects with the error if there's any
@@ -439,6 +434,7 @@ const updateUserSubscriptionOnSync = (
           requestDate = ?,
           entitlementId = ?,
           isActive = ?,
+          willRenew = ?,
           productId = ?,
           periodType = ?,
           expirationDate = ?,
@@ -457,6 +453,7 @@ const updateUserSubscriptionOnSync = (
           customerInfo.requestDate,
           activeEntitlement.identifier,
           activeEntitlement.isActive,
+          activeEntitlement.willRenew,
           activeEntitlement.productIdentifier,
           activeEntitlement.periodType,
           activeEntitlement.expirationDate,
@@ -532,6 +529,27 @@ const toggleCrossgrade = async () => {
   });
 };
 
+const getCrossgrade = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `SELECT crossgrade
+      FROM UserSubscriptionAuxiliary
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
 const setExpiryNotificationCount = async (count: Number = 3) => {
   const db = getDBInstance();
 
@@ -564,7 +582,7 @@ const decrementExpiryNotificationCount = async () => {
 
       tx.executeSql(
         query,
-        [count],
+        [],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);
         },
@@ -628,13 +646,14 @@ export {
   getRoutineByID,
   getExercisesForRoutine,
   getUserSubscriptionStatus,
-  getUserSubscriptionTable,
+  getCachedProductID,
   updateExercise,
   updateRoutine,
   updateUserSubscriptionOnSync,
   deleteExercise,
   deleteRoutine,
   toggleCrossgrade,
+  getCrossgrade,
   setExpiryNotificationCount,
   decrementExpiryNotificationCount,
   getExpiryNotificationCount,

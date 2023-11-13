@@ -9,6 +9,7 @@ import {
   getExpiryNotificationCount,
   setExpiryNotificationCount,
   decrementExpiryNotificationCount,
+  getCachedProductID,
 } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
 import NetInfo from "@react-native-community/netinfo";
@@ -47,10 +48,14 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const handleCustomerInfoUpdate = async (customerInfo) => {
-    console.log(JSON.stringify(customerInfo, null, 2));
-
     const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
     if (typeof premiumEntitlement !== "undefined") {
+      const cachedProductID = await getCachedProductID();
+      // First time seeing crossgrade. Mark complete
+      if (cachedProductID !== premiumEntitlement.productIdentifier) {
+        await toggleCrossgrade();
+      }
+
       setPremiumPlan(
         extractPlanFromProductIdentifier(premiumEntitlement?.productIdentifier),
       );

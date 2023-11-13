@@ -111,6 +111,7 @@ export const createTables = async () => {
         requestDate TEXT,
         entitlementId TEXT,
         isActive INTEGER,
+        willRenew INTEGER,
         productId TEXT,
         periodType Text,
         expirationDate TEXT,

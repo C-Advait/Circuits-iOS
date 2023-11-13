@@ -25,7 +25,11 @@ import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
 import OverlayLoader from "../components/OverlayLoader";
-import { getUserSubscriptionStatus } from "../db/DBActions";
+import {
+  getCrossgrade,
+  getUserSubscriptionStatus,
+  toggleCrossgrade,
+} from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -37,25 +41,33 @@ const SubscriptionScreen = ({ route }) => {
 
   const generateSubscriptionDetails = async () => {
     if (typeof premiumPlan === "undefined") {
-      setSubscriptionDetails("You are currently on the free tier.");
+      setSubscriptionDetails("You are not currently subscribed.");
       return;
     }
 
-    const { expirationDate, unsubscribeDetectedAt } =
-      await getUserSubscriptionStatus({ returnSubscription: true });
+    const { expirationDate, willRenew } = await getUserSubscriptionStatus({
+      returnSubscription: true,
+    });
 
     const expiry = formatExpiry(expirationDate);
-    const isUnsubscribed = unsubscribeDetectedAt !== null;
+    const renew = willRenew !== null;
+    const isCrossgrading = await getCrossgrade();
 
-    if (!isUnsubscribed) {
+    if (isCrossgrading) {
+      setSubscriptionDetails(
+        `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will be switched to the ${getOtherPlan(
+          premiumPlan,
+        )} tier.`,
+      );
+    } else if (renew) {
       setSubscriptionDetails(
         `Your subscription to the ${premiumPlan} pass renews on ${expiry}.`,
       );
-    } else if (isUnsubscribed) {
+    } else {
       setSubscriptionDetails(
         `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will revert to the free-tier.`,
       );
-    } // Handle cross-upgrade.
+    }
   };
 
   useEffect(() => {
@@ -241,27 +253,47 @@ const SubscriptionScreen = ({ route }) => {
               purchased={premiumPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
               priceText={`${state.monthly} monthly`}
-              onPress={() =>
+              onPress={async () => {
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
                   payload: PREMIUM_PLANS.MONTHLY,
-                })
-              }
+                });
+
+                if (premiumPlan && premiumPlan !== state.selectedPlan) {
+                  await toggleCrossgrade();
+                }
+              }}
             />
             <SubscriptionButton
               enabled={state.selectedPlan === PREMIUM_PLANS.ANNUAL}
               purchased={premiumPlan === PREMIUM_PLANS.ANNUAL}
               titleText={"Annual Pass"}
               priceText={`${state.annual} annually`}
-              onPress={() =>
+              onPress={async () => {
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
                   payload: PREMIUM_PLANS.ANNUAL,
-                })
-              }
+                });
+
+                if (premiumPlan && premiumPlan !== state.selectedPlan) {
+                  await toggleCrossgrade();
+                }
+              }}
             />
           </View>
-          <PurchaseContinueButton onPress={state.continueFunction} />
+          <PurchaseContinueButton
+            onPress={async () => {
+              const crossgrading = await getCrossgrade();
+              if (!crossgrading) state.continueFunction();
+              else
+                Alert.alert(
+                  `You are already subscribed`,
+                  `You are currently subscribed to our ${premiumPlan} plan, and will switch to ${getOtherPlan(
+                    premiumPlan,
+                  )} in the next renewal cycle.\n\nTo manage your subscription, please go to settings.`,
+                );
+            }}
+          />
           <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
@@ -272,6 +304,12 @@ const SubscriptionScreen = ({ route }) => {
     </ImageBackground>
   );
 };
+
+function getOtherPlan(current) {
+  return current === PREMIUM_PLANS.MONTHLY
+    ? PREMIUM_PLANS.ANNUAL
+    : PREMIUM_PLANS.MONTHLY;
+}
 
 function formatExpiry(isoString) {
   console.log("iso", isoString);
