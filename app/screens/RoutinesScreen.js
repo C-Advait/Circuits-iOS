@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, FlatList, Alert } from "react-native";
+import { StyleSheet, FlatList, Alert, Text } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
@@ -15,7 +15,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import routes from "../navigation/routes";
-import { getAllUserCreatedRoutines } from "../db/DBActions";
+import { getAllRoutines } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
@@ -40,19 +40,60 @@ function RoutinesScreen() {
   const styles = getStyles(theme);
 
   const [routines, setRoutines] = useState([]);
+  const [userRoutines, setUserRoutines] = useState([]);
+  const [defaultRoutines, setDefaultRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
   const [isPremium, setIsPremium] = useState(false);
   const [dataHash, setDataHash] = useState(null);
 
-
   const loadRoutines = async () => {
-    const newRoutines = await getAllUserCreatedRoutines();
+    const newRoutines = await getAllRoutines();
     const newHash = hashString(JSON.stringify(newRoutines));
 
     if (newHash !== dataHash) {
+
+      const userCreatedRoutines = [];
+      const defRoutines = [];
+
+      newRoutines.forEach((element) => {
+        if (element.userCreated) {
+          userCreatedRoutines.push(element);
+        } else {
+          defRoutines.push(element);
+        }
+      });
+
       setRoutines(newRoutines);
+      setUserRoutines(userCreatedRoutines);
+      setDefaultRoutines(defRoutines);
       setDataHash(newHash);
     }
+  };
+
+  const CustomFooter = () => {
+    return (
+      <View>
+        <View style={{ marginBottom: 10 }} />
+        {defaultRoutines.map((providedRoutine, index) => (
+          <View key={providedRoutine.id} style={{ marginBottom: 10 }}>
+            <RoutineCard
+              routine={providedRoutine}
+              isExpanded={expandedStates[index + userRoutines.length]}
+              toggleExpand={() => toggleExpand(index + userRoutines.length)}
+              deleteCallback={() => {
+                loadRoutines();
+                setExpandedCount(0);
+                setExpandedStates((prev) =>
+                  new Array(Math.max(prev.length - 1, 0)).fill(false),
+                );
+              }}
+              isEnabled={true}
+            />
+          </View>
+        ))}
+        <View style={{ height: TAB_BAR_HEIGHT }} />
+      </View>
+    );
   };
 
   useFocusEffect(
@@ -169,7 +210,7 @@ function RoutinesScreen() {
           onPress={() => {
             isPremium
               ? handleNewRoutineOnpress()
-              : routines.length < 5
+              : userRoutines.length < 5
                 ? handleNewRoutineOnpress()
                 : handleBlockedRoutineCreation();
           }}
@@ -188,7 +229,7 @@ function RoutinesScreen() {
         />
       </View>
       <FlatList
-        data={routines}
+        data={userRoutines}
         renderItem={({ item: routine, index }) => (
           <RoutineCard
             routine={routine}
@@ -201,7 +242,7 @@ function RoutinesScreen() {
                 new Array(Math.max(prev.length - 1, 0)).fill(false),
               );
             }}
-            isEnabled={isPremium ? true : index <= 4}
+            isEnabled={isPremium ? true : index <= 2}
           />
         )}
         keyExtractor={(item) => item.id}

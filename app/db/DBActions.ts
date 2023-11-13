@@ -196,6 +196,38 @@ const getAllUserCreatedRoutines = async () => {
   });
 };
 
+const getAllDefaultRoutines = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM Routine WHERE userCreated = 0 ORDER BY id",
+        [],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw().map((row: any) => new Routine(row)));
+        },
+      );
+    }, reject);
+  });
+};
+
+const getAllRoutines = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM Routine",
+        [],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw().map((row: any) => new Routine(row)));
+        },
+      );
+    }, reject);
+  });
+};
+
 const getNewRoutineID = async () => {
   const db = getDBInstance();
 
@@ -400,7 +432,9 @@ export {
   createRoutine,
   logRoutineCompletion,
   getAllUserCreatedRoutines,
+  getAllDefaultRoutines,
   getAllRoutineNames,
+  getAllRoutines,
   getRoutineByID,
   getExercisesForRoutine,
   getNewRoutineID,
