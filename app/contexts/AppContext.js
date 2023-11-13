@@ -6,9 +6,14 @@ import {
   getUserSubscriptionStatus,
   retrieveSetting,
   updateSetting,
+  getExpiryNotificationCount,
+  setExpiryNotificationCount,
+  decrementExpiryNotificationCount,
 } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
+import NetInfo from "@react-native-community/netinfo";
 import Purchases from "react-native-purchases";
+import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
 export const AppContext = createContext();
 
@@ -58,14 +63,34 @@ export const AppContextProvider = ({ children }) => {
     // Update context
     const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
     setIsPremium(premiumStatus);
-    if (isInGracePeriod) {
-      Alert.alert(
-        "Subscription expiring soon",
-        "To keep access to premium features, please go online and verify subscription status.",
-      );
+
+    if (!premiumStatus) setExpiryNotificationCount();
+    else if (isInGracePeriod && (await getExpiryNotificationCount()) > 0) {
+      NetInfo.fetch().then((state) => {
+        if (state.isConnected) {
+          onlineGracePeriodAlert();
+        } else {
+          offlineGracePeriodAlert();
+        }
+      });
+      decrementExpiryNotificationCount();
     }
 
     console.log(`UserSubscription info updated`);
+  };
+
+  const onlineGracePeriodAlert = () => {
+    Alert.alert(
+      "Subscription expires soon",
+      `Within ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days, your account will transition to our free-tier, which allows access to your first five routines only.\n\nPlease note, while routines beyond the fifth won’t be accessible, they will remain saved in your account.`,
+    );
+  };
+
+  const offlineGracePeriodAlert = () => {
+    Alert.alert(
+      "Unable to verify subscription",
+      `We're unable to confirm your premium status for the upcoming billing cycle, as you're currently using the app offline.\n\nTo keep enjoying your subscription benefits, please connect to the internet while using the app sometime in the next ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days.\n\nThis will help us ensure your account remains on the premium tier`,
+    );
   };
 
   useEffect(() => {

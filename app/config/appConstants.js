@@ -1,7 +1,7 @@
 import { Tag, Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 
-export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 3;
+export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 16;
 
 export const TAB_BAR_HEIGHT = 90;
 

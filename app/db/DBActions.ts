@@ -532,17 +532,34 @@ const toggleCrossgrade = async () => {
   });
 };
 
-// If 0 -> Count = 3, else decrement.
-const updateExpiryNotificationCount = async (count: Number = 3) => {
+const setExpiryNotificationCount = async (count: Number = 3) => {
   const db = getDBInstance();
 
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx: any) => {
       const query = `UPDATE UserSubscriptionAuxiliary
-      SET expiryNotificationCount = CASE
-        WHEN expiryNotificationCount > 0 THEN expiryNotificationCount - 1
-        ELSE ?
-      END
+      SET expiryNotificationCount = ?
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [count],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const decrementExpiryNotificationCount = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscriptionAuxiliary
+      SET expiryNotificationCount = expiryNotificationCount - 1
       WHERE id = 1`;
 
       tx.executeSql(
@@ -618,7 +635,8 @@ export {
   deleteExercise,
   deleteRoutine,
   toggleCrossgrade,
-  updateExpiryNotificationCount,
+  setExpiryNotificationCount,
+  decrementExpiryNotificationCount,
   getExpiryNotificationCount,
 };
 
