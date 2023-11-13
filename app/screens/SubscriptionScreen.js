@@ -74,7 +74,7 @@ const SubscriptionScreen = ({ route }) => {
 
   useEffect(() => {
     generateSubscriptionDetails();
-  }, [premiumPlan]);
+  });
 
   useEffect(() => {
     const localizePrices = async () => {
