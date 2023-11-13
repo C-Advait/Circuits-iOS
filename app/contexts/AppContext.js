@@ -18,7 +18,6 @@ export const AppContextProvider = ({ children }) => {
   const [soundOn, setSoundOn] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
   const [premiumPlan, setPremiumPlan] = useState();
-  const [loading, setLoading] = useState(false);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
@@ -43,7 +42,7 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const handleCustomerInfoUpdate = async (customerInfo) => {
-    setLoading(false);
+    console.log(JSON.stringify(customerInfo, null, 2));
 
     const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
     if (typeof premiumEntitlement !== "undefined") {
@@ -97,8 +96,6 @@ export const AppContextProvider = ({ children }) => {
         setIsPremium,
         premiumPlan,
         setPremiumPlan,
-        loading,
-        setLoading,
       }}
     >
       {children}

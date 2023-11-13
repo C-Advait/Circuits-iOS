@@ -30,13 +30,16 @@ import { getUserSubscriptionStatus } from "../db/DBActions";
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
   const [subscriptionDetails, setSubscriptionDetails] = useState();
-  const { theme, premiumPlan, loading, setLoading } = useAppContext();
+  const { theme, premiumPlan } = useAppContext();
+  const [loading, setLoading] = useState(false);
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
   const generateSubscriptionDetails = async () => {
-    if (typeof premiumPlan === "undefined")
+    if (typeof premiumPlan === "undefined") {
       setSubscriptionDetails("You are currently on the free tier.");
+      return;
+    }
 
     const { expirationDate, unsubscribeDetectedAt } =
       await getUserSubscriptionStatus({ returnSubscription: true });
@@ -57,7 +60,7 @@ const SubscriptionScreen = ({ route }) => {
 
   useEffect(() => {
     generateSubscriptionDetails();
-  }, []);
+  }, [premiumPlan]);
 
   useEffect(() => {
     const localizePrices = async () => {
@@ -116,6 +119,8 @@ const SubscriptionScreen = ({ route }) => {
         ? err.message
         : "An unexpected error occurred.";
       console.log("Error", `${errorCode}\n${errorMessage}`);
+    } finally {
+      setLoading(false);
     }
   };
 

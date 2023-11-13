@@ -315,7 +315,10 @@ const getUserSubscriptionStatus = async ({
             const currentDate = new Date();
             const expirationDate = new Date(subscription.expirationDate);
             const forcedDowngradeDate = new Date(expirationDate);
-            forcedDowngradeDate.setDate(forcedDowngradeDate.getMinutes() + 1);
+            // TODO: Change to __setDate__.
+            forcedDowngradeDate.setMinutes(
+              forcedDowngradeDate.getMinutes() + 1,
+            );
 
             if (currentDate < expirationDate) {
               // User Subscription is fine
