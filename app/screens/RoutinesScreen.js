@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, FlatList, Alert } from "react-native";
+import { StyleSheet, FlatList, Alert, Text } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
@@ -217,7 +217,7 @@ function RoutinesScreen() {
   };
 
   const renderRoutineCard = ({ item: routine, index }) => {
-    if (!item.section)
+    if (!routine.section)
       return (
         <RoutineCard
           routine={routine}
@@ -230,13 +230,13 @@ function RoutinesScreen() {
               new Array(Math.max(prev.length - 1, 0)).fill(false),
             );
           }}
-          isEnabled={isPremium ? true : !item.userCreated || index <= 2}
+          isEnabled={isPremium ? true : !routine.userCreated || index <= 3}
         />
       );
     else
       return (
         <View style={styles.sectionBreak}>
-          <Text style={styles.sectionText}>{item.title}</Text>
+          <Text style={styles.sectionText}>{routine.title}</Text>
         </View>
       );
   };
@@ -253,9 +253,9 @@ function RoutinesScreen() {
           onPress={() => {
             isPremium
               ? handleNewRoutineOnpress()
-              : userRoutines.length < 5
-              ? handleNewRoutineOnpress()
-              : handleBlockedRoutineCreation();
+              : userRoutines.length < 3
+                ? handleNewRoutineOnpress()
+                : handleBlockedRoutineCreation();
           }}
         />
       </View>
@@ -305,15 +305,17 @@ const getStyles = (theme) =>
       alignItems: "center",
     },
     sectionBreak: {
-      alignItems: "center",
+      alignItems: "flex-end",
       flexDirection: "row",
-      height: 30,
+      height: 18,
       justifyContent: "flex-start",
       marginTop: 10,
+      backgroundColor: 'transparent'
     },
-    sectionTitle: {
-      color: theme.text87,
-      fontSize: 12,
+    sectionText: {
+      color: theme.secondary,
+      fontSize: 14,
+      fontWeight: "500",
     },
   });
 
