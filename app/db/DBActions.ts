@@ -247,27 +247,7 @@ const getExercisesForRoutine = async (routineID: number) => {
   });
 };
 
-const doesUserSubscriptionExist = async () => {
-  const db = getDBInstance();
-
-  return new Promise((resolve, reject) => {
-    db.transaction((tx: any) => {
-      tx.executeSql(
-        "SELECT * from UserSubscription LIMIT 1",
-        [],
-        (_tx: any, results: any) => {
-          if (results.rows.length === 1) {
-            // No entry exists
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        },
-      );
-    });
-  });
-};
-
+// TODO: Remove. Written for debugging purposes.
 const getUserSubscriptionTable = async () => {
   const db = getDBInstance();
 
@@ -303,11 +283,6 @@ const getUserSubscriptionStatus = async ({
         [],
         (_tx: any, results: any) => {
           const subscription = results.rows.item(0);
-          console.log(
-            "Here's the subscription: ",
-            JSON.stringify(subscription, null, 2),
-          );
-          console.log("returnSub; ", returnSubscription);
           if (returnSubscription) resolve(subscription);
 
           // Check if user has ever synced to RevenueCat
@@ -536,6 +511,95 @@ const deleteRoutine = async (routineID: number) => {
   });
 };
 
+const toggleCrossgrade = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscriptionAuxiliary
+      SET crossgrade = 1 - crossgrade
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+// If 0 -> Count = 3, else decrement.
+const updateExpiryNotificationCount = async (count: Number = 3) => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscriptionAuxiliary
+      SET expiryNotificationCount = CASE
+        WHEN expiryNotificationCount > 0 THEN expiryNotificationCount - 1
+        ELSE ?
+      END
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [count],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const getExpiryNotificationCount = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `SELECT expiryNotificationCount
+      FROM UserSubscriptionAuxiliary
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rows.raw()[0]?.expiryNotificationCount);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+// TODO: Remove. Written for debugging purposes.
+export const getAuxiliary = () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM UserSubscriptionAuxiliary WHERE id = 1",
+        [],
+        (_tx: any, results: any) => {
+          resolve(
+            results.rows.raw().length > 0 ? results.rows.raw()[0] : undefined,
+          );
+        },
+        (error: any) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
 export {
   retrieveSetting,
   updateSetting,
@@ -546,7 +610,6 @@ export {
   getAllRoutineNames,
   getRoutineByID,
   getExercisesForRoutine,
-  doesUserSubscriptionExist,
   getUserSubscriptionStatus,
   getUserSubscriptionTable,
   updateExercise,
@@ -554,6 +617,9 @@ export {
   updateUserSubscriptionOnSync,
   deleteExercise,
   deleteRoutine,
+  toggleCrossgrade,
+  updateExpiryNotificationCount,
+  getExpiryNotificationCount,
 };
 
 // FOR TESTING

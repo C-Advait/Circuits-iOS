@@ -3,7 +3,15 @@ import { View, StyleSheet, Button, Alert } from "react-native";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
 
-import { dropTable } from "../db/DBActions";
+import {
+  decrementExpiryNotificationCount,
+  dropTable,
+  getAuxiliary,
+  getExpiryNotificationCount,
+  setExpiryNotificationCount,
+  toggleCrossgrade,
+  updateExpiryNotificationCount,
+} from "../db/DBActions";
 import { initTables } from "../db/DBSetup";
 import Purchases from "react-native-purchases";
 import { getUserSubscriptionTable } from "../db/DBActions";
@@ -211,6 +219,19 @@ const logSubscriptions = async () => {
     );
 };
 
+const logAuxiliary = async () => {
+  const aux = await getAuxiliary();
+  console.log(JSON.stringify(aux, null, 2));
+};
+
+const toggleAux = async () => {
+  await toggleCrossgrade();
+};
+
+const setNotif = async () => {
+  await updateExpiryNotificationCount();
+};
+
 function DebugScreen() {
   return (
     <Screen>
@@ -228,6 +249,13 @@ function DebugScreen() {
       <Button
         title="Check SubscriptionStatus"
         onPress={() => checkSubscriptionStatus()}
+      />
+      <Button title="Log aux" onPress={() => logAuxiliary()} />
+      <Button title="Toggle aux" onPress={() => toggleAux()} />
+      <Button title="Set notif" onPress={() => setNotif()} />
+      <Button
+        title="Get notif"
+        onPress={async () => console.log(await getExpiryNotificationCount())}
       />
     </Screen>
   );

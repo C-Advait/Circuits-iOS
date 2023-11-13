@@ -15,7 +15,8 @@ export const initializeDB = async () => {
       async () => {
         try {
           db.executeSql("PRAGMA foreign_keys = ON;", []);
-          await initTables();
+          await createTables();
+          await setDefaultValues();
           resolve(true);
         } catch (error) {
           reject(error);
@@ -26,8 +27,8 @@ export const initializeDB = async () => {
   });
 };
 
-export const initTables = async () => {
-  console.log("Initializing tables: ", db);
+export const createTables = async () => {
+  console.log(`Creating tables... db = ${JSON.stringify(db, null, 2)}`);
 
   db.transaction((tx) => {
     tx.executeSql(
@@ -42,19 +43,6 @@ export const initTables = async () => {
       },
       (error) => {
         console.error("Error creating `Setting` table.", error);
-      },
-    );
-
-    tx.executeSql(
-      `INSERT OR IGNORE INTO Setting
-      (id, key, value)
-      VALUES ( ?, ?, ? );`,
-      [1, SETTINGS_KEYS.SOUND, "true"],
-      (_tx, resultSet) => {
-        return;
-      },
-      (error) => {
-        console.error("Error setting defaults in `Setting` table.", error);
       },
     );
 
@@ -144,6 +132,43 @@ export const initTables = async () => {
     );
 
     tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS UserSubscriptionAuxiliary (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        crossgrade INTEGER, 
+        expiryNotificationCount INTEGER 
+      );`,
+      [],
+      (_tx, _resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error(
+          "Error creating `UserSubscriptionAuxiliary` table.",
+          error,
+        );
+      },
+    );
+  });
+};
+
+export const setDefaultValues = async () => {
+  console.log(`Setting default table values`);
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      `INSERT OR IGNORE INTO Setting
+      (id, key, value)
+      VALUES ( ?, ?, ? );`,
+      [1, SETTINGS_KEYS.SOUND, "true"],
+      (_tx, _resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error("Error setting defaults in `Setting` table.", error);
+      },
+    );
+
+    tx.executeSql(
       `INSERT OR IGNORE INTO UserSubscription
       (id, isActive)
       VALUES ( ?, ? );`,
@@ -154,6 +179,22 @@ export const initTables = async () => {
       (error) => {
         console.error(
           "Error setting defaults in `UserSubscription` table.",
+          error,
+        );
+      },
+    );
+
+    tx.executeSql(
+      `INSERT OR IGNORE INTO UserSubscriptionAuxiliary
+      (id, crossgrade, expiryNotificationCount)
+      VALUES ( ?, ?, ? );`,
+      [1, 0, 0],
+      (_tx, _resultSet) => {
+        return;
+      },
+      (error) => {
+        console.error(
+          "Error setting defaults in `UserSubscriptionAuxiliary` table.",
           error,
         );
       },
