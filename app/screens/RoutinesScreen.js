@@ -49,7 +49,6 @@ function RoutinesScreen() {
     const newHash = hashString(JSON.stringify(newRoutines));
 
     if (newHash !== dataHash) {
-
       const userCreatedRoutines = [];
       const defRoutines = [];
 
@@ -94,11 +93,9 @@ function RoutinesScreen() {
     );
   };
 
-  useFocusEffect(
-    () => {
-      loadRoutines();
-    }
-  );
+  useFocusEffect(() => {
+    loadRoutines();
+  });
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -195,6 +192,55 @@ function RoutinesScreen() {
     );
   };
 
+  const combineData = () => {
+    let ret = [];
+
+    if (userRoutines.length) {
+      ret.push({
+        section: true,
+        id: "user-routines-title",
+        title: "Custom routines",
+      });
+      ret = ret.concat(userRoutines);
+    }
+
+    if (defaultRoutines.length) {
+      ret.push({
+        section: true,
+        id: "default-routines-title",
+        title: "Default routines",
+      });
+      ret = ret.concat(defaultRoutines);
+    }
+
+    return ret;
+  };
+
+  const renderRoutineCard = ({ item: routine, index }) => {
+    if (!item.section)
+      return (
+        <RoutineCard
+          routine={routine}
+          isExpanded={expandedStates[index]}
+          toggleExpand={() => toggleExpand(index)}
+          deleteCallback={() => {
+            loadRoutines();
+            setExpandedCount(0);
+            setExpandedStates((prev) =>
+              new Array(Math.max(prev.length - 1, 0)).fill(false),
+            );
+          }}
+          isEnabled={isPremium ? true : !item.userCreated || index <= 2}
+        />
+      );
+    else
+      return (
+        <View style={styles.sectionBreak}>
+          <Text style={styles.sectionText}>{item.title}</Text>
+        </View>
+      );
+  };
+
   return (
     <Screen>
       <View style={styles.topPanel}>
@@ -208,8 +254,8 @@ function RoutinesScreen() {
             isPremium
               ? handleNewRoutineOnpress()
               : userRoutines.length < 5
-                ? handleNewRoutineOnpress()
-                : handleBlockedRoutineCreation();
+              ? handleNewRoutineOnpress()
+              : handleBlockedRoutineCreation();
           }}
         />
       </View>
@@ -226,22 +272,8 @@ function RoutinesScreen() {
         />
       </View>
       <FlatList
-        data={userRoutines}
-        renderItem={({ item: routine, index }) => (
-          <RoutineCard
-            routine={routine}
-            isExpanded={expandedStates[index]}
-            toggleExpand={() => toggleExpand(index)}
-            deleteCallback={() => {
-              loadRoutines();
-              setExpandedCount(0);
-              setExpandedStates((prev) =>
-                new Array(Math.max(prev.length - 1, 0)).fill(false),
-              );
-            }}
-            isEnabled={isPremium ? true : index <= 2}
-          />
-        )}
+        data={combineData()}
+        renderItem={renderRoutineCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ marginHorizontal: 16 }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -271,6 +303,17 @@ const getStyles = (theme) =>
       flexDirection: "row",
       justifyContent: "flex-end",
       alignItems: "center",
+    },
+    sectionBreak: {
+      alignItems: "center",
+      flexDirection: "row",
+      height: 30,
+      justifyContent: "flex-start",
+      marginTop: 10,
+    },
+    sectionTitle: {
+      color: theme.text87,
+      fontSize: 12,
     },
   });
 
