@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { EvilIcons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import { INFO_FONT_SIZE } from "../config/appConstants";
 
 function ExerciseCard({
@@ -15,9 +15,10 @@ function ExerciseCard({
   contentOnpress,
   deleteOnpress,
 }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
+  accentColor = accentColor ? accentColor : "transparent";
   accentColor = accentColor ? accentColor : "transparent";
 
   return (

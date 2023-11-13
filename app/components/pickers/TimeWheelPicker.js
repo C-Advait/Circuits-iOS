@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { useSettings } from "../../contexts/SettingsContext";
+import { useAppContext } from "../../contexts/AppContext";
 
 const { width } = Dimensions.get("window");
 
@@ -16,8 +16,12 @@ const MINIMUM_SECONDS = 5;
 // is only ever consumed by components wrapped
 // in <Portal>. <Portal> is known to not work
 // with context.
-const TimeWheelPicker = ({ startingTime = 60, onValueChange, increment5Seconds = false }) => {
-  const { theme } = useSettings();
+const TimeWheelPicker = ({
+  startingTime = 60,
+  onValueChange,
+  increment5Seconds = false,
+}) => {
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   const items = [...Array(60).keys()];
@@ -27,8 +31,11 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange, increment5Seconds =
   );
   const [selectedSecond, setSelectedSecond] = useState(startingTime % 60);
   const [filteredSeconds, setFilteredSeconds] = useState(
-    increment5Seconds ? items.filter(value => value % 5 === 0) :
-      startingTime >= 60 ? items : items.slice(5),
+    increment5Seconds
+      ? items.filter((value) => value % 5 === 0)
+      : startingTime >= 60
+      ? items
+      : items.slice(5),
   );
   const key = filteredSeconds.length;
 
@@ -44,7 +51,8 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange, increment5Seconds =
             onValueChange(itemValue * 60 + selectedSecond);
             setSelectedMinute(itemValue);
 
-            if (itemValue === 0 && !increment5Seconds) { // Min 5s requirement if incrementFiveSeconds === false
+            if (itemValue === 0 && !increment5Seconds) {
+              // Min 5s requirement if incrementFiveSeconds === false
               setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
 
               if (selectedSecond < MINIMUM_SECONDS) {
@@ -53,7 +61,9 @@ const TimeWheelPicker = ({ startingTime = 60, onValueChange, increment5Seconds =
                 onValueChange(itemValue * 60 + MINIMUM_SECONDS);
               }
             } else {
-              increment5Seconds ? setFilteredSeconds(items.filter(value => value % 5 === 0)) : setFilteredSeconds(items) // reset to the full range
+              increment5Seconds
+                ? setFilteredSeconds(items.filter((value) => value % 5 === 0))
+                : setFilteredSeconds(items); // reset to the full range
             }
           }}
           color={theme.primary}

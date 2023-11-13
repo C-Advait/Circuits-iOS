@@ -3,10 +3,10 @@ import { Text, View, StyleSheet } from "react-native";
 import { Slider } from "@miblanchard/react-native-slider";
 
 import parseTime from "../../utilities/parseTime";
-import { useSettings } from "../../contexts/SettingsContext";
+import { useAppContext } from "../../contexts/AppContext";
 
 function ProgressSlider({ elapsed, total }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   return (

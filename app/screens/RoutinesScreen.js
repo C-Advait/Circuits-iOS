@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { StyleSheet, FlatList, Alert } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import { View } from "react-native";
 import {
   DEFAULT_COOLDOWN,
@@ -33,17 +33,14 @@ function hashString(str) {
   return hash;
 }
 
-
 function RoutinesScreen() {
   const navigation = useNavigation();
-  const { theme } = useSettings();
+  const { theme, isPremium } = useAppContext();
   const styles = getStyles(theme);
 
   const [routines, setRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
-  const [isPremium, setIsPremium] = useState(false);
   const [dataHash, setDataHash] = useState(null);
-
 
   const loadRoutines = async () => {
     const newRoutines = await getAllUserCreatedRoutines();
@@ -55,11 +52,9 @@ function RoutinesScreen() {
     }
   };
 
-  useFocusEffect(
-    () => {
-      loadRoutines();
-    }
-  );
+  useFocusEffect(() => {
+    loadRoutines();
+  });
 
   // Initialize all items as not expanded.
   const [expandedStates, setExpandedStates] = useState(
@@ -98,7 +93,6 @@ function RoutinesScreen() {
 
   const handleNewRoutineOnpress = async () => {
     try {
-
       const accentColorsArray = Object.values(routineAccentColors);
       const randomAccentColor =
         accentColorsArray[Math.floor(Math.random() * accentColorsArray.length)];
@@ -170,8 +164,8 @@ function RoutinesScreen() {
             isPremium
               ? handleNewRoutineOnpress()
               : routines.length < 5
-                ? handleNewRoutineOnpress()
-                : handleBlockedRoutineCreation();
+              ? handleNewRoutineOnpress()
+              : handleBlockedRoutineCreation();
           }}
         />
       </View>

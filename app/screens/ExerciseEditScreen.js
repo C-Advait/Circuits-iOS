@@ -14,7 +14,7 @@ import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import NavHeader from "../components/NavHeader";
 import { IconButton } from "../components/buttons";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import routes from "../navigation/routes";
 import AuxiliaryCard from "../components/AuxiliaryCard";
 import Screen from "../components/Screen";
@@ -40,7 +40,7 @@ const MODAL_HEIGHT = 350;
 
 function ExerciseEditScreen({ route }) {
   const navigation = useNavigation();
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   const {
     isRoutineEditing,
@@ -96,16 +96,16 @@ function ExerciseEditScreen({ route }) {
         onPress={
           enabled
             ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              Keyboard.dismiss();
-              modalRef.current?.expand();
-            }
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+                Keyboard.dismiss();
+                modalRef.current?.expand();
+              }
             : () => null
         }
       >

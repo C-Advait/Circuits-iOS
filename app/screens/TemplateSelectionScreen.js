@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import Screen from "../components/Screen";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import { useNavigation } from "@react-navigation/native";
@@ -90,7 +90,7 @@ const data = [
 
 const TemplateSelectionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   const isRoutineEditing = route.params.edit;
 
