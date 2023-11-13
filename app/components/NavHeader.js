@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import Header from "./Header";
 
 function NavHeader({
@@ -20,7 +20,7 @@ function NavHeader({
   ) : (
     <View style={{ width: 50, height: 50 }} />
   );
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   return (
@@ -53,7 +53,7 @@ const getStyles = (theme) =>
     },
     text: {
       fontSize: 17,
-      fontWeight: 500,
+      fontWeight: "500",
     },
     textView: {
       position: "center",

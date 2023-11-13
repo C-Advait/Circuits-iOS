@@ -1,11 +1,11 @@
 import React from "react";
 import { Text, StyleSheet } from "react-native";
 
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 
 function DummyInputComponent({ text = "10 minutes", disabled = false }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = disabled ? getStylesDisabled(theme) : getStylesActive(theme);
   return <Text style={[styles.body]}>{text}</Text>;
 }

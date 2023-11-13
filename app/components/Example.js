@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 
 function Example() {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   return (

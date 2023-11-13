@@ -1,10 +1,10 @@
 import React from "react";
 import { Text, TouchableOpacity, StyleSheet } from "react-native";
 
-import { useSettings } from "../../contexts/SettingsContext";
+import { useAppContext } from "../../contexts/AppContext";
 
 function AppTextButton({ children, onPress, buttonStyle, textStyle }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   onPress = onPress ? onPress : () => null;
 

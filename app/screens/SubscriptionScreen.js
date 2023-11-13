@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import {
+  Alert,
   Image,
   ImageBackground,
   View,
@@ -12,86 +13,191 @@ import { useNavigation } from "@react-navigation/native";
 
 import Screen from "../components/Screen";
 import NavHeader from "../components/NavHeader";
-import { IconButton } from "../components/buttons";
-import { useSettings } from "../contexts/SettingsContext";
+import { IconButton, PurchaseContinueButton } from "../components/buttons";
+import { useAppContext } from "../contexts/AppContext";
 import ImageText from "../components/ImageText";
 import {
   PARAGRAPH_FONT_SIZE,
   PARAGRAPH_FONT_WEIGHT,
 } from "../config/appConstants";
 import { SubscriptionButton } from "../components/buttons";
-import { SKU } from "../config/skus";
-import { useIAP } from "react-native-iap";
+import subscriptionActions from "../actions/subscriptionActions";
+import { PREMIUM_PLANS } from "../config/premiumPlans";
+import Purchases from "react-native-purchases";
+import OverlayLoader from "../components/OverlayLoader";
+import {
+  getCrossgrade,
+  getUserSubscriptionStatus,
+  toggleCrossgrade,
+} from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const { theme } = useSettings();
+  const [subscriptionDetails, setSubscriptionDetails] = useState();
+  const { theme, premiumPlan } = useAppContext();
+  const [loading, setLoading] = useState(false);
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
 
-  const [selectedPlan, setSelectedPlan] = useState(1);
+  const generateSubscriptionDetails = async () => {
+    if (typeof premiumPlan === "undefined") {
+      setSubscriptionDetails("You are not currently subscribed.");
+      return;
+    }
 
-  const {
-    requestSubscription,
-    requestPurchase,
-    getAvailablePurchases,
-    availablePurchases,
-  } = useIAP();
+    const { expirationDate, willRenew } = await getUserSubscriptionStatus({
+      returnSubscription: true,
+    });
 
-  const subscribe = async (sku, offerToken = null) => {
-    try {
-      await requestSubscription({
-        sku,
-        ...(offerToken && { subscriptionOffers: [{ sku, offerToken }] }),
-      });
-    } catch (err) {
-      console.warn(err.code, err.message);
+    const expiry = formatExpiry(expirationDate);
+    const renew = willRenew !== null;
+    const isCrossgrading = await getCrossgrade();
+
+    console.log("isCrossgrading: ", isCrossgrading);
+
+    if (isCrossgrading) {
+      setSubscriptionDetails(
+        `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will be switched to the ${getOtherPlan(
+          premiumPlan,
+        )} tier.`,
+      );
+    } else if (renew) {
+      setSubscriptionDetails(
+        `Your subscription to the ${premiumPlan} pass renews on ${expiry}.`,
+      );
+    } else {
+      setSubscriptionDetails(
+        `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will revert to the free-tier.`,
+      );
     }
   };
 
-  const purchase = async (sku) => {
-    try {
-      await requestPurchase({
-        sku,
-        andDangerouslyFinishTransactionAutomaticallyIOS: false,
+  useEffect(() => {
+    generateSubscriptionDetails();
+  });
+
+  useEffect(() => {
+    const localizePrices = async () => {
+      const offerings = await Purchases.getOfferings();
+      const { monthly, annual } = offerings?.current;
+      dispatch({
+        type: subscriptionActions.SET_PRICE,
+        plan: PREMIUM_PLANS.MONTHLY,
+        price: monthly?.product?.priceString,
       });
+      dispatch({
+        type: subscriptionActions.SET_PRICE,
+        plan: PREMIUM_PLANS.ANNUAL,
+        price: annual?.product?.priceString,
+      });
+    };
+
+    localizePrices();
+  }, []);
+
+  const buy = async (subscriptionDuration) => {
+    try {
+      setLoading(true);
+      const offerings = await Purchases.getOfferings();
+      if (
+        offerings.current !== null &&
+        offerings.current.availablePackages.length !== 0
+      ) {
+        const packageToBuy = offerings.current[`${subscriptionDuration}`];
+
+        // Purchase it.
+        console.log(
+          `About to purchase package (${JSON.stringify(
+            packageToBuy,
+            null,
+            2,
+          )})`,
+        );
+
+        const { customerInfo, _productIdentifier } =
+          await Purchases.purchasePackage(packageToBuy);
+
+        if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
+          console.log(
+            `Purchase of ${subscriptionDuration} package successful!`,
+          );
+        } else {
+          console.log(`Purchase of ${subscriptionDuration} package failed!`);
+        }
+      } else {
+        console.log("WEIRD BRANCH", "offerings.current was null");
+      }
     } catch (err) {
-      console.warn(err.code, err.message);
+      const errorCode = err.code ? `Error Code: ${err.code}` : "";
+      const errorMessage = err.message
+        ? err.message
+        : "An unexpected error occurred.";
+      console.log("Error", `${errorCode}\n${errorMessage}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   const restore = async () => {
-    let titles = [];
-
     try {
-      await getAvailablePurchases();
-
-      await Promise.all(
-        availablePurchases.map(async (purchase) => {
-          switch (purchase.productId) {
-            case SKU.MONTHLY:
-              titles.push("Monthly");
-              break;
-
-            case SKU.LIFETIME:
-              titles.push("Lifetime");
-              break;
-          }
-        }),
-      );
-    } catch (err) {
-      console.warn("Couldn't restore", err);
-    } finally {
-      if (titles.length > 0) {
+      Alert.alert("Attempting restore", "Just a moment");
+      const customerInfo = await Purchases.restorePurchases();
+      if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
         Alert.alert(
-          "Restore Successful",
-          `You successfully restored the following purchases: ${titles.join(
-            ", ",
-          )}`,
+          `Restore of ${customerInfo.entitlements.active.Premium.identifier} package successful!`,
         );
+      } else {
+        Alert.alert(`Restore unsuccessful`);
+      }
+    } catch (err) {
+      if (!err.userCancelled) {
+        const errorCode = err.code ? `Error Code: ${err.code}` : "";
+        const errorMessage = err.message
+          ? err.message
+          : "An unexpected error occurred.";
+        console.log("Error", `${errorCode}\n${errorMessage}`);
       }
     }
   };
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case subscriptionActions.SET_PLAN:
+        switch (action.payload) {
+          case PREMIUM_PLANS.MONTHLY:
+            return {
+              ...state,
+              selectedPlan: PREMIUM_PLANS.MONTHLY,
+              continueFunction: () => {
+                console.log("loading: ", loading);
+                buy(PREMIUM_PLANS.MONTHLY);
+              },
+            };
+          case PREMIUM_PLANS.ANNUAL:
+            return {
+              ...state,
+              selectedPlan: PREMIUM_PLANS.ANNUAL,
+              continueFunction: () => buy(PREMIUM_PLANS.ANNUAL),
+            };
+          default:
+            console.error(`Unknown plan: ${action.payload}`);
+            return state;
+        }
+
+      case subscriptionActions.SET_PRICE:
+        if (typeof action.price !== undefined)
+          return { ...state, [action.plan]: [action.price] };
+    }
+  };
+
+  const initialState = {
+    monthly: "$0.99",
+    annual: "$4.99",
+    selectedPlan: PREMIUM_PLANS.MONTHLY,
+    continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
+  };
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <ImageBackground
@@ -99,6 +205,7 @@ const SubscriptionScreen = ({ route }) => {
       style={styles.background}
       resizeMode="cover"
     >
+      <OverlayLoader isVisible={loading} />
       <Screen style={styles.container}>
         <View>
           <NavHeader
@@ -135,10 +242,6 @@ const SubscriptionScreen = ({ route }) => {
             />
             <ImageText
               image={require("../assets/zap.png")}
-              text="Enjoy extensive premium routines"
-            />
-            <ImageText
-              image={require("../assets/zap.png")}
               text="Access new features early"
             />
           </View>
@@ -148,40 +251,77 @@ const SubscriptionScreen = ({ route }) => {
           <Text style={styles.modalTitle}>Available Plans</Text>
           <View style={styles.plansContainer}>
             <SubscriptionButton
-              enabled={selectedPlan === 1}
+              enabled={state.selectedPlan === PREMIUM_PLANS.MONTHLY}
+              purchased={premiumPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
-              priceText={"$0.99/month"}
-              onPress={() => {
-                setSelectedPlan(1);
-                subscribe(SKU.MONTHLY);
+              priceText={`${state.monthly} monthly`}
+              onPress={async () => {
+                dispatch({
+                  type: subscriptionActions.SET_PLAN,
+                  payload: PREMIUM_PLANS.MONTHLY,
+                });
+
+                if (premiumPlan && premiumPlan !== state.selectedPlan) {
+                  await toggleCrossgrade();
+                }
               }}
             />
             <SubscriptionButton
-              enabled={selectedPlan === 2}
-              titleText={"Lifetime Access"}
-              priceText={"$9.99, one-time payment"}
-              onPress={() => {
-                setSelectedPlan(2);
-                purchase(SKU.LIFETIME);
+              enabled={state.selectedPlan === PREMIUM_PLANS.ANNUAL}
+              purchased={premiumPlan === PREMIUM_PLANS.ANNUAL}
+              titleText={"Annual Pass"}
+              priceText={`${state.annual} annually`}
+              onPress={async () => {
+                dispatch({
+                  type: subscriptionActions.SET_PLAN,
+                  payload: PREMIUM_PLANS.ANNUAL,
+                });
+
+                if (premiumPlan && premiumPlan !== state.selectedPlan) {
+                  await toggleCrossgrade();
+                }
               }}
             />
           </View>
-          <TouchableOpacity style={styles.continueButton}>
-            <Text style={styles.continueText}>Continue</Text>
-          </TouchableOpacity>
+          <PurchaseContinueButton
+            onPress={async () => {
+              const crossgrading = await getCrossgrade();
+              if (!crossgrading) state.continueFunction();
+              else
+                Alert.alert(
+                  `You are already subscribed`,
+                  `You are currently subscribed to our ${premiumPlan} plan, and will switch to ${getOtherPlan(
+                    premiumPlan,
+                  )} in the next renewal cycle.\n\nTo manage your subscription, please go to settings.`,
+                );
+            }}
+          />
           <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 
-          <Text style={styles.descriptionText}>
-            Description of how purchases will be handled. Charged to your Apple
-            ID account ....
-          </Text>
+          <Text style={styles.descriptionText}>{subscriptionDetails}</Text>
         </View>
       </Screen>
     </ImageBackground>
   );
 };
+
+function getOtherPlan(current) {
+  return current === PREMIUM_PLANS.MONTHLY
+    ? PREMIUM_PLANS.ANNUAL
+    : PREMIUM_PLANS.MONTHLY;
+}
+
+function formatExpiry(isoString) {
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  // Add 1 to the month because getMonth() returns 0-11
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 
 const getStyles = (theme) =>
   StyleSheet.create({
@@ -222,20 +362,6 @@ const getStyles = (theme) =>
       gap: 16,
       marginBottom: 17,
     },
-    continueButton: {
-      backgroundColor: theme.accentDarkBlue,
-      width: "100%",
-      borderRadius: 10,
-      height: 58,
-      justifyContent: "center",
-      marginBottom: 20,
-    },
-    continueText: {
-      color: theme.primary,
-      fontWeight: PARAGRAPH_FONT_WEIGHT,
-      fontSize: PARAGRAPH_FONT_SIZE,
-      textAlign: "center",
-    },
     restoreText: {
       color: theme.blue,
       marginBottom: 20,
@@ -245,11 +371,11 @@ const getStyles = (theme) =>
     titlePanel: {
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 28,
+      marginBottom: 45,
     },
     descriptionText: {
       fontSize: 13,
-      fontWeight: 400,
+      fontWeight: "400",
       color: "gray",
       alignSelf: "stretch",
       marginBottom: 10,

@@ -3,6 +3,7 @@ import { getDBInstance } from "./DBSetup";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
+import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
 // Settings
 const retrieveSetting = (key: String) => {
@@ -218,31 +219,13 @@ const getAllRoutines = async () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx: any) => {
       tx.executeSql(
-        "SELECT * FROM Routine",
+        "SELECT * FROM Routine ORDER BY id",
         [],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Routine(row)));
         },
       );
     }, reject);
-  });
-};
-
-const getNewRoutineID = async () => {
-  const db = getDBInstance();
-
-  return new Promise<number>((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT MAX(id) as maxID FROM Routine",
-        [],
-        (_tx, results) => {
-          const maxID = results.rows.item(0).maxID || 0;
-          resolve(maxID + 1);
-        },
-        (error) => reject(error),
-      );
-    });
   });
 };
 
@@ -290,6 +273,86 @@ const getExercisesForRoutine = async (routineID: number) => {
         [routineID],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Exercise(row)));
+        },
+      );
+    }, reject);
+  });
+};
+
+const getCachedProductID = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT productId FROM UserSubscription",
+        [],
+        (_tx: any, results: any) => {
+          resolve(results.rows.item(0)?.productId);
+        },
+        (error: any) => {
+          reject(error); // Rejects with the error if there's any
+        },
+      );
+    });
+  });
+};
+
+const getUserSubscriptionStatus = async ({
+  returnSubscription = false,
+} = {}) => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM UserSubscription LIMIT 1", // Assuming there's only one entry per user
+        [],
+        (_tx: any, results: any) => {
+          const subscription = results.rows.item(0);
+          if (returnSubscription) resolve(subscription);
+
+          // Check if user has ever synced to RevenueCat
+          if (subscription.expirationDate) {
+            const currentDate = new Date();
+            const expirationDate = new Date(subscription.expirationDate);
+            const forcedDowngradeDate = new Date(expirationDate);
+            // TODO: Change to __setDate__.
+            forcedDowngradeDate.setMinutes(
+              forcedDowngradeDate.getMinutes() + 1,
+            );
+
+            if (currentDate < expirationDate) {
+              // User Subscription is fine
+              resolve([true, false]);
+            } else if (currentDate < forcedDowngradeDate) {
+              // User is in grace period
+              resolve([true, true]);
+            } else {
+              // User has passed grace period
+              resolve([false, false]);
+            }
+          } else {
+            // User has never synced
+            resolve([false, false]);
+          }
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const getAllRoutineCompletions = async (routineID: number) => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM RoutineCompletion",
+        [routineID],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw());
         },
       );
     }, reject);
@@ -392,6 +455,58 @@ const updateMostRecentRoutineCompletion = async (routineID: number) => {
   });
 };
 
+const updateUserSubscriptionOnSync = (
+  customerInfo: any,
+  activeEntitlement: any,
+) => {
+  const db = getDBInstance();
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscription SET
+          requestDate = ?,
+          entitlementId = ?,
+          isActive = ?,
+          willRenew = ?,
+          productId = ?,
+          periodType = ?,
+          expirationDate = ?,
+          purchaseDate = ?,
+          originalPurchaseDate = ?,
+          store = ?,
+          isSandbox = ?,
+          unsubscribeDetectedAt = ?,
+          billingIssueDetectedAt = ?,
+          revenueCatID = ? 
+        WHERE id = ?`;
+
+      tx.executeSql(
+        query,
+        [
+          customerInfo.requestDate,
+          activeEntitlement.identifier,
+          activeEntitlement.isActive,
+          activeEntitlement.willRenew,
+          activeEntitlement.productIdentifier,
+          activeEntitlement.periodType,
+          activeEntitlement.expirationDate,
+          activeEntitlement.latestPurchaseDate,
+          activeEntitlement.originalPurchaseDate,
+          activeEntitlement.store,
+          activeEntitlement.isSandbox,
+          activeEntitlement.unsubscribeDetectedAt,
+          activeEntitlement.billingIssueDetectedAt,
+          customerInfo.originalAppUserId,
+          1,
+        ],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
 // DELETE
 const deleteExercise = async (exerciseID: number) => {
   const db = getDBInstance();
@@ -425,6 +540,133 @@ const deleteRoutine = async (routineID: number) => {
   });
 };
 
+const toggleCrossgrade = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscriptionAuxiliary
+      SET crossgrade = 1 - crossgrade
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const getCrossgrade = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `SELECT crossgrade
+      FROM UserSubscriptionAuxiliary
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rows.raw()[0]?.crossgrade);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const setExpiryNotificationCount = async (count: Number = 3) => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscriptionAuxiliary
+      SET expiryNotificationCount = ?
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [count],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const decrementExpiryNotificationCount = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `UPDATE UserSubscriptionAuxiliary
+      SET expiryNotificationCount = expiryNotificationCount - 1
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rowsAffected);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+const getExpiryNotificationCount = async () => {
+  const db = getDBInstance();
+
+  return new Promise<number>((resolve, reject) => {
+    db.transaction((tx: any) => {
+      const query = `SELECT expiryNotificationCount
+      FROM UserSubscriptionAuxiliary
+      WHERE id = 1`;
+
+      tx.executeSql(
+        query,
+        [],
+        (_txObj: any, resultSet: any) => {
+          resolve(resultSet.rows.raw()[0]?.expiryNotificationCount);
+        },
+        (error: any) => reject(error),
+      );
+    });
+  });
+};
+
+// TODO: Remove. Written for debugging purposes.
+export const getAuxiliary = () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM UserSubscriptionAuxiliary WHERE id = 1",
+        [],
+        (_tx: any, results: any) => {
+          resolve(
+            results.rows.raw().length > 0 ? results.rows.raw()[0] : undefined,
+          );
+        },
+        (error: any) => {
+          reject(error);
+        },
+      );
+    });
+  });
+};
+
 export {
   retrieveSetting,
   updateSetting,
@@ -437,11 +679,18 @@ export {
   getAllRoutines,
   getRoutineByID,
   getExercisesForRoutine,
-  getNewRoutineID,
+  getUserSubscriptionStatus,
+  getCachedProductID,
   updateExercise,
   updateRoutine,
+  updateUserSubscriptionOnSync,
   deleteExercise,
   deleteRoutine,
+  toggleCrossgrade,
+  getCrossgrade,
+  setExpiryNotificationCount,
+  decrementExpiryNotificationCount,
+  getExpiryNotificationCount,
 };
 
 // FOR TESTING

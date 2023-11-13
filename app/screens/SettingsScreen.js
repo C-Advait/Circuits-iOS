@@ -17,15 +17,15 @@ import routes from "../navigation/routes";
 
 import Screen from "../components/Screen";
 import Header from "../components/Header";
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 
 // localize 'behaviour'?
 function SettingsScreen() {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
   const navigation = useNavigation();
 
-  const { soundOn, updateSound } = useSettings();
+  const { soundOn, updateSound } = useAppContext();
 
   const toggleSound = () => {
     updateSound(!soundOn);
@@ -50,24 +50,16 @@ function SettingsScreen() {
   };
 
   const rateUs = () => {
-    Alert.alert("Thank you for your feedback");
-
-    // const options = {
-    //   AppleAppID: "422689480", // Gmail ID
-    //   preferInApp: true,
-    //   openAppStoreIfInAppFails: true,
-    //   // fallbackPlatformURL: "http://www.google.com",
-    // }
-    // Rate.rate(options, (success, errorMessage) => {
-    //   if (success) {
-    //     null;
-    //   }
-    //   if (errorMessage) {
-    //     null;
-    //     // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
-    //     // Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
-    //   }
-    // })
+    const options = {
+      AppleAppID: "6471159497",
+      preferInApp: true,
+      openAppStoreIfInAppFails: true,
+    };
+    Rate.rate(options, (_success, errorMessage) => {
+      if (errorMessage) {
+        console.log(errorMessage);
+      }
+    });
   };
 
   const navPrivacyPolicy = () => {
@@ -92,19 +84,22 @@ function SettingsScreen() {
     {
       id: 1,
       title: "Subscription Plan",
-      onTouchablePress: () => navigation.navigate(routes.SUBSCRIPTION_SCREEN, { prevScreen: routes.SETTINGS_SCREEN }),
-    }
+      onTouchablePress: () =>
+        navigation.navigate(routes.SUBSCRIPTION_SCREEN, {
+          prevScreen: routes.SETTINGS_SCREEN,
+        }),
+    },
   ];
 
   const support = [
     {
       id: 4,
-      title: "Contact The Developers",
+      title: "Contact us",
       onTouchablePress: contactSupport,
     },
     {
       id: 5,
-      title: "Rate This App",
+      title: "Rate us",
       onTouchablePress: rateUs,
     },
   ];
@@ -125,8 +120,8 @@ function SettingsScreen() {
           item.onTouchablePress
             ? item.onTouchablePress
             : () => {
-              Alert.alert(item.title, item.title);
-            }
+                Alert.alert(item.title, item.title);
+              }
         }
       >
         <Text style={styles.choiceText}>{item.title}</Text>
@@ -193,7 +188,7 @@ const getStyles = (theme) =>
     sectionTitle: {
       color: theme.secondary,
       fontSize: 14,
-      fontWeight: 500,
+      fontWeight: "500",
       marginLeft: 16,
       marginBottom: 8,
     },

@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import * as SplashScreen from "expo-splash-screen";
-import { withIAPContext } from "react-native-iap";
 
-import { SettingsProvider } from "./app/contexts/SettingsContext";
+import { AppContextProvider } from "./app/contexts/AppContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
 import { Audio, InterruptionModeIOS } from "expo-av";
-import initIAP from "./app/purchases/initIAP";
+
+SplashScreen.preventAutoHideAsync();
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -17,36 +18,42 @@ function App() {
   useEffect(() => {
     const init = async () => {
       try {
-        SplashScreen.preventAutoHideAsync();
         await initializeDB();
         await Audio.setAudioModeAsync({
           staysActiveInBackground: true,
           playsInSilentModeIOS: true,
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
-        await initIAP();
+
+        Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+        Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY });
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {
         setReady(true);
-        await SplashScreen.hideAsync();
       }
     };
 
     init();
-  });
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (ready) {
+      await SplashScreen.hideAsync();
+    }
+  }, [ready]);
 
   return ready ? (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <Host>
-        <SettingsProvider>
+        <AppContextProvider>
           <NavigationContainer>
             <AppNavigator />
           </NavigationContainer>
-        </SettingsProvider>
+        </AppContextProvider>
       </Host>
     </GestureHandlerRootView>
   ) : null;
 }
 
-export default withIAPContext(App);
+export default App;

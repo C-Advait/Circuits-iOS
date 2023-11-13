@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Audio } from "expo-av";
 import { SOUNDS } from "../config/sounds";
-import { useSettings } from "./SettingsContext";
+import { useAppContext } from "./AppContext";
 
 const SoundContext = createContext();
 
@@ -13,7 +13,7 @@ export const SoundProvider = ({ children }) => {
   const [sounds, setSounds] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const { soundOn } = useSettings();
+  const { soundOn } = useAppContext();
 
   const soundFiles = SOUNDS;
 
@@ -26,7 +26,6 @@ export const SoundProvider = ({ children }) => {
         try {
           await soundInstance.loadAsync(soundFiles[key].file);
           loadedSounds[key] = soundInstance;
-          console.log(`Successfully loaded the sound for key ${key}`);
         } catch (error) {
           console.error(`Couldn't load the sound for key ${key}`, error);
         }

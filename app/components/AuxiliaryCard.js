@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 
-import { useSettings } from "../contexts/SettingsContext";
+import { useAppContext } from "../contexts/AppContext";
 import EditableText from "./EditableText";
 import { PARAGRAPH_FONT_SIZE } from "../config/appConstants";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -15,11 +15,11 @@ function AuxiliaryCard({
   onPress,
   children,
 }) {
-  const { theme } = useSettings();
+  const { theme } = useAppContext();
   const styles = getStylesActive(theme); // disabled ? getStylesDisabled(theme) : getStylesActive(theme);
   accentColor = accentColor || theme.backgroundFaded;
 
-  const fontWeight = bold ? 600 : 400;
+  const fontWeight = bold ? "600" : "400";
 
   return (
     <TouchableOpacity
