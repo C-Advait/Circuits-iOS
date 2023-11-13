@@ -50,24 +50,16 @@ function SettingsScreen() {
   };
 
   const rateUs = () => {
-    Alert.alert("Thank you for your feedback");
-
-    // const options = {
-    //   AppleAppID: "422689480", // Gmail ID
-    //   preferInApp: true,
-    //   openAppStoreIfInAppFails: true,
-    //   // fallbackPlatformURL: "http://www.google.com",
-    // }
-    // Rate.rate(options, (success, errorMessage) => {
-    //   if (success) {
-    //     null;
-    //   }
-    //   if (errorMessage) {
-    //     null;
-    //     // errorMessage comes from the native code. Useful for debugging, but probably not for users to view
-    //     // Alert.alert(`Example page Rate.rate() error: ${errorMessage}`)
-    //   }
-    // })
+    const options = {
+      AppleAppID: "6471159497",
+      preferInApp: true,
+      openAppStoreIfInAppFails: true,
+    };
+    Rate.rate(options, (_success, errorMessage) => {
+      if (errorMessage) {
+        console.log(errorMessage);
+      }
+    });
   };
 
   const navPrivacyPolicy = () => {
