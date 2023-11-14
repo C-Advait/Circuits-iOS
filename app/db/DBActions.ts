@@ -317,9 +317,9 @@ const getUserSubscriptionStatus = async ({
             const currentDate = new Date();
             const expirationDate = new Date(subscription.expirationDate);
             const forcedDowngradeDate = new Date(expirationDate);
-            // TODO: Change to __setDate__.
-            forcedDowngradeDate.setMinutes(
-              forcedDowngradeDate.getMinutes() + 3,
+
+            forcedDowngradeDate.setDate(
+              forcedDowngradeDate.getDate() + SUBSCRIPTION_GRACE_PERIOD_DAYS,
             );
 
             if (currentDate < expirationDate) {
