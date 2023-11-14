@@ -40,10 +40,14 @@ export const lightTheme = {
 };
 
 export const routineAccentColors = {
-  yellow: "#fccb06",
-  lightBlue: "#b1ddf1",
+  accentDarkBlue: "#1b5cfd",
+  accentTeal: "#49dcc2",
+  accentGreen: "#bcdc49",
   fuschia: "#ca2c92",
-  teal: "#008080",
+  accentRed: "#db0064",
+}
+
+const unusedAccentColours = {
   cobalt: "#0047ab",
   burgundy: "#800020",
   orange: "#ff7f11",

@@ -4,7 +4,6 @@ import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
 import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
-import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
 // Settings
 const retrieveSetting = (key: String) => {
