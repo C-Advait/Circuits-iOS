@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { StyleSheet, FlatList, Alert, Text } from "react-native";
+import React, { useState, useCallback } from "react";
+import { StyleSheet, FlatList, Alert } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
+import { useAppContext } from "../contexts/AppContext";
 import { useAppContext } from "../contexts/AppContext";
 import { View } from "react-native";
 import {
@@ -205,7 +206,7 @@ function RoutinesScreen() {
           onPress={() => {
             isPremium
               ? handleNewRoutineOnpress()
-              : userRoutines.length < 10
+              : routines.length < 3
                 ? handleNewRoutineOnpress()
                 : handleBlockedRoutineCreation();
           }}

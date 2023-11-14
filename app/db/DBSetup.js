@@ -97,6 +97,8 @@ export const initializeDB = async () => {
           db.executeSql("PRAGMA foreign_keys = ON;", []);
           await createTables();
           await setDefaultValues();
+          await createTables();
+          await setDefaultValues();
           resolve(true);
         } catch (error) {
           reject(error);
