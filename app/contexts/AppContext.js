@@ -10,7 +10,7 @@ import {
   setExpiryNotificationCount,
   decrementExpiryNotificationCount,
   getCachedProductID,
-  toggleCrossgrade,
+  setCrossgrade,
 } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
 import NetInfo from "@react-native-community/netinfo";
@@ -50,16 +50,15 @@ export const AppContextProvider = ({ children }) => {
 
   const handleCustomerInfoUpdate = async (customerInfo) => {
     console.log(
-      "Current customerInfo: ",
-      JSON.stringify(customerInfo, null, 2),
+      "Expiry: ",
+      JSON.stringify(customerInfo?.entitlements, null, 2),
     );
     const premiumEntitlement = customerInfo?.entitlements?.active?.Premium;
     if (typeof premiumEntitlement !== "undefined") {
       const cachedProductID = await getCachedProductID();
       // First time seeing crossgrade. Mark complete
       if (cachedProductID !== premiumEntitlement.productIdentifier) {
-        console.log("Detected crossgrade. Switching over");
-        await toggleCrossgrade();
+        await setCrossgrade(0);
       }
 
       setPremiumPlan(
@@ -71,36 +70,56 @@ export const AppContextProvider = ({ children }) => {
       setPremiumPlan(undefined);
     }
 
+    await updateUserExperience();
+  };
+
+  const syncSubscriptionIfOnline = (async = () => {
+    NetInfo.fetch().then((state) => {
+      if (state.isConnected) {
+        Purchases.getCustomerInfo();
+      } else {
+        updateUserExperience();
+      }
+    });
+  });
+
+  const updateUserExperience = async () => {
+    console.log("Updating user experience");
     // Update context
     const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
     setIsPremium(premiumStatus);
 
-    if (!premiumStatus) setExpiryNotificationCount();
-    else if (isInGracePeriod && (await getExpiryNotificationCount()) > 0) {
-      NetInfo.fetch().then((state) => {
+    console.log("Premium: ", premiumStatus);
+
+    if (!isPremium) await setExpiryNotificationCount();
+    if (isInGracePeriod && (await getExpiryNotificationCount()) > 0) {
+      NetInfo.fetch().then(async (state) => {
         if (state.isConnected) {
-          onlineGracePeriodAlert();
+          const customerInfo = await Purchases.getCustomerInfo();
+          if (
+            typeof customerInfo?.entitlements?.active?.Premium === "undefined"
+          )
+            onlineGracePeriodAlert();
         } else {
           offlineGracePeriodAlert();
         }
       });
       decrementExpiryNotificationCount();
     }
-
     console.log(`UserSubscription info updated`);
   };
 
   const onlineGracePeriodAlert = () => {
     Alert.alert(
       "Subscription expires soon",
-      `Within ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days, your account will transition to our free-tier, which allows access to your first three routines only.\n\nPlease note, while routines beyond the fifth won’t be accessible, they will remain saved in your account.`,
+      `Within ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days, your account will transition to our free-tier, which allows access to your first three routines only.\n\nPlease note, while routines beyond the third won’t be accessible, they will remain saved in your account.`,
     );
   };
 
   const offlineGracePeriodAlert = () => {
     Alert.alert(
       "Unable to verify subscription",
-      `We're unable to confirm your premium status for the upcoming billing cycle, as you're currently using the app offline.\n\nTo keep enjoying your subscription benefits, please connect to the internet while using the app sometime in the next ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days.\n\nThis will help us ensure your account remains on the premium tier`,
+      `We're unable to confirm your premium status for the upcoming billing cycle, as you're currently using the app offline.\n\nTo keep enjoying your subscription benefits, please connect to the internet while using the app sometime in the next ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days.\n\nThis will help us ensure your account remains on the premium tier.`,
     );
   };
 
@@ -132,6 +151,8 @@ export const AppContextProvider = ({ children }) => {
         setIsPremium,
         premiumPlan,
         setPremiumPlan,
+        updateUserExperience,
+        syncSubscriptionIfOnline,
       }}
     >
       {children}

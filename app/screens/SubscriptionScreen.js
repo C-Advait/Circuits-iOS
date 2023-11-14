@@ -28,53 +28,15 @@ import OverlayLoader from "../components/OverlayLoader";
 import {
   getCrossgrade,
   getUserSubscriptionStatus,
-  toggleCrossgrade,
+  setCrossgrade,
 } from "../db/DBActions";
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
-  const [subscriptionDetails, setSubscriptionDetails] = useState();
   const { theme, premiumPlan } = useAppContext();
   const [loading, setLoading] = useState(false);
   const styles = getStyles(theme);
   const { prevScreen } = route.params;
-
-  const generateSubscriptionDetails = async () => {
-    if (typeof premiumPlan === "undefined") {
-      setSubscriptionDetails("You are not currently subscribed.");
-      return;
-    }
-
-    const { expirationDate, willRenew } = await getUserSubscriptionStatus({
-      returnSubscription: true,
-    });
-
-    const expiry = formatExpiry(expirationDate);
-    const renew = willRenew !== null;
-    const isCrossgrading = await getCrossgrade();
-
-    console.log("isCrossgrading: ", isCrossgrading);
-
-    if (isCrossgrading) {
-      setSubscriptionDetails(
-        `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will be switched to the ${getOtherPlan(
-          premiumPlan,
-        )} tier.`,
-      );
-    } else if (renew) {
-      setSubscriptionDetails(
-        `Your subscription to the ${premiumPlan} pass renews on ${expiry}.`,
-      );
-    } else {
-      setSubscriptionDetails(
-        `Your subscription to the ${premiumPlan} pass ends on ${expiry}. Afterwards, you will revert to the free-tier.`,
-      );
-    }
-  };
-
-  useEffect(() => {
-    generateSubscriptionDetails();
-  });
 
   useEffect(() => {
     const localizePrices = async () => {
@@ -105,27 +67,18 @@ const SubscriptionScreen = ({ route }) => {
       ) {
         const packageToBuy = offerings.current[`${subscriptionDuration}`];
 
-        // Purchase it.
-        console.log(
-          `About to purchase package (${JSON.stringify(
-            packageToBuy,
-            null,
-            2,
-          )})`,
-        );
-
         const { customerInfo, _productIdentifier } =
           await Purchases.purchasePackage(packageToBuy);
 
         if (typeof customerInfo.entitlements.active.Premium !== "undefined") {
-          console.log(
-            `Purchase of ${subscriptionDuration} package successful!`,
-          );
-        } else {
-          console.log(`Purchase of ${subscriptionDuration} package failed!`);
+          if (state.shouldSetCrossgrading) {
+            dispatch({
+              type: subscriptionActions.SET_CROSSGRADE,
+              payload: false,
+            });
+            await setCrossgrade(1);
+          }
         }
-      } else {
-        console.log("WEIRD BRANCH", "offerings.current was null");
       }
     } catch (err) {
       const errorCode = err.code ? `Error Code: ${err.code}` : "";
@@ -147,7 +100,10 @@ const SubscriptionScreen = ({ route }) => {
           `Restore of ${customerInfo.entitlements.active.Premium.identifier} package successful!`,
         );
       } else {
-        Alert.alert(`Restore unsuccessful`);
+        Alert.alert(
+          `Unable to restore`,
+          `We were not able to restore your purchase at this time.`,
+        );
       }
     } catch (err) {
       if (!err.userCancelled) {
@@ -168,10 +124,7 @@ const SubscriptionScreen = ({ route }) => {
             return {
               ...state,
               selectedPlan: PREMIUM_PLANS.MONTHLY,
-              continueFunction: () => {
-                console.log("loading: ", loading);
-                buy(PREMIUM_PLANS.MONTHLY);
-              },
+              continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
             };
           case PREMIUM_PLANS.ANNUAL:
             return {
@@ -187,6 +140,12 @@ const SubscriptionScreen = ({ route }) => {
       case subscriptionActions.SET_PRICE:
         if (typeof action.price !== undefined)
           return { ...state, [action.plan]: [action.price] };
+
+      case subscriptionActions.SET_CROSSGRADE:
+        return { ...state, shouldSetCrossgrading: [action.payload] };
+
+      default:
+        console.error("Unknown action.type: ", action.type);
     }
   };
 
@@ -194,6 +153,7 @@ const SubscriptionScreen = ({ route }) => {
     monthly: "$0.99",
     annual: "$4.99",
     selectedPlan: PREMIUM_PLANS.MONTHLY,
+    shouldSetCrossgrading: false,
     continueFunction: () => buy(PREMIUM_PLANS.MONTHLY),
   };
 
@@ -251,7 +211,7 @@ const SubscriptionScreen = ({ route }) => {
           <Text style={styles.modalTitle}>Available Plans</Text>
           <View style={styles.plansContainer}>
             <SubscriptionButton
-              enabled={state.selectedPlan === PREMIUM_PLANS.MONTHLY}
+              enabled={state?.selectedPlan === PREMIUM_PLANS.MONTHLY}
               purchased={premiumPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
               priceText={`${state.monthly} monthly`}
@@ -260,14 +220,10 @@ const SubscriptionScreen = ({ route }) => {
                   type: subscriptionActions.SET_PLAN,
                   payload: PREMIUM_PLANS.MONTHLY,
                 });
-
-                if (premiumPlan && premiumPlan !== state.selectedPlan) {
-                  await toggleCrossgrade();
-                }
               }}
             />
             <SubscriptionButton
-              enabled={state.selectedPlan === PREMIUM_PLANS.ANNUAL}
+              enabled={state?.selectedPlan === PREMIUM_PLANS.ANNUAL}
               purchased={premiumPlan === PREMIUM_PLANS.ANNUAL}
               titleText={"Annual Pass"}
               priceText={`${state.annual} annually`}
@@ -276,31 +232,33 @@ const SubscriptionScreen = ({ route }) => {
                   type: subscriptionActions.SET_PLAN,
                   payload: PREMIUM_PLANS.ANNUAL,
                 });
-
-                if (premiumPlan && premiumPlan !== state.selectedPlan) {
-                  await toggleCrossgrade();
-                }
               }}
             />
           </View>
           <PurchaseContinueButton
             onPress={async () => {
-              const crossgrading = await getCrossgrade();
-              if (!crossgrading) state.continueFunction();
-              else
-                Alert.alert(
-                  `You are already subscribed`,
-                  `You are currently subscribed to our ${premiumPlan} plan, and will switch to ${getOtherPlan(
-                    premiumPlan,
-                  )} in the next renewal cycle.\n\nTo manage your subscription, please go to settings.`,
-                );
+              if (
+                typeof premiumPlan !== "undefined" && // Have a premium plan
+                premiumPlan !== state.selectedPlan
+              ) {
+                // About to buy a different premium plan
+                dispatch({
+                  type: subscriptionActions.SET_CROSSGRADE,
+                  payload: true,
+                });
+              }
+              state.continueFunction();
             }}
           />
           <TouchableOpacity onPress={() => restore()}>
             <Text style={styles.restoreText}>Restore purchase</Text>
           </TouchableOpacity>
 
-          <Text style={styles.descriptionText}>{subscriptionDetails}</Text>
+          <Text style={styles.descriptionText}>
+            To manage your subscription, please go to Settings. If you'd like to
+            change your current plan, simply purchase it, and you will be
+            automatically switched over at your next renewal date.
+          </Text>
         </View>
       </Screen>
     </ImageBackground>

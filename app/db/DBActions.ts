@@ -319,7 +319,7 @@ const getUserSubscriptionStatus = async ({
             const forcedDowngradeDate = new Date(expirationDate);
             // TODO: Change to __setDate__.
             forcedDowngradeDate.setMinutes(
-              forcedDowngradeDate.getMinutes() + 1,
+              forcedDowngradeDate.getMinutes() + 3,
             );
 
             if (currentDate < expirationDate) {
@@ -540,18 +540,18 @@ const deleteRoutine = async (routineID: number) => {
   });
 };
 
-const toggleCrossgrade = async () => {
+const setCrossgrade = async (value: number) => {
   const db = getDBInstance();
 
   return new Promise<number>((resolve, reject) => {
     db.transaction((tx: any) => {
       const query = `UPDATE UserSubscriptionAuxiliary
-      SET crossgrade = 1 - crossgrade
+      SET crossgrade = ?
       WHERE id = 1`;
 
       tx.executeSql(
         query,
-        [],
+        [value],
         (_txObj: any, resultSet: any) => {
           resolve(resultSet.rowsAffected);
         },
@@ -686,7 +686,7 @@ export {
   updateUserSubscriptionOnSync,
   deleteExercise,
   deleteRoutine,
-  toggleCrossgrade,
+  setCrossgrade,
   getCrossgrade,
   setExpiryNotificationCount,
   decrementExpiryNotificationCount,
