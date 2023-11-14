@@ -67,32 +67,6 @@ function RoutinesScreen() {
     }
   };
 
-  const CustomFooter = () => {
-    return (
-      <View>
-        <View style={{ marginBottom: 10 }} />
-        {defaultRoutines.map((providedRoutine, index) => (
-          <View key={providedRoutine.id} style={{ marginBottom: 10 }}>
-            <RoutineCard
-              routine={providedRoutine}
-              isExpanded={expandedStates[index + userRoutines.length]}
-              toggleExpand={() => toggleExpand(index + userRoutines.length)}
-              deleteCallback={() => {
-                loadRoutines();
-                setExpandedCount(0);
-                setExpandedStates((prev) =>
-                  new Array(Math.max(prev.length - 1, 0)).fill(false),
-                );
-              }}
-              isEnabled={true}
-            />
-          </View>
-        ))}
-        <View style={{ height: TAB_BAR_HEIGHT }} />
-      </View>
-    );
-  };
-
   useFocusEffect(() => {
     loadRoutines();
   });
@@ -102,35 +76,14 @@ function RoutinesScreen() {
     new Array(routines.length).fill(false),
   );
 
-  // State to track if all items are expanded or collapsed.
-  const [expandedCount, setExpandedCount] = useState(0);
-
   const toggleExpand = useCallback(
     (index) => {
-      // If the current item is expanded, decrement, else increment
-      if (expandedStates[index]) {
-        setExpandedCount((prevCount) => prevCount - 1);
-      } else {
-        setExpandedCount((prevCount) => prevCount + 1);
-      }
-
-      // Toggle the specific item's state
       const newStates = [...expandedStates];
       newStates[index] = !newStates[index];
       setExpandedStates(newStates);
     },
     [expandedStates],
   );
-
-  const expandCollapseAll = useCallback(() => {
-    if (expandedCount === routines.length) {
-      setExpandedStates(new Array(routines.length).fill(false));
-      setExpandedCount(0);
-    } else {
-      setExpandedStates(new Array(routines.length).fill(true));
-      setExpandedCount(routines.length);
-    }
-  }, [expandedCount, routines.length]);
 
   const handleNewRoutineOnpress = async () => {
     try {
@@ -259,18 +212,6 @@ function RoutinesScreen() {
           }}
         />
       </View>
-      <View style={styles.middlePanel}>
-        <IconButton
-          iconName={
-            expandedCount === routines.length ? "minimize-2" : "maximize-2"
-          }
-          IconFamily={Feather}
-          iconSize={40}
-          foregroundColor={theme.text87}
-          onPress={() => expandCollapseAll()}
-          style={{ width: 77, height: 50 }}
-        />
-      </View>
       <FlatList
         data={combineData()}
         renderItem={renderRoutineCard}
@@ -292,7 +233,7 @@ const getStyles = (theme) =>
       alignItems: "center",
       height: 45,
       marginLeft: 15,
-      marginBottom: 34,
+      marginBottom: 24,
       marginHorizontal: 10,
       marginTop: 25,
     },
