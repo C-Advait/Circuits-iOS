@@ -178,7 +178,6 @@ function RoutinesScreen() {
           toggleExpand={() => toggleExpand(index)}
           deleteCallback={() => {
             loadRoutines();
-            setExpandedCount(0);
             setExpandedStates((prev) =>
               new Array(Math.max(prev.length - 1, 0)).fill(false),
             );
@@ -206,7 +205,7 @@ function RoutinesScreen() {
           onPress={() => {
             isPremium
               ? handleNewRoutineOnpress()
-              : userRoutines.length < 3
+              : userRoutines.length < 10
                 ? handleNewRoutineOnpress()
                 : handleBlockedRoutineCreation();
           }}
