@@ -13,7 +13,7 @@ import {
   toggleCrossgrade,
 } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
-// import NetInfo from "@react-native-community/netinfo";
+import NetInfo from "@react-native-community/netinfo";
 import Purchases from "react-native-purchases";
 import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
@@ -77,13 +77,13 @@ export const AppContextProvider = ({ children }) => {
 
     if (!premiumStatus) setExpiryNotificationCount();
     else if (isInGracePeriod && (await getExpiryNotificationCount()) > 0) {
-      // NetInfo.fetch().then((state) => {
-      //   if (state.isConnected) {
-      //     onlineGracePeriodAlert();
-      //   } else {
-      //     offlineGracePeriodAlert();
-      //   }
-      // });
+      NetInfo.fetch().then((state) => {
+        if (state.isConnected) {
+          onlineGracePeriodAlert();
+        } else {
+          offlineGracePeriodAlert();
+        }
+      });
       decrementExpiryNotificationCount();
     }
 
@@ -93,7 +93,7 @@ export const AppContextProvider = ({ children }) => {
   const onlineGracePeriodAlert = () => {
     Alert.alert(
       "Subscription expires soon",
-      `Within ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days, your account will transition to our free-tier, which allows access to your first five routines only.\n\nPlease note, while routines beyond the fifth won’t be accessible, they will remain saved in your account.`,
+      `Within ${SUBSCRIPTION_GRACE_PERIOD_DAYS} days, your account will transition to our free-tier, which allows access to your first three routines only.\n\nPlease note, while routines beyond the fifth won’t be accessible, they will remain saved in your account.`,
     );
   };
 
