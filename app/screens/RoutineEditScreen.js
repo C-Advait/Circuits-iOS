@@ -310,6 +310,7 @@ function RoutineEditScreen({ route }) {
     const updatedRoutine = new Routine({
       // New Routine Object to save
       ...state.routine,
+      numberOfLoops: state.numberOfLoops,
       duration: finalTime, // or however you need to structure the updated routine object
     });
     // Make backend call
@@ -615,8 +616,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-                state.cooldown.workTime +
-                state.numberOfLoops * state.workTime,
+              state.cooldown.workTime +
+              state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
