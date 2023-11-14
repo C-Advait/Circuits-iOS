@@ -4,6 +4,7 @@ import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 import getCurrentTimestamp from "../utilities/getCurrentTimestamp";
 import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
+import { SUBSCRIPTION_GRACE_PERIOD_DAYS } from "../config/appConstants";
 
 // Settings
 const retrieveSetting = (key: String) => {
@@ -188,6 +189,38 @@ const getAllUserCreatedRoutines = async () => {
     db.transaction((tx: any) => {
       tx.executeSql(
         "SELECT * FROM Routine WHERE userCreated = 1 ORDER BY id",
+        [],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw().map((row: any) => new Routine(row)));
+        },
+      );
+    }, reject);
+  });
+};
+
+const getAllDefaultRoutines = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM Routine WHERE userCreated = 0 ORDER BY id",
+        [],
+        (_tx: any, results: any) => {
+          resolve(results.rows.raw().map((row: any) => new Routine(row)));
+        },
+      );
+    }, reject);
+  });
+};
+
+const getAllRoutines = async () => {
+  const db = getDBInstance();
+
+  return new Promise((resolve, reject) => {
+    db.transaction((tx: any) => {
+      tx.executeSql(
+        "SELECT * FROM Routine ORDER BY id",
         [],
         (_tx: any, results: any) => {
           resolve(results.rows.raw().map((row: any) => new Routine(row)));
@@ -642,7 +675,9 @@ export {
   createRoutine,
   logRoutineCompletion,
   getAllUserCreatedRoutines,
+  getAllDefaultRoutines,
   getAllRoutineNames,
+  getAllRoutines,
   getRoutineByID,
   getExercisesForRoutine,
   getUserSubscriptionStatus,

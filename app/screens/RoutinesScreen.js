@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { StyleSheet, FlatList, Alert } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
 import RoutineCard from "../components/RoutineCard";
+import { useAppContext } from "../contexts/AppContext";
 import { useAppContext } from "../contexts/AppContext";
 import { View } from "react-native";
 import {
@@ -15,7 +16,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { IconButton } from "../components/buttons";
 import routes from "../navigation/routes";
-import { getAllUserCreatedRoutines } from "../db/DBActions";
+import { getAllRoutines } from "../db/DBActions";
 import EmptyRoutinesListComponent from "../components/EmptyRoutinesListComponent";
 import { Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
@@ -39,15 +40,30 @@ function RoutinesScreen() {
   const styles = getStyles(theme);
 
   const [routines, setRoutines] = useState([]);
+  const [userRoutines, setUserRoutines] = useState([]);
+  const [defaultRoutines, setDefaultRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
   const [dataHash, setDataHash] = useState(null);
 
   const loadRoutines = async () => {
-    const newRoutines = await getAllUserCreatedRoutines();
+    const newRoutines = await getAllRoutines();
     const newHash = hashString(JSON.stringify(newRoutines));
 
     if (newHash !== dataHash) {
+      const userCreatedRoutines = [];
+      const defRoutines = [];
+
+      newRoutines.forEach((element) => {
+        if (element.userCreated) {
+          userCreatedRoutines.push(element);
+        } else {
+          defRoutines.push(element);
+        }
+      });
+
       setRoutines(newRoutines);
+      setUserRoutines(userCreatedRoutines);
+      setDefaultRoutines(defRoutines);
       setDataHash(newHash);
     }
   };
@@ -61,35 +77,14 @@ function RoutinesScreen() {
     new Array(routines.length).fill(false),
   );
 
-  // State to track if all items are expanded or collapsed.
-  const [expandedCount, setExpandedCount] = useState(0);
-
   const toggleExpand = useCallback(
     (index) => {
-      // If the current item is expanded, decrement, else increment
-      if (expandedStates[index]) {
-        setExpandedCount((prevCount) => prevCount - 1);
-      } else {
-        setExpandedCount((prevCount) => prevCount + 1);
-      }
-
-      // Toggle the specific item's state
       const newStates = [...expandedStates];
       newStates[index] = !newStates[index];
       setExpandedStates(newStates);
     },
     [expandedStates],
   );
-
-  const expandCollapseAll = useCallback(() => {
-    if (expandedCount === routines.length) {
-      setExpandedStates(new Array(routines.length).fill(false));
-      setExpandedCount(0);
-    } else {
-      setExpandedStates(new Array(routines.length).fill(true));
-      setExpandedCount(routines.length);
-    }
-  }, [expandedCount, routines.length]);
 
   const handleNewRoutineOnpress = async () => {
     try {
@@ -151,6 +146,54 @@ function RoutinesScreen() {
     );
   };
 
+  const combineData = () => {
+    let ret = [];
+
+    if (userRoutines.length) {
+      ret.push({
+        section: true,
+        id: "user-routines-title",
+        title: "Custom routines",
+      });
+      ret = ret.concat(userRoutines);
+    }
+
+    if (defaultRoutines.length) {
+      ret.push({
+        section: true,
+        id: "default-routines-title",
+        title: "Default routines",
+      });
+      ret = ret.concat(defaultRoutines);
+    }
+
+    return ret;
+  };
+
+  const renderRoutineCard = ({ item: routine, index }) => {
+    if (!routine.section)
+      return (
+        <RoutineCard
+          routine={routine}
+          isExpanded={expandedStates[index]}
+          toggleExpand={() => toggleExpand(index)}
+          deleteCallback={() => {
+            loadRoutines();
+            setExpandedStates((prev) =>
+              new Array(Math.max(prev.length - 1, 0)).fill(false),
+            );
+          }}
+          isEnabled={isPremium ? true : !routine.userCreated || index <= 3}
+        />
+      );
+    else
+      return (
+        <View style={styles.sectionBreak}>
+          <Text style={styles.sectionText}>{routine.title}</Text>
+        </View>
+      );
+  };
+
   return (
     <Screen>
       <View style={styles.topPanel}>
@@ -163,41 +206,15 @@ function RoutinesScreen() {
           onPress={() => {
             isPremium
               ? handleNewRoutineOnpress()
-              : routines.length < 5
-              ? handleNewRoutineOnpress()
-              : handleBlockedRoutineCreation();
+              : routines.length < 3
+                ? handleNewRoutineOnpress()
+                : handleBlockedRoutineCreation();
           }}
         />
       </View>
-      <View style={styles.middlePanel}>
-        <IconButton
-          iconName={
-            expandedCount === routines.length ? "minimize-2" : "maximize-2"
-          }
-          IconFamily={Feather}
-          iconSize={40}
-          foregroundColor={theme.text87}
-          onPress={() => expandCollapseAll()}
-          style={{ width: 77, height: 50 }}
-        />
-      </View>
       <FlatList
-        data={routines}
-        renderItem={({ item: routine, index }) => (
-          <RoutineCard
-            routine={routine}
-            isExpanded={expandedStates[index]}
-            toggleExpand={() => toggleExpand(index)}
-            deleteCallback={() => {
-              loadRoutines();
-              setExpandedCount(0);
-              setExpandedStates((prev) =>
-                new Array(Math.max(prev.length - 1, 0)).fill(false),
-              );
-            }}
-            isEnabled={isPremium ? true : index <= 4}
-          />
-        )}
+        data={combineData()}
+        renderItem={renderRoutineCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ marginHorizontal: 16 }}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -216,7 +233,7 @@ const getStyles = (theme) =>
       alignItems: "center",
       height: 45,
       marginLeft: 15,
-      marginBottom: 34,
+      marginBottom: 24,
       marginHorizontal: 10,
       marginTop: 25,
     },
@@ -227,6 +244,19 @@ const getStyles = (theme) =>
       flexDirection: "row",
       justifyContent: "flex-end",
       alignItems: "center",
+    },
+    sectionBreak: {
+      alignItems: "flex-end",
+      flexDirection: "row",
+      height: 18,
+      justifyContent: "flex-start",
+      marginTop: 10,
+      backgroundColor: 'transparent'
+    },
+    sectionText: {
+      color: theme.secondary,
+      fontSize: 14,
+      fontWeight: "500",
     },
   });
 
