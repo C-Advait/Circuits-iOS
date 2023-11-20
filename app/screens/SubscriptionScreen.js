@@ -26,7 +26,6 @@ import { SubscriptionButton } from "../components/buttons";
 import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
-import OverlayLoader from "../components/OverlayLoader";
 import { setCrossgrade } from "../db/DBActions";
 
 const navTOS = () => {
@@ -176,7 +175,6 @@ const SubscriptionScreen = ({ route }) => {
       style={styles.background}
       resizeMode="cover"
     >
-      <OverlayLoader isVisible={loading} />
       <Screen style={styles.container}>
         <View>
           <NavHeader
@@ -247,6 +245,7 @@ const SubscriptionScreen = ({ route }) => {
             />
           </View>
           <PurchaseContinueButton
+            loading={loading}
             onPress={async () => {
               if (
                 typeof premiumPlan !== "undefined" && // Have a premium plan
