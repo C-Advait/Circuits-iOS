@@ -268,8 +268,9 @@ const SubscriptionScreen = ({ route }) => {
           <Text style={styles.descriptionText}>
             By clicking 'Continue', you agree to our{" "}
             <Text style={{ color: theme.blue }} onPress={navTOS}>
-              Terms of Service.
+              Terms of Service
             </Text>
+            <Text>.</Text>
             {"\n\n"}
             Subscriptions will automatically renew unless auto-renew is turned
             off at least 24 hours before the end of the current period. You can
