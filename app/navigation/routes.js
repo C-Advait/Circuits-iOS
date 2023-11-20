@@ -8,6 +8,5 @@ export default Object.freeze({
   SETTINGS_SCREEN: "SettingsScreen",
   EXERCISE_EDIT_SCREEN: "ExerciseEditScreen",
   DEBUG_SCREEN: "Debug",
-  PRIVACY_POLICY_SCREEN: "PrivacyPolicyScreen",
   SUBSCRIPTION_SCREEN: "SubscriptionScreen",
 });

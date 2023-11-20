@@ -9,7 +9,6 @@ import {
   Switch,
   Linking,
 } from "react-native";
-import Constants from "expo-constants";
 import { Feather } from "@expo/vector-icons";
 import Rate from "react-native-rate";
 import { useNavigation } from "@react-navigation/core";
@@ -18,6 +17,7 @@ import routes from "../navigation/routes";
 import Screen from "../components/Screen";
 import Header from "../components/Header";
 import { useAppContext } from "../contexts/AppContext";
+import { PRIVACY_STATEMENT_URL } from "../config/appConstants";
 
 // localize 'behaviour'?
 function SettingsScreen() {
@@ -63,7 +63,16 @@ function SettingsScreen() {
   };
 
   const navPrivacyPolicy = () => {
-    navigation.navigate(routes.PRIVACY_POLICY_SCREEN);
+    const url = PRIVACY_STATEMENT_URL;
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (!supported) {
+          console.log("Can't handle url: " + url);
+        } else {
+          return Linking.openURL(url);
+        }
+      })
+      .catch((err) => console.error("An error occurred", err));
   };
 
   const behaviour = [
@@ -94,12 +103,12 @@ function SettingsScreen() {
   const support = [
     {
       id: 4,
-      title: "Contact us",
+      title: "Contact Us",
       onTouchablePress: contactSupport,
     },
     {
       id: 5,
-      title: "Rate us",
+      title: "Rate Us",
       onTouchablePress: rateUs,
     },
   ];

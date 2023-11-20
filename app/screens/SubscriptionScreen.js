@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Linking,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -17,6 +18,7 @@ import { IconButton, PurchaseContinueButton } from "../components/buttons";
 import { useAppContext } from "../contexts/AppContext";
 import ImageText from "../components/ImageText";
 import {
+  EULA_URL,
   PARAGRAPH_FONT_SIZE,
   PARAGRAPH_FONT_WEIGHT,
 } from "../config/appConstants";
@@ -25,11 +27,20 @@ import subscriptionActions from "../actions/subscriptionActions";
 import { PREMIUM_PLANS } from "../config/premiumPlans";
 import Purchases from "react-native-purchases";
 import OverlayLoader from "../components/OverlayLoader";
-import {
-  getCrossgrade,
-  getUserSubscriptionStatus,
-  setCrossgrade,
-} from "../db/DBActions";
+import { setCrossgrade } from "../db/DBActions";
+
+const navTOS = () => {
+  const url = EULA_URL;
+  Linking.canOpenURL(url)
+    .then((supported) => {
+      if (!supported) {
+        console.log("Can't handle url: " + url);
+      } else {
+        return Linking.openURL(url);
+      }
+    })
+    .catch((err) => console.error("An error occurred", err));
+};
 
 const SubscriptionScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -214,7 +225,7 @@ const SubscriptionScreen = ({ route }) => {
               enabled={state?.selectedPlan === PREMIUM_PLANS.MONTHLY}
               purchased={premiumPlan === PREMIUM_PLANS.MONTHLY}
               titleText={"Monthly Pass"}
-              priceText={`${state.monthly} monthly`}
+              priceText={`${state.monthly} billed monthly`}
               onPress={async () => {
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
@@ -226,7 +237,7 @@ const SubscriptionScreen = ({ route }) => {
               enabled={state?.selectedPlan === PREMIUM_PLANS.ANNUAL}
               purchased={premiumPlan === PREMIUM_PLANS.ANNUAL}
               titleText={"Annual Pass"}
-              priceText={`${state.annual} annually`}
+              priceText={`${state.annual} billed yearly`}
               onPress={async () => {
                 dispatch({
                   type: subscriptionActions.SET_PLAN,
@@ -255,9 +266,18 @@ const SubscriptionScreen = ({ route }) => {
           </TouchableOpacity>
 
           <Text style={styles.descriptionText}>
-            To manage your subscription, please go to Settings. If you'd like to
-            change your current plan, simply purchase it, and you will be
-            automatically switched over at your next renewal date.
+            By clicking 'Continue', you agree to our{" "}
+            <Text style={{ color: theme.blue }} onPress={navTOS}>
+              Terms of Service
+            </Text>
+            <Text>.</Text>
+            {"\n\n"}
+            Subscriptions will automatically renew unless auto-renew is turned
+            off at least 24 hours before the end of the current period. You can
+            manage your subscription in settings any time after purchase.
+            {"\n\n"}
+            To switch plans, simply purchase the other, and you will be
+            automatically switched over next period.
           </Text>
         </View>
       </Screen>
@@ -329,10 +349,10 @@ const getStyles = (theme) =>
     titlePanel: {
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 45,
+      marginBottom: 30,
     },
     descriptionText: {
-      fontSize: 13,
+      fontSize: 11,
       fontWeight: "400",
       color: "gray",
       alignSelf: "stretch",
@@ -342,10 +362,6 @@ const getStyles = (theme) =>
       width: "100%",
       justifyContent: "center",
       alignItems: "center",
-    },
-    highlightBorder: {
-      borderWidth: 3,
-      borderColor: "red",
     },
     navHeader: {
       marginBottom: 0,
