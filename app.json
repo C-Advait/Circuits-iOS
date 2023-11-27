@@ -28,7 +28,7 @@
         "foregroundImage": "./app/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.a99wang.Circuits",
+      "package": "com.a99wang.circuits",
       "versionCode": 1
     },
     "web": {

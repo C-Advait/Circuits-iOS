@@ -53,7 +53,7 @@ function SettingsScreen() {
   const rateUs = () => {
     const options = {
       AppleAppID: "6471159497",
-      GooglePackageName: "com.mywebsite.myapp", // TODO: CORRECT TO REAL PACKAGE
+      GooglePackageName: "com.a99wang.circuits",
       preferInApp: true,
       openAppStoreIfInAppFails: true,
     };
