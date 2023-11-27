@@ -3,7 +3,7 @@ import { Routine } from "../classes/Routine";
 
 export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 16;
 
-export const TAB_BAR_HEIGHT = 90;
+export const TAB_BAR_HEIGHT = 82;
 
 export const PRIVACY_STATEMENT_URL =
   "https://circuittimer.wordpress.com/privacy-policy";
