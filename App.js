@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
+import { Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -26,7 +27,9 @@ function App() {
         });
 
         Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-        Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY });
+        Platform.OS === "ios"
+          ? Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY })
+          : Purchases.configure({ apiKey: process.env.PUBLIC_ANDROID_SDK_KEY });
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {
