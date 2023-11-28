@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useReducer, useRef } from "react";
 import {
+  Button,
   Keyboard,
-  View,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
-  Button,
-  ScrollView,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { Feather } from "@expo/vector-icons";
@@ -96,16 +97,16 @@ function ExerciseEditScreen({ route }) {
         onPress={
           enabled
             ? () => {
-                dispatch({
-                  type: exerciseEditActions.SET_ACTIVE_KEY,
-                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-                });
-                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-                Keyboard.dismiss();
-                modalRef.current?.expand();
-              }
+              dispatch({
+                type: exerciseEditActions.SET_ACTIVE_KEY,
+                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+              });
+              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+              Keyboard.dismiss();
+              modalRef.current?.expand();
+            }
             : () => null
         }
       >
@@ -298,7 +299,7 @@ function ExerciseEditScreen({ route }) {
                   dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
                   modalRef.current?.close();
                 }}
-                color={theme.primary}
+                color={Platform.OS === 'ios' ? theme.primary : theme.tertiaryBackground}
               />
             </View>
             <View style={styles.buttonContainer}>

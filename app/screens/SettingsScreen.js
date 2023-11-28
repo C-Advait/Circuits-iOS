@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Switch,
   Linking,
+  Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Rate from "react-native-rate";
@@ -52,6 +53,7 @@ function SettingsScreen() {
   const rateUs = () => {
     const options = {
       AppleAppID: "6471159497",
+      GooglePackageName: "com.a99wang.circuits",
       preferInApp: true,
       openAppStoreIfInAppFails: true,
     };

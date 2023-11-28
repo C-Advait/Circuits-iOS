@@ -19,6 +19,7 @@ export const SoundProvider = ({ children }) => {
 
   useEffect(() => {
     async function loadSounds() {
+      console.log("Loading sounds...")
       const loadedSounds = {};
 
       const loadPromises = Object.keys(soundFiles).map(async (key) => {

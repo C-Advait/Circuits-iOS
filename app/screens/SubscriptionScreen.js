@@ -320,6 +320,7 @@ const getStyles = (theme) =>
       borderRadius: 20,
       paddingHorizontal: 20,
       paddingTop: 16,
+      paddingBottom: 4,
     },
     modalTitle: {
       fontSize: PARAGRAPH_FONT_SIZE,
