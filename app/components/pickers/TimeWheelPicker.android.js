@@ -14,11 +14,12 @@ const TimeWheelPicker = ({
   const { theme } = useAppContext();
   const styles = getStyles(theme);
 
-  const [localTime, setLocalTime] = useState(startingTime);
+  // These are indices.
   const [selectedMinute, setSelectedMinute] = useState(
-    Math.floor(localTime / 60),
+    Math.floor(startingTime / 60),
   );
-  const [selectedSecond, setSelectedSecond] = useState(localTime % 60);
+  const [selectedSecond, setSelectedSecond] = useState(startingTime % 60);
+
   const items = [...Array(60).keys()].map(String);  // Convert to string array
   const [filteredSeconds, setFilteredSeconds] = useState(
     increment5Seconds
@@ -51,38 +52,40 @@ const TimeWheelPicker = ({
 
   const handleSecondChange = (index) => {
     const secondValue = parseInt(filteredSeconds[index]);
+    console.log(`handling second change. index: ${index} secondValue: ${secondValue}`);
+
     setSelectedSecond(secondValue);
     onValueChange(selectedMinute * 60 + secondValue);
   };
 
-  useEffect(() => {
-    onValueChange(selectedMinute * 60 + selectedSecond);
-  }, [selectedMinute, selectedSecond]);
-
-  useEffect(() => {
-    setLocalTime(startingTime);
-  }, [startingTime]);
+  const getInitialSeconds = () => {
+    if (increment5Seconds) {
+      return Math.floor((startingTime % 60) / 5)
+    } else if (filteredSeconds.length < 60) {
+      return startingTime % 60 - MINIMUM_SECONDS
+    } else {
+      return startingTime % 60;
+    }
+  }
 
   return (
     <View style={styles.container} pointerEvents="box-none">
       <WheelPicker
         data={items}
-        initPosition={Math.floor(localTime / 60)}
-        selectedItem={selectedMinute}
+        initPosition={Math.floor(startingTime / 60)}
+        onItemSelected={handleMinuteChange}
         selectedItemTextColor={theme.primary}
         selectedItemTextSize={ITEM_FONT_SIZE}
         itemTextSize={ITEM_FONT_SIZE}
-        onItemSelected={handleMinuteChange}
         style={styles.wheelPicker}
       />
       <WheelPicker
         data={filteredSeconds}
-        initPosition={increment5Seconds ? Math.floor((localTime % 60) / 5) : localTime % 60}
-        selectedItem={filteredSeconds.indexOf(selectedSecond.toString())}
+        initPosition={getInitialSeconds()}
+        onItemSelected={handleSecondChange}
         selectedItemTextColor={theme.primary}
         selectedItemTextSize={ITEM_FONT_SIZE}
         itemTextSize={ITEM_FONT_SIZE}
-        onItemSelected={handleSecondChange}
         style={styles.wheelPicker}
       />
     </View>

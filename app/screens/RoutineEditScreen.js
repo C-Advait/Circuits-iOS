@@ -842,7 +842,7 @@ const getStyles = (theme) =>
       bottom: 0,
       flexDirection: "row",
       height: 65,
-      justifyContent: "rlex-end",
+      justifyContent: "flex-end",
       position: "absolute",
       width: "100%",
     },
