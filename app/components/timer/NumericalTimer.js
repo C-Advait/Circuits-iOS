@@ -14,7 +14,7 @@ const NumericalTimer = ({ state, dispatch, nextExerciseTag }) => {
     state.intervals[state.currentIndex]?.duration,
   );
 
-  const EPS = 0.015; // Tolerance for elapsedTime === 1.
+  const EPS = Platform.OS === 'ios' ? 0.015 : 0.018; // Tolerance for elapsedTime === 1.
 
   useEffect(() => {
     setExerciseSecondsRemaining(state.exerciseSecondsRemaining);
@@ -108,9 +108,8 @@ const getSoundToPlay = (tag) => {
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.ceil(time % 60);
-  return `${minutes < 10 ? "0" : ""}${minutes}:${
-    seconds < 10 ? "0" : ""
-  }${seconds}`;
+  return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""
+    }${seconds}`;
 };
 
 const styles = StyleSheet.create({

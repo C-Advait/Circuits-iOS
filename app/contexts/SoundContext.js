@@ -19,7 +19,6 @@ export const SoundProvider = ({ children }) => {
 
   useEffect(() => {
     async function loadSounds() {
-      console.log("Loading sounds...")
       const loadedSounds = {};
 
       const loadPromises = Object.keys(soundFiles).map(async (key) => {
@@ -48,7 +47,6 @@ export const SoundProvider = ({ children }) => {
   }, []);
 
   const playSound = async (key) => {
-    console.log("Inside playSound");
     if (isPlaying) return;
 
     if (sounds[key] && soundOn) {
@@ -60,7 +58,7 @@ export const SoundProvider = ({ children }) => {
           if (status.didJustFinish) {
             console.log(`Just played sound for key ${key}`);
             setIsPlaying(false);
-            await sounds[key].setPositionAsync(0);
+            await sounds[key].stopAsync();
           }
         });
       } catch (error) {
