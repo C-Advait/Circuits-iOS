@@ -132,7 +132,9 @@ function RoutineEditScreen({ route }) {
           type: routineEditActions.INIT,
           payload: {
             warmup: warmup,
+            warmupDuration: warmup.workTime,
             cooldown: cooldown,
+            cooldownDuration: cooldown.workTime,
             workingSet: workingSet,
             workTime: workTime,
             numExercises: numExercises,
@@ -361,7 +363,6 @@ function RoutineEditScreen({ route }) {
           type: routineEditActions.SET_ACTIVE_KEY,
           payload: ROUTINE_EDIT_MODAL[contentKey]?.key,
         });
-        dispatch({ type: routineEditActions.SET_PREVIOUS });
         dispatch({ type: routineEditActions.TOGGLE_REFRESH });
         setModalContent(ROUTINE_EDIT_MODAL[contentKey]);
         modalRef.current?.expand();
@@ -429,7 +430,7 @@ function RoutineEditScreen({ route }) {
             <InputModalButton
               accentColor={theme.accentGreen}
               title="Warmup"
-              text={formatMinutesSeconds(state.warmup.workTime)}
+              text={formatMinutesSeconds(state.warmupDuration)}
               contentKey="WARMUP"
             />
           </View>
@@ -521,7 +522,7 @@ function RoutineEditScreen({ route }) {
             <InputModalButton
               accentColor={theme.accentDarkBlue}
               title="Cooldown"
-              text={formatMinutesSeconds(state.cooldown.workTime)}
+              text={formatMinutesSeconds(state.cooldownDuration)}
               contentKey="COOLDOWN"
             />
           </View>
@@ -670,29 +671,27 @@ const reducer = (state, action) => {
       return { ...state, previous: action.payload };
 
     case routineEditActions.REVERT_PREVIOUS:
-      console.log("Reverting ", state.activeKey, "to", state.previous);
       return { ...state, [state.activeKey]: state.previous };
 
     case routineEditActions.SET_WARMUP:
-      console.log("Setting warmup");
       return {
         ...state,
         warmup: { ...state.warmup, workTime: action.payload },
+        warmupDuration: action.payload,
         isValidRoutine:
           action.payload + state.workTime + state.cooldown.workTime > 0,
       };
 
     case routineEditActions.SET_COOLDOWN:
-      console.log("Setting cooldown");
       return {
         ...state,
         cooldown: { ...state.cooldown, workTime: action.payload },
+        cooldownDuration: action.payload,
         isValidRoutine:
           state.warmup.workTime + state.workTime + action.payload > 0,
       };
 
     case routineEditActions.SET_LOOPS:
-      console.log("Setting loops to, ", action.payload);
       return { ...state, numberOfLoops: action.payload };
 
     case routineEditActions.TOGGLE_APPLY:

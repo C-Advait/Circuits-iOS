@@ -52,8 +52,6 @@ const TimeWheelPicker = ({
 
   const handleSecondChange = (index) => {
     const secondValue = parseInt(filteredSeconds[index]);
-    console.log(`handling second change. index: ${index} secondValue: ${secondValue}`);
-
     setSelectedSecond(secondValue);
     onValueChange(selectedMinute * 60 + secondValue);
   };
