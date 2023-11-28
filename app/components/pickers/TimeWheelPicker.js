@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { Platform, View, Text, StyleSheet, Dimensions } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useAppContext } from "../../contexts/AppContext";
+import { WheelPicker } from 'react-native-wheel-picker-android';
 
 const { width } = Dimensions.get("window");
 
@@ -34,10 +35,35 @@ const TimeWheelPicker = ({
     increment5Seconds
       ? items.filter((value) => value % 5 === 0)
       : startingTime >= 60
-      ? items
-      : items.slice(5),
+        ? items
+        : items.slice(5),
   );
   const key = filteredSeconds.length;
+
+  const handleMinuteChange = (itemValue) => {
+    onValueChange(itemValue * 60 + selectedSecond);
+    setSelectedMinute(itemValue);
+
+    if (itemValue === 0 && !increment5Seconds) {
+      // Min 5s requirement if incrementFiveSeconds === false
+      setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
+
+      if (selectedSecond < MINIMUM_SECONDS) {
+        // Move to legal range
+        setSelectedSecond(MINIMUM_SECONDS);
+        onValueChange(itemValue * 60 + MINIMUM_SECONDS);
+      }
+    } else {
+      increment5Seconds
+        ? setFilteredSeconds(items.filter((value) => value % 5 === 0))
+        : setFilteredSeconds(items); // reset to the full range
+    }
+  }
+
+  const handleSecondChange = (itemValue) => {
+    setSelectedSecond(itemValue);
+    onValueChange(selectedMinute * 60 + itemValue);
+  }
 
   return (
     <View style={styles.container} pointerEvents="box-none">
@@ -47,25 +73,7 @@ const TimeWheelPicker = ({
           selectedValue={selectedMinute}
           selectionColor={theme.tertiaryTranslucentBackground}
           style={styles.minutesPicker}
-          onValueChange={(itemValue) => {
-            onValueChange(itemValue * 60 + selectedSecond);
-            setSelectedMinute(itemValue);
-
-            if (itemValue === 0 && !increment5Seconds) {
-              // Min 5s requirement if incrementFiveSeconds === false
-              setFilteredSeconds(items.slice(MINIMUM_SECONDS)); // starts from ' 5'
-
-              if (selectedSecond < MINIMUM_SECONDS) {
-                // Move to legal range
-                setSelectedSecond(MINIMUM_SECONDS);
-                onValueChange(itemValue * 60 + MINIMUM_SECONDS);
-              }
-            } else {
-              increment5Seconds
-                ? setFilteredSeconds(items.filter((value) => value % 5 === 0))
-                : setFilteredSeconds(items); // reset to the full range
-            }
-          }}
+          onValueChange={handleMinuteChange}
           color={theme.primary}
           itemStyle={{
             color: theme.primary,
@@ -90,10 +98,7 @@ const TimeWheelPicker = ({
           selectedValue={selectedSecond}
           style={styles.secondsPicker}
           selectionColor={theme.tertiaryTranslucentBackground}
-          onValueChange={(itemValue) => {
-            setSelectedSecond(itemValue);
-            onValueChange(selectedMinute * 60 + itemValue);
-          }}
+          onValueChange={handleSecondChange}
           itemStyle={{ color: theme.primary }}
         >
           {filteredSeconds.map((item) => (

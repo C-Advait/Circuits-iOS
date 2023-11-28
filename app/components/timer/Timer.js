@@ -111,6 +111,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
   });
 
   const handleAppStateChange = (nextAppState) => {
+    console.log(nextAppState)
     if (nextAppState === "active") {
       handleAppToForeground();
     } else if (nextAppState === "background") {

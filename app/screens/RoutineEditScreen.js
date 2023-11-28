@@ -13,6 +13,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Platform,
   Keyboard,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/core";
@@ -588,7 +589,7 @@ function RoutineEditScreen({ route }) {
                   dispatch({ type: routineEditActions.REVERT_PREVIOUS });
                   modalRef.current?.close();
                 }}
-                color={theme.primary}
+                color={Platform.OS === 'ios' ? theme.primary : theme.tertiaryBackground}
               />
             </View>
             <View style={styles.buttonContainer}>
@@ -672,6 +673,7 @@ const reducer = (state, action) => {
       return { ...state, [state.activeKey]: state.previous };
 
     case routineEditActions.SET_WARMUP:
+      console.log("Setting warmup");
       return {
         ...state,
         warmup: { ...state.warmup, workTime: action.payload },
@@ -680,6 +682,7 @@ const reducer = (state, action) => {
       };
 
     case routineEditActions.SET_COOLDOWN:
+      console.log("Setting cooldown");
       return {
         ...state,
         cooldown: { ...state.cooldown, workTime: action.payload },
