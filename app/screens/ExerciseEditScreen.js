@@ -294,16 +294,6 @@ function ExerciseEditScreen({ route }) {
           <View style={styles.footer}>
             <View style={styles.buttonContainer}>
               <Button
-                title="Cancel"
-                onPress={() => {
-                  dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
-                  modalRef.current?.close();
-                }}
-                color={Platform.OS === 'ios' ? theme.primary : theme.tertiaryBackground}
-              />
-            </View>
-            <View style={styles.buttonContainer}>
-              <Button
                 title="Apply"
                 onPress={() => {
                   modalRef.current?.close();
@@ -395,7 +385,7 @@ const getStyles = (theme) =>
       bottom: 0,
       flexDirection: "row",
       height: 65,
-      justifyContent: "space-between",
+      justifyContent: "flex-end",
       position: "absolute",
       width: "100%",
     },
