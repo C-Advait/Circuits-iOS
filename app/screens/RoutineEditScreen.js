@@ -420,6 +420,7 @@ function RoutineEditScreen({ route }) {
                 maxLength={28}
                 overwriteStyle={styles.title}
                 size="large"
+                placeholder="My Routine"
               />
             </TouchableOpacity>
           </View>

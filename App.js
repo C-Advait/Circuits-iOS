@@ -5,6 +5,7 @@ import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import * as SplashScreen from "expo-splash-screen";
+import * as NavigationBar from 'expo-navigation-bar';
 
 import { AppContextProvider } from "./app/contexts/AppContext";
 import AppNavigator from "./app/navigation/AppNavigator";
@@ -27,9 +28,13 @@ function App() {
         });
 
         Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-        Platform.OS === "ios"
-          ? Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY })
-          : Purchases.configure({ apiKey: process.env.PUBLIC_ANDROID_SDK_KEY });
+        if (Platform.OS === "ios") {
+          Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY })
+        } else {
+          Purchases.configure({ apiKey: process.env.PUBLIC_ANDROID_SDK_KEY });
+          await NavigationBar.setVisibilityAsync("hidden");
+          await NavigationBar.setBehaviorAsync('overlay-swipe')
+        }
       } catch (error) {
         console.error("Something went wrong during init.", error);
       } finally {
