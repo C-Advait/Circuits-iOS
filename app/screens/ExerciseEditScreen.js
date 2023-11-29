@@ -195,6 +195,7 @@ function ExerciseEditScreen({ route }) {
                   });
                 }}
                 rightFlush={true}
+                placeholder="Exercise Name"
                 maxLength={24}
               />
             </AuxiliaryCard>
