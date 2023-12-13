@@ -30,8 +30,6 @@ function RoutineCard({
   const createDescription = async () => {
     const exercises = await getExercisesForRoutine(routine.id);
 
-    // console.log(JSON.stringify(exercises, null, 2));
-
     const formattedExerciseString =
       exercises
         .map((exercise) => {
@@ -141,21 +139,25 @@ function RoutineCard({
                 IconFamily={Ionicons}
                 foregroundColor={theme.primary}
               />
-              <RoutineActionButton
-                title="Edit"
-                onPress={() => handleEditRoutineOnpress()}
-                iconName="edit-2"
-                iconSize={40}
-                IconFamily={Feather}
-                foregroundColor={theme.primary}
-              />
-              <IconButton
-                iconName="trash-can-outline"
-                IconFamily={MaterialCommunityIcons}
-                foregroundColor={theme.danger}
-                onPress={() => confirmDeletion(routine, deleteCallback)}
-                style={{ marginLeft: 0, alignItems: "flex-start" }}
-              />
+              {routine.userCreated ?
+                <RoutineActionButton
+                  title="Edit"
+                  onPress={() => handleEditRoutineOnpress()}
+                  iconName="edit-2"
+                  iconSize={40}
+                  IconFamily={Feather}
+                  foregroundColor={theme.primary}
+                /> : null
+              }
+              <View style={styles.trashCanContainer}>
+                <IconButton
+                  iconName="trash-can-outline"
+                  IconFamily={MaterialCommunityIcons}
+                  foregroundColor={theme.danger}
+                  onPress={() => confirmDeletion(routine, deleteCallback)}
+                  style={styles.trashCan}
+                />
+              </View>
             </View>
           </>
         </Collapsible>
@@ -238,6 +240,15 @@ const getStyles = (theme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       marginVertical: 12,
+    },
+    trashCan: {
+      marginLeft: 0,
+      alignItems: "flex-start"
+    },
+    trashCanContainer: {
+      position: 'absolute',
+      right: 10,
+      width: 30
     },
   });
 
