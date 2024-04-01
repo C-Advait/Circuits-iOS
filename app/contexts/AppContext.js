@@ -23,7 +23,7 @@ export const AppContextProvider = ({ children }) => {
   // default theme
   const [theme, setTheme] = useState(darkTheme);
   const [soundOn, setSoundOn] = useState(true);
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(true);
   const [premiumPlan, setPremiumPlan] = useState();
 
   const toggleTheme = () => {
@@ -87,7 +87,7 @@ export const AppContextProvider = ({ children }) => {
     console.log("Updating user experience");
     // Update context
     const [premiumStatus, isInGracePeriod] = await getUserSubscriptionStatus();
-    setIsPremium(premiumStatus);
+    setIsPremium(true);
 
     console.log("Premium: ", premiumStatus);
 
