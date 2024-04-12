@@ -207,11 +207,7 @@ const SubscriptionScreen = ({ route }) => {
           <View style={styles.featureHighlights}>
             <ImageText
               image={require("../assets/zap.png")}
-              text="Create unlimited routines"
-            />
-            <ImageText
-              image={require("../assets/zap.png")}
-              text="Access new features early"
+              text="Support the developers!"
             />
           </View>
         </View>
