@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
@@ -17,8 +17,10 @@ import { processExerciseList } from "../utilities/processExerciseList";
 import { confirmedNavigate } from "../alerts/endRoutine";
 import timerActions from "../actions/timerActions";
 import { Tag } from "../classes/Exercise";
-import { SkipTypes } from "../classes/SkipTypes";
 import CountdownModal from "../components/timer/CountdownModal";
+import { advanceTimerTo } from "../utilities/timerClock";
+
+const CLOCK_INTERVAL_MS = 100;
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
@@ -39,6 +41,15 @@ function TimerScreen({ route }) {
     }
   }, [state.routineComplete]);
 
+  useEffect(() => {
+    if (!state.isPlaying || state.routineComplete) return;
+
+    const tick = () => dispatch({ type: timerActions.TICK, now: Date.now() });
+    const intervalID = setInterval(tick, CLOCK_INTERVAL_MS);
+
+    return () => clearInterval(intervalID);
+  }, [state.isPlaying, state.routineComplete]);
+
   // Check header for length, and potentially truncate!
   return (
     <Screen>
@@ -46,7 +57,7 @@ function TimerScreen({ route }) {
         visible={state.showCountdown}
         onClose={() => {
           dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
-          dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
+          dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
         }}
       />
       <View style={styles.topContainer}>
@@ -109,21 +120,6 @@ function TimerScreen({ route }) {
   );
 }
 
-function computeSkippedState(elapsedTime, intervals, oldIdx) {
-  const newIdx = intervals.findIndex(
-    (obj) => obj.startTime + obj.duration > elapsedTime,
-  );
-  return [
-    newIdx,
-    intervals[newIdx]?.currentLoop,
-    Math.round(
-      intervals[newIdx]?.duration -
-        (elapsedTime - intervals[newIdx]?.startTime),
-    ),
-    newIdx > oldIdx,
-  ];
-}
-
 function reducer(state, action) {
   switch (action.type) {
     case timerActions.INIT_FROM_PARAMS:
@@ -132,11 +128,16 @@ function reducer(state, action) {
         ...action.params,
       };
     case timerActions.SET_EXERCISE_DATA:
+      const finalInterval = action.intervals[action.intervals.length - 1];
       return {
         ...state,
         numberOfExercises: action.numberOfExercises,
         intervals: action.intervals,
         exerciseSecondsRemaining: action.initialDuration,
+        totalDuration: finalInterval
+          ? finalInterval.startTime + finalInterval.duration
+          : 0,
+        clockRevision: state.clockRevision + 1,
       };
     case timerActions.SKIP_FORWARD:
       // If we've reached the end of 'intervals', then either
@@ -150,16 +151,24 @@ function reducer(state, action) {
         return {
           ...state,
           routineComplete: true,
+          isPlaying: false,
+          exerciseSecondsRemaining: 0,
+          totalElapsedTime: state.totalDuration,
+          lastTickAt: null,
+          clockRevision: state.clockRevision + 1,
         };
       } else {
         return {
           ...state,
-          shouldResetTimer: true,
           currentIndex: state.currentIndex + 1,
           currentLoop: state.intervals[state.currentIndex + 1]?.currentLoop,
           exerciseSecondsRemaining:
             state.intervals[state.currentIndex + 1]?.duration,
           totalElapsedTime: state.intervals[state.currentIndex + 1]?.startTime,
+          lastTickAt: state.isPlaying
+            ? Math.max(action.now, state.lastTickAt || 0)
+            : null,
+          clockRevision: state.clockRevision + 1,
         };
       }
     case timerActions.SKIP_BACKWARD:
@@ -167,77 +176,52 @@ function reducer(state, action) {
 
       return {
         ...state,
-        shouldResetTimer: true,
         currentIndex: state.currentIndex - 1,
         currentLoop: state.intervals[state.currentIndex - 1]?.currentLoop,
         exerciseSecondsRemaining:
           state.intervals[state.currentIndex - 1]?.duration,
         totalElapsedTime: state.intervals[state.currentIndex - 1]?.startTime,
+        lastTickAt: state.isPlaying
+          ? Math.max(action.now, state.lastTickAt || 0)
+          : null,
+        clockRevision: state.clockRevision + 1,
       };
-    case timerActions.SKIP_AMOUNT:
-      console.log(
-        `App was outside the foreground for ${action.payload} milliseconds`,
-      );
-
-      // Check if amount to skip is greater than remaining amount of time.
-      // If so, end the routine.
-      const totalTimeLeft = state.totalDuration - state.totalElapsedTime;
-      console.log(
-        `totalDuration: ${state.totalDuration}, totalTimeLeft: ${totalTimeLeft}`,
-      );
-
-      if (action.payload > totalTimeLeft) {
-        return { ...state, routineComplete: true };
-      }
-
-      // If we've reached here, then there is still time
-      // remaining in the routine. Set totalElapsedTime,
-      // exerciseSecondsRemaining, figure out where along
-      // the exercises we need to be, and ensure that the
-      // ring timer is set appropriately.
-      const [newIdx, loop, remainingTime, skippedBorder] = computeSkippedState(
-        state.totalElapsedTime + action.payload,
-        state.intervals,
-        state.currentIndex,
-      );
-
+    case timerActions.TICK:
+      return advanceTimerTo(state, action.now);
+    case timerActions.RESYNC_CLOCK:
+      const resyncedState = advanceTimerTo(state, action.now);
       return {
-        ...state,
-        totalElapsedTime: state.totalElapsedTime + action.payload,
-        exerciseSecondsRemaining: remainingTime,
-        currentIndex: newIdx,
-        currentLoop: loop,
-        skipData: skippedBorder
-          ? SkipTypes.SKIPPED_BORDER
-          : SkipTypes.SKIPPED_WITHIN,
-      };
-    case timerActions.ELAPSE:
-      return {
-        ...state,
-        exerciseSecondsRemaining: state.exerciseSecondsRemaining - 1,
-        totalElapsedTime: state.totalElapsedTime + 1,
+        ...resyncedState,
+        clockRevision: resyncedState.clockRevision + 1,
       };
     case timerActions.TOGGLE_IS_PLAYING:
+      if (state.isPlaying) {
+        const pausedState = advanceTimerTo(state, action.now);
+        return {
+          ...pausedState,
+          isPlaying: false,
+          lastTickAt: null,
+          clockRevision: pausedState.clockRevision + 1,
+        };
+      }
+
+      if (state.routineComplete || !state.intervals.length) return state;
+
       return {
         ...state,
-        isPlaying: !state.isPlaying,
+        isPlaying: true,
+        lastTickAt: action.now,
+        clockRevision: state.clockRevision + 1,
       };
     case timerActions.RESET_TIMER:
       return {
         ...state,
-        shouldResetTimer: true,
         exerciseSecondsRemaining: state.intervals[state.currentIndex]?.duration,
         totalElapsedTime: state.intervals[state.currentIndex]?.startTime,
-      };
-    case timerActions.MARK_TIMER_LOAD_COMPLETE:
-      return {
-        ...state,
-        shouldResetTimer: false,
-      };
-    case timerActions.MARK_SKIP_COMPLETE:
-      return {
-        ...state,
-        skipped: false,
+        lastTickAt: state.isPlaying
+          ? Math.max(action.now, state.lastTickAt || 0)
+          : null,
+        clockRevision: state.clockRevision + 1,
       };
     case timerActions.MARK_COUNTDOWN_COMPLETE:
       return {
@@ -292,10 +276,10 @@ const initialState = {
   currentLoop: 0,
   numberOfLoops: 1,
 
-  skipped: SkipTypes.UNSKIPPED,
-
-  shouldResetTimer: false,
   routineComplete: false,
+
+  lastTickAt: null,
+  clockRevision: 0,
 
   showCountdown: true,
   showSuccess: false,
