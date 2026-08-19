@@ -35,8 +35,7 @@ function hashString(str) {
 
 function RoutinesScreen() {
   const navigation = useNavigation();
-  const { theme, isPremium, updateUserExperience, syncSubscriptionIfOnline } =
-    useAppContext();
+  const { theme, isPremium } = useAppContext();
   const styles = getStyles(theme);
 
   const [routines, setRoutines] = useState([]);
@@ -44,16 +43,6 @@ function RoutinesScreen() {
   const [defaultRoutines, setDefaultRoutines] = useState([]);
   const { setContextRoutine, setContextExercises } = useRoutineContext(); // Manage context variables
   const [dataHash, setDataHash] = useState(null);
-
-  useFocusEffect(
-    useCallback(() => {
-      const syncSubscriptions = async () => {
-        syncSubscriptionIfOnline();
-      };
-
-      syncSubscriptions();
-    }, []),
-  );
 
   const loadRoutines = async () => {
     const newRoutines = await getAllRoutines();

@@ -3,7 +3,6 @@ import { Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from 'expo-navigation-bar';
 
@@ -27,11 +26,7 @@ function App() {
           interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
         });
 
-        Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-        if (Platform.OS === "ios") {
-          Purchases.configure({ apiKey: process.env.PUBLIC_IOS_SDK_KEY })
-        } else {
-          Purchases.configure({ apiKey: process.env.PUBLIC_ANDROID_SDK_KEY });
+        if (Platform.OS === "android") {
           await NavigationBar.setVisibilityAsync("hidden");
           await NavigationBar.setBehaviorAsync('overlay-swipe')
         }
