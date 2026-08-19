@@ -352,7 +352,7 @@ function RoutineEditScreen({ route }) {
 
     // Note: Context is not being cleaned up.
 
-    navigation.navigate(routes.ROUTINES_SCREEN);
+    navigation.popTo(routes.ROUTINES_SCREEN);
   };
 
   const InputModalButton = ({ accentColor, title, text, contentKey, Icon }) => (
@@ -391,7 +391,7 @@ function RoutineEditScreen({ route }) {
           <NavHeader
             LeftComponent={
               <AppTextButton
-                onPress={() => navigation.navigate(routes.ROUTINES_SCREEN)}
+                onPress={() => navigation.popTo(routes.ROUTINES_SCREEN)}
                 textStyle={{ fontWeight: "400", color: theme.foreground }}
               >
                 Cancel
