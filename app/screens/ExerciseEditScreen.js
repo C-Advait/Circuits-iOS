@@ -52,6 +52,7 @@ function ExerciseEditScreen({ route }) {
   const modalRef = useRef(null);
   const nameFieldRef = useRef(null);
   const [contentType, setContentType] = useState(EXERCISE_EDIT_MODAL.ROUNDS);
+  const [sheetIndex, setSheetIndex] = useState(-1);
   const { contextExercises, setContextExercises } = useRoutineContext();
   const [keyboardActive, setKeyboardActive] = useState(false);
 
@@ -78,8 +79,9 @@ function ExerciseEditScreen({ route }) {
     };
   }, []);
 
-  const onModalChange = (isOpen) => {
-    if (isOpen === 1) {
+  const onModalChange = (sheetIndex) => {
+    setSheetIndex(sheetIndex);
+    if (sheetIndex >= 0) {
       // Opening modal; save value to which to possibly revert.
       dispatch({
         type: exerciseEditActions.SET_PREVIOUS,
@@ -97,16 +99,16 @@ function ExerciseEditScreen({ route }) {
         onPress={
           enabled
             ? () => {
-              dispatch({
-                type: exerciseEditActions.SET_ACTIVE_KEY,
-                payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
-              });
-              dispatch({ type: exerciseEditActions.SET_PREVIOUS });
-              dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
-              setContentType(EXERCISE_EDIT_MODAL[contentKey]);
-              Keyboard.dismiss();
-              modalRef.current?.expand();
-            }
+                dispatch({
+                  type: exerciseEditActions.SET_ACTIVE_KEY,
+                  payload: EXERCISE_EDIT_MODAL[contentKey]?.key,
+                });
+                dispatch({ type: exerciseEditActions.SET_PREVIOUS });
+                dispatch({ type: exerciseEditActions.TOGGLE_REFRESH_PICKER });
+                setContentType(EXERCISE_EDIT_MODAL[contentKey]);
+                Keyboard.dismiss();
+                setSheetIndex(0);
+              }
             : () => null
         }
       >
@@ -224,8 +226,9 @@ function ExerciseEditScreen({ route }) {
         </ScrollView>
         <BottomSheet
           ref={modalRef}
-          index={-1}
-          snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
+          index={sheetIndex}
+          snapPoints={[MODAL_HEIGHT]}
+          enableDynamicSizing={false}
           enablePanDownToClose={true}
           enableContentPanningGesture={false}
           backdropComponent={BottomSheetBackdrop}
@@ -242,75 +245,81 @@ function ExerciseEditScreen({ route }) {
           }}
           onChange={onModalChange}
         >
-          {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
-            <NumberWheelPicker
-              key={state.shouldRefreshPicker}
-              number={state.numberOfRounds}
-              onValueChange={(data) =>
-                dispatch({
-                  type: exerciseEditActions.SET_ROUNDS,
-                  payload: data,
-                })
-              }
-            />
-          )}
-          {contentType.key === EXERCISE_EDIT_MODAL.WORK_TIME.key && (
-            <TimeWheelPicker
-              key={state.shouldRefreshPicker}
-              startingTime={state.workTime}
-              onValueChange={(data) =>
-                dispatch({
-                  type: exerciseEditActions.SET_WORK_TIME,
-                  payload: data,
-                })
-              }
-            />
-          )}
-          {contentType.key === EXERCISE_EDIT_MODAL.REST_TIME.key && (
-            <TimeWheelPicker
-              key={state.shouldRefreshPicker}
-              startingTime={state.restBetweenRounds}
-              onValueChange={(data) =>
-                dispatch({
-                  type: exerciseEditActions.SET_REST,
-                  payload: data,
-                })
-              }
-              increment5Seconds={true}
-            />
-          )}
-          {contentType.key === EXERCISE_EDIT_MODAL.BREAK_TIME.key && (
-            <TimeWheelPicker
-              key={state.shouldRefreshPicker}
-              startingTime={state.breakBeforeNext}
-              onValueChange={(data) =>
-                dispatch({
-                  type: exerciseEditActions.SET_BREAK,
-                  payload: data,
-                })
-              }
-              increment5Seconds={true}
-            />
-          )}
-          <View style={styles.footer}>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Cancel"
-                onPress={() => {
-                  dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
-                  modalRef.current?.close();
-                }}
-                color={Platform.OS === 'ios' ? theme.primary : theme.tertiaryBackground}
+          <View style={styles.sheetContent}>
+            {contentType.key === EXERCISE_EDIT_MODAL.ROUNDS.key && (
+              <NumberWheelPicker
+                key={state.shouldRefreshPicker}
+                number={state.numberOfRounds}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: exerciseEditActions.SET_ROUNDS,
+                    payload: data,
+                  })
+                }
               />
-            </View>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Apply"
-                onPress={() => {
-                  modalRef.current?.close();
-                }}
-                color={theme.blue}
+            )}
+            {contentType.key === EXERCISE_EDIT_MODAL.WORK_TIME.key && (
+              <TimeWheelPicker
+                key={state.shouldRefreshPicker}
+                startingTime={state.workTime}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: exerciseEditActions.SET_WORK_TIME,
+                    payload: data,
+                  })
+                }
               />
+            )}
+            {contentType.key === EXERCISE_EDIT_MODAL.REST_TIME.key && (
+              <TimeWheelPicker
+                key={state.shouldRefreshPicker}
+                startingTime={state.restBetweenRounds}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: exerciseEditActions.SET_REST,
+                    payload: data,
+                  })
+                }
+                increment5Seconds={true}
+              />
+            )}
+            {contentType.key === EXERCISE_EDIT_MODAL.BREAK_TIME.key && (
+              <TimeWheelPicker
+                key={state.shouldRefreshPicker}
+                startingTime={state.breakBeforeNext}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: exerciseEditActions.SET_BREAK,
+                    payload: data,
+                  })
+                }
+                increment5Seconds={true}
+              />
+            )}
+            <View style={styles.footer}>
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Cancel"
+                  onPress={() => {
+                    dispatch({ type: exerciseEditActions.REVERT_PREVIOUS });
+                    modalRef.current?.close();
+                  }}
+                  color={
+                    Platform.OS === "ios"
+                      ? theme.primary
+                      : theme.tertiaryBackground
+                  }
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Apply"
+                  onPress={() => {
+                    modalRef.current?.close();
+                  }}
+                  color={theme.blue}
+                />
+              </View>
             </View>
           </View>
         </BottomSheet>
@@ -399,11 +408,15 @@ const getStyles = (theme) =>
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",
+      zIndex: 10,
     },
     inputText: {
       fontSize: PICKER_BUTTON_FONT_SIZE,
       fontWeight: PICKER_BUTTON_FONT_WEIGHT,
       color: theme.text87,
+    },
+    sheetContent: {
+      flex: 1,
     },
     tile: {
       backgroundColor: "#333",
