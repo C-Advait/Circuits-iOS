@@ -1,11 +1,6 @@
 import React from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  View,
-  SafeAreaView,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 
 import { TAB_BAR_HEIGHT } from "../config/appConstants";
@@ -18,7 +13,7 @@ const AppTabBar = ({ state, descriptors, navigation }) => {
   const { theme } = useAppContext();
 
   return shouldShowTabBar(getCurrentRoute(state)) ? (
-    <SafeAreaView style={styles.tabBar}>
+    <SafeAreaView edges={["bottom"]} style={styles.tabBar}>
       <BlurView
         style={styles.tabBar}
         blurType="extraDark"

@@ -4,14 +4,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { Host } from "react-native-portalize";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as SplashScreen from "expo-splash-screen";
-import * as NavigationBar from 'expo-navigation-bar';
+import * as NavigationBar from "expo-navigation-bar";
 
 import { AppContextProvider } from "./app/contexts/AppContext";
 import AppNavigator from "./app/navigation/AppNavigator";
 import { initializeDB } from "./app/db/DBSetup";
-import { Audio, InterruptionModeIOS } from "expo-av";
+import { setAudioModeAsync } from "expo-audio";
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch((error) => {
+  console.error("Couldn't keep the splash screen visible during init.", error);
+});
 
 function App() {
   const [ready, setReady] = useState(false);
@@ -20,15 +22,15 @@ function App() {
     const init = async () => {
       try {
         await initializeDB();
-        await Audio.setAudioModeAsync({
-          staysActiveInBackground: true,
-          playsInSilentModeIOS: true,
-          interruptionModeIOS: InterruptionModeIOS.MixWithOthers,
+        await setAudioModeAsync({
+          shouldPlayInBackground: true,
+          playsInSilentMode: true,
+          interruptionMode: "mixWithOthers",
         });
 
         if (Platform.OS === "android") {
           await NavigationBar.setVisibilityAsync("hidden");
-          await NavigationBar.setBehaviorAsync('overlay-swipe')
+          await NavigationBar.setBehaviorAsync("overlay-swipe");
         }
       } catch (error) {
         console.error("Something went wrong during init.", error);
@@ -42,7 +44,11 @@ function App() {
 
   const onLayoutRootView = useCallback(async () => {
     if (ready) {
-      await SplashScreen.hideAsync();
+      try {
+        await SplashScreen.hideAsync();
+      } catch (error) {
+        console.error("Couldn't hide the splash screen after init.", error);
+      }
     }
   }, [ready]);
 

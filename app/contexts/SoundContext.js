@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import { Audio } from "expo-av";
+import { createAudioPlayer } from "expo-audio";
 import { SOUNDS } from "../config/sounds";
 import { useAppContext } from "./AppContext";
 
@@ -26,32 +26,45 @@ export const SoundProvider = ({ children }) => {
   const soundFiles = SOUNDS;
 
   useEffect(() => {
-    async function loadSounds() {
-      const loadedSounds = {};
+    const loadedSounds = {};
+    const subscriptions = [];
 
-      const loadPromises = Object.keys(soundFiles).map(async (key) => {
-        const soundInstance = new Audio.Sound();
-        try {
-          await soundInstance.loadAsync(soundFiles[key].file);
-          loadedSounds[key] = soundInstance;
-        } catch (error) {
-          console.error(`Couldn't load the sound for key ${key}`, error);
-        }
-      });
+    Object.keys(soundFiles).forEach((key) => {
+      try {
+        const player = createAudioPlayer(soundFiles[key].file, {
+          downloadFirst: true,
+        });
+        const subscription = player.addListener(
+          "playbackStatusUpdate",
+          (status) => {
+            if (!status.didJustFinish) return;
 
-      await Promise.all(loadPromises);
-      soundsRef.current = loadedSounds;
-      setSounds(loadedSounds);
-    }
+            activeSoundRef.current = null;
+            player.seekTo(0).catch((error) => {
+              console.error(`Couldn't rewind the sound for key ${key}`, error);
+            });
+          },
+        );
 
-    loadSounds();
+        loadedSounds[key] = player;
+        subscriptions.push(subscription);
+      } catch (error) {
+        console.error(`Couldn't create the audio player for key ${key}`, error);
+      }
+    });
+
+    soundsRef.current = loadedSounds;
+    setSounds(loadedSounds);
 
     return () => {
-      for (let key in soundsRef.current) {
-        if (soundsRef.current[key]) {
-          soundsRef.current[key].unloadAsync();
+      subscriptions.forEach((subscription) => subscription.remove());
+      Object.values(soundsRef.current).forEach((player) => {
+        try {
+          player.remove();
+        } catch (error) {
+          console.error("Couldn't release an audio player", error);
         }
-      }
+      });
       soundsRef.current = {};
     };
   }, []);
@@ -61,7 +74,12 @@ export const SoundProvider = ({ children }) => {
     if (!pendingKey || !sounds[pendingKey]) return;
 
     pendingSoundRef.current = null;
-    playSound(pendingKey);
+    playSound(pendingKey).catch((error) => {
+      console.error(
+        `Couldn't play the pending sound for key ${pendingKey}`,
+        error,
+      );
+    });
   }, [sounds]);
 
   const playSound = async (key) => {
@@ -77,18 +95,8 @@ export const SoundProvider = ({ children }) => {
       console.log(`About to play sound for key ${key}`);
       try {
         activeSoundRef.current = key;
-        sound.setOnPlaybackStatusUpdate(async (status) => {
-          if (status.didJustFinish) {
-            console.log(`Just played sound for key ${key}`);
-            activeSoundRef.current = null;
-            try {
-              await sound.stopAsync();
-            } catch (error) {
-              console.error(`Couldn't rewind the sound for key ${key}`, error);
-            }
-          }
-        });
-        await sound.replayAsync();
+        await sound.seekTo(0);
+        sound.play();
       } catch (error) {
         activeSoundRef.current = null;
         console.error(`Couldn't play the sound for key ${key}`, error);
@@ -103,7 +111,8 @@ export const SoundProvider = ({ children }) => {
 
     activeSoundRef.current = null;
     try {
-      await sound.stopAsync();
+      sound.pause();
+      await sound.seekTo(0);
     } catch (error) {
       console.error(`Couldn't stop the sound for key ${activeKey}`, error);
     }

@@ -15,11 +15,7 @@ function PlayPause({ isPlaying, dispatch }) {
       }}
       style={styles.background}
     >
-      <Ionicons
-        name={isPlaying ? "ios-pause" : "ios-play"}
-        size={30}
-        color="black"
-      />
+      <Ionicons name={isPlaying ? "pause" : "play"} size={30} color="black" />
     </TouchableOpacity>
   );
 }
