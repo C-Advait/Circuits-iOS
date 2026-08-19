@@ -5,7 +5,8 @@
     "postinstall": "patch-package",
     "start": "expo start --dev-client",
     "android": "expo run:android",
-    "ios": "expo run:ios",
+    "ios": "expo run:ios --no-build-cache",
+    "ios:device": "expo run:ios --device --no-build-cache",
     "web": "expo start --web",
     "bugsnag:create-build": "bugsnag-cli create-build",
     "bugsnag:upload-android": "bugsnag-cli upload react-native-android"
