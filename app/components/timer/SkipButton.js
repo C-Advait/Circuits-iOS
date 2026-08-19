@@ -10,9 +10,7 @@ function SkipButton({ shouldSkipForward, dispatch, active = true }) {
 
   return (
     <IconButton
-      iconName={
-        shouldSkipForward ? "md-play-skip-forward" : "md-play-skip-back"
-      }
+      iconName={shouldSkipForward ? "play-skip-forward" : "play-skip-back"}
       iconSize={70}
       foregroundColor={active ? theme.primary : theme.tertiary}
       IconFamily={Ionicons}
