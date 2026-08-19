@@ -6,10 +6,9 @@ import { useAppContext } from "../../contexts/AppContext";
 import Header from "../Header";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../../navigation/routes";
-import timerActions from "../../actions/timerActions";
 import { logRoutineCompletion } from "../../db/DBActions";
 
-function SuccessModal({ routineTitle, routineID, visible, dispatch }) {
+function SuccessModal({ routineTitle, routineID, visible }) {
   const navigation = useNavigation();
   const [animationCompleted, setAnimationCompleted] = useState(false);
   const animationRef = useRef(null);
@@ -45,10 +44,7 @@ function SuccessModal({ routineTitle, routineID, visible, dispatch }) {
         <TouchableOpacity
           activeOpacity={0.8}
           style={styles.touchable}
-          onPress={() => {
-            navigation.navigate(routes.ROUTINES_SCREEN);
-            dispatch({ type: timerActions.CLOSE_SUCCESS_MODAL });
-          }}
+          onPress={() => navigation.popTo(routes.ROUTINES_SCREEN)}
         >
           <Text style={styles.done}>Done</Text>
         </TouchableOpacity>
