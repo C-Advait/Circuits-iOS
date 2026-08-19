@@ -110,6 +110,7 @@ function RoutineEditScreen({ route }) {
   const routineTitleRef = useRef(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const [modalContent, setModalContent] = useState(ROUTINE_EDIT_MODAL.NONE);
+  const [sheetIndex, setSheetIndex] = useState(-1);
   const [keyboardActive, setKeyboardActive] = useState(false);
   const [exerciseIDsToDelete, setExerciseIDsToDelete] = useState([]);
   // end region
@@ -170,8 +171,9 @@ function RoutineEditScreen({ route }) {
     };
   }, []);
 
-  const onModalChange = (isOpen) => {
-    if (isOpen === 1) {
+  const onModalChange = (sheetIndex) => {
+    setSheetIndex(sheetIndex);
+    if (sheetIndex >= 0) {
       // Opening modal; save value to which to possibly revert.
       dispatch({
         type: routineEditActions.SET_PREVIOUS,
@@ -365,7 +367,7 @@ function RoutineEditScreen({ route }) {
         });
         dispatch({ type: routineEditActions.TOGGLE_REFRESH });
         setModalContent(ROUTINE_EDIT_MODAL[contentKey]);
-        modalRef.current?.expand();
+        setSheetIndex(0);
       }}
     >
       <Text style={styles.inputText}>{text}</Text>
@@ -530,8 +532,9 @@ function RoutineEditScreen({ route }) {
         </NestableScrollContainer>
         <BottomSheet
           ref={modalRef}
-          index={-1}
-          snapPoints={[MODAL_HEIGHT, MODAL_HEIGHT]}
+          index={sheetIndex}
+          snapPoints={[MODAL_HEIGHT]}
+          enableDynamicSizing={false}
           enablePanDownToClose={true}
           enableContentPanningGesture={false}
           backdropComponent={BottomSheetBackdrop}
@@ -545,63 +548,69 @@ function RoutineEditScreen({ route }) {
           )}
           onChange={onModalChange}
         >
-          {modalContent.key === ROUTINE_EDIT_MODAL.WARMUP.key && (
-            <TimeWheelPicker
-              key={state.refresh}
-              startingTime={state.warmup.workTime}
-              onValueChange={(data) =>
-                dispatch({
-                  type: routineEditActions.SET_WARMUP,
-                  payload: data,
-                })
-              }
-              increment5Seconds={true}
-            />
-          )}
-          {modalContent.key === ROUTINE_EDIT_MODAL.COOLDOWN.key && (
-            <TimeWheelPicker
-              key={state.refresh}
-              startingTime={state.cooldown.workTime}
-              onValueChange={(data) =>
-                dispatch({
-                  type: routineEditActions.SET_COOLDOWN,
-                  payload: data,
-                })
-              }
-              increment5Seconds={true}
-            />
-          )}
-          {modalContent.key === ROUTINE_EDIT_MODAL.LOOPS.key && (
-            <NumberWheelPicker
-              key={state.refresh}
-              number={state.numberOfLoops}
-              onValueChange={(data) =>
-                dispatch({
-                  type: routineEditActions.SET_LOOPS,
-                  payload: data,
-                })
-              }
-            />
-          )}
-          <View style={styles.footer}>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Cancel"
-                onPress={() => {
-                  dispatch({ type: routineEditActions.REVERT_PREVIOUS });
-                  modalRef.current?.close();
-                }}
-                color={Platform.OS === 'ios' ? theme.primary : theme.tertiaryBackground}
+          <View style={styles.sheetContent}>
+            {modalContent.key === ROUTINE_EDIT_MODAL.WARMUP.key && (
+              <TimeWheelPicker
+                key={state.refresh}
+                startingTime={state.warmup.workTime}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: routineEditActions.SET_WARMUP,
+                    payload: data,
+                  })
+                }
+                increment5Seconds={true}
               />
-            </View>
-            <View style={styles.buttonContainer}>
-              <Button
-                title="Apply"
-                onPress={() => {
-                  modalRef.current?.close();
-                }}
-                color={theme.blue}
+            )}
+            {modalContent.key === ROUTINE_EDIT_MODAL.COOLDOWN.key && (
+              <TimeWheelPicker
+                key={state.refresh}
+                startingTime={state.cooldown.workTime}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: routineEditActions.SET_COOLDOWN,
+                    payload: data,
+                  })
+                }
+                increment5Seconds={true}
               />
+            )}
+            {modalContent.key === ROUTINE_EDIT_MODAL.LOOPS.key && (
+              <NumberWheelPicker
+                key={state.refresh}
+                number={state.numberOfLoops}
+                onValueChange={(data) =>
+                  dispatch({
+                    type: routineEditActions.SET_LOOPS,
+                    payload: data,
+                  })
+                }
+              />
+            )}
+            <View style={styles.footer}>
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Cancel"
+                  onPress={() => {
+                    dispatch({ type: routineEditActions.REVERT_PREVIOUS });
+                    modalRef.current?.close();
+                  }}
+                  color={
+                    Platform.OS === "ios"
+                      ? theme.primary
+                      : theme.tertiaryBackground
+                  }
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Apply"
+                  onPress={() => {
+                    modalRef.current?.close();
+                  }}
+                  color={theme.blue}
+                />
+              </View>
             </View>
           </View>
         </BottomSheet>
@@ -619,8 +628,8 @@ function RoutineEditScreen({ route }) {
             {" "}
             {`Total time: ${formatDurationExact(
               state.warmup.workTime +
-              state.cooldown.workTime +
-              state.numberOfLoops * state.workTime,
+                state.cooldown.workTime +
+                state.numberOfLoops * state.workTime,
             )}`}{" "}
           </Text>
           <View style={styles.timeColorBar}>
@@ -855,9 +864,13 @@ const getStyles = (theme) =>
       justifyContent: "space-between",
       position: "absolute",
       width: "100%",
+      zIndex: 10,
     },
     sectionSeparator: {
       marginBottom: 22,
+    },
+    sheetContent: {
+      flex: 1,
     },
   });
 
