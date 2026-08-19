@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import Screen from "../components/Screen";
 import { useNavigation } from "@react-navigation/core";
 
@@ -25,7 +25,10 @@ const CLOCK_INTERVAL_MS = 100;
 function TimerScreen({ route }) {
   const navigation = useNavigation();
   const { theme } = useAppContext();
-  const styles = getStyles(theme);
+  const { width, height } = useWindowDimensions();
+  const compact = width < 600 && height < 750;
+  const timerSize = Math.min(width - 60, compact ? height * 0.43 : width - 60);
+  const styles = getStyles(theme, compact);
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [nextExerciseTitle, nextExerciseTag] = getNextExercise(state);
@@ -79,6 +82,8 @@ function TimerScreen({ route }) {
         state={state}
         dispatch={dispatch}
         nextExerciseTag={nextExerciseTag}
+        size={timerSize}
+        compact={compact}
       />
       <View style={styles.nextContainer}>
         <Text style={styles.upNext}>UP NEXT:</Text>
@@ -285,7 +290,7 @@ const initialState = {
   showSuccess: false,
 };
 
-const getStyles = (theme) =>
+const getStyles = (theme, compact) =>
   StyleSheet.create({
     backButton: {
       backgroundColor: "rgba(255, 255, 255, 0.14)",
@@ -305,27 +310,27 @@ const getStyles = (theme) =>
       justifyContent: "center",
       alignItems: "center",
       alignSelf: "center",
-      gap: 46,
-      marginBottom: 48,
+      gap: compact ? 34 : 46,
+      marginBottom: compact ? 12 : 48,
     },
     nextContainer: {
       marginTop: 5,
       justifyContent: "center",
       alignItems: "center",
-      gap: 8,
+      gap: compact ? 4 : 8,
     },
     nextExercise: {
       color: theme.secondary,
       fontWeight: "500",
       fontSize: 25,
-      marginBottom: 48,
+      marginBottom: compact ? 12 : 48,
     },
     progressRow: {
       flexDirection: "row",
       justifyContent: "space-between",
       gap: 10,
       marginHorizontal: 15,
-      marginBottom: 16,
+      marginBottom: compact ? 8 : 16,
     },
     routineTitle: {
       color: theme.foreground,
@@ -338,8 +343,8 @@ const getStyles = (theme) =>
     topContainer: {
       alignItems: "center",
       justifyContent: "center",
-      marginTop: 25,
-      marginBottom: 10,
+      marginTop: compact ? 8 : 25,
+      marginBottom: compact ? 4 : 10,
     },
     upNext: {
       color: theme.primary,
