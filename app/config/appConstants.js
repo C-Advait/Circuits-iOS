@@ -1,14 +1,10 @@
 import { Tag, Exercise } from "../classes/Exercise";
 import { Routine } from "../classes/Routine";
 
-export const SUBSCRIPTION_GRACE_PERIOD_DAYS = 16;
-
 export const TAB_BAR_HEIGHT = 82;
 
 export const PRIVACY_STATEMENT_URL =
   "https://circuittimer.wordpress.com/privacy-policy";
-export const EULA_URL =
-  "https://circuittimer.wordpress.com/terms-and-licensing";
 
 // Font
 export const EDITABLE_TEXT_FONT_SIZE = 17;

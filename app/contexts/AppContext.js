@@ -1,9 +1,6 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { lightTheme, darkTheme } from "../config/colors";
-import {
-  retrieveSetting,
-  updateSetting,
-} from "../db/DBActions";
+import { retrieveSetting, updateSetting } from "../db/DBActions";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
 
 export const AppContext = createContext();
@@ -12,7 +9,6 @@ export const AppContextProvider = ({ children }) => {
   // default theme
   const [theme, setTheme] = useState(darkTheme);
   const [soundOn, setSoundOn] = useState(true);
-  const [isPremium, setIsPremium] = useState(true);
 
   const toggleTheme = () => {
     setTheme(theme === lightTheme ? darkTheme : lightTheme);
@@ -44,8 +40,6 @@ export const AppContextProvider = ({ children }) => {
         soundOn,
         setSoundOn,
         updateSound,
-        isPremium,
-        setIsPremium,
       }}
     >
       {children}

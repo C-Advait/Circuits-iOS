@@ -15,13 +15,7 @@ import { deleteRoutine, getExercisesForRoutine } from "../db/DBActions";
 import { useRoutineContext } from "../contexts/RoutineContext";
 import { Tag } from "../classes/Exercise";
 
-function RoutineCard({
-  routine,
-  isExpanded,
-  toggleExpand,
-  deleteCallback,
-  isEnabled = true,
-}) {
+function RoutineCard({ routine, isExpanded, toggleExpand, deleteCallback }) {
   const navigation = useNavigation();
   const { theme } = useAppContext();
   const styles = getStyles(theme);
@@ -34,8 +28,9 @@ function RoutineCard({
       exercises
         .map((exercise) => {
           if (exercise.tag === Tag.WORKING) {
-            return `${exercise.title} (${exercise.numberOfRounds
-              } x ${formatDuration(exercise.workTime)})`;
+            return `${exercise.title} (${
+              exercise.numberOfRounds
+            } x ${formatDuration(exercise.workTime)})`;
           } else {
             // Warmup / cooldown shouldnt't display number of rounds
             if (exercise.workTime)
@@ -70,36 +65,7 @@ function RoutineCard({
     }
   };
 
-  return !isEnabled ? (
-    <View style={styles.container}>
-      <View style={[styles.accent, { backgroundColor: "#38383A" }]} />
-      <View style={styles.permanentInfoContainer}>
-        <View>
-          <View style={{ flexDirection: "row" }}>
-            <Feather name="lock" size={20} color="#646464" />
-            <Text
-              style={[
-                styles.header,
-                { fontWeight: "600", color: theme.textDisabled, marginLeft: 6 },
-              ]}
-            >
-              {routine.title}
-            </Text>
-          </View>
-          <Text style={styles.duration}>
-            {formatDuration(routine.duration)}
-          </Text>
-        </View>
-        <IconButton
-          iconName={"chevron-down"}
-          IconFamily={Feather}
-          iconSize={52}
-          foregroundColor={"#646464"}
-          onPress={() => toggleExpand()}
-        />
-      </View>
-    </View>
-  ) : (
+  return (
     <View style={styles.container}>
       {routine.color ? (
         <View style={[styles.accent, { backgroundColor: routine.color }]} />
@@ -139,7 +105,7 @@ function RoutineCard({
                 IconFamily={Ionicons}
                 foregroundColor={theme.primary}
               />
-              {routine.userCreated ?
+              {routine.userCreated ? (
                 <RoutineActionButton
                   title="Edit"
                   onPress={() => handleEditRoutineOnpress()}
@@ -147,8 +113,8 @@ function RoutineCard({
                   iconSize={40}
                   IconFamily={Feather}
                   foregroundColor={theme.primary}
-                /> : null
-              }
+                />
+              ) : null}
               <View style={styles.trashCanContainer}>
                 <IconButton
                   iconName="trash-can-outline"
@@ -227,9 +193,6 @@ const getStyles = (theme) =>
       fontSize: ROUTINE_PARAGRAPH_FONT_SIZE,
       fontWeight: "600",
     },
-    disabled: {
-      color: "#121212",
-    },
     header: {
       color: theme.primary,
       fontSize: ROUTINE_TITLE_FONT_SIZE,
@@ -243,12 +206,12 @@ const getStyles = (theme) =>
     },
     trashCan: {
       marginLeft: 0,
-      alignItems: "flex-start"
+      alignItems: "flex-start",
     },
     trashCanContainer: {
-      position: 'absolute',
+      position: "absolute",
       right: 10,
-      width: 30
+      width: 30,
     },
   });
 
