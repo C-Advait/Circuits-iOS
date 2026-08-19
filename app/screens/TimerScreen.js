@@ -26,8 +26,11 @@ function TimerScreen({ route }) {
   const navigation = useNavigation();
   const { theme } = useAppContext();
   const { width, height } = useWindowDimensions();
-  const compact = width < 600 && height < 750;
-  const timerSize = Math.min(width - 60, compact ? height * 0.43 : width - 60);
+  const isPhone = width < 600;
+  const compact = (isPhone && height < 750) || (!isPhone && height < 900);
+  const timerSize = isPhone
+    ? Math.min(width - 60, compact ? height * 0.43 : width - 60)
+    : Math.min(width - 80, height * (compact ? 0.45 : 0.52), 520);
   const styles = getStyles(theme, compact);
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -63,57 +66,59 @@ function TimerScreen({ route }) {
           dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
         }}
       />
-      <View style={styles.topContainer}>
-        <Text style={styles.routineTitle}>{state.title}</Text>
-        <View style={styles.backButtonContainer}>
-          <LabelledIconButton
-            title={"End"}
-            foregroundColor="white"
-            onPress={() =>
-              confirmedNavigate(() =>
-                navigation.navigate(routes.ROUTINES_SCREEN),
-              )
-            }
-            style={styles.backButton}
+      <View style={styles.content}>
+        <View style={styles.topContainer}>
+          <Text style={styles.routineTitle}>{state.title}</Text>
+          <View style={styles.backButtonContainer}>
+            <LabelledIconButton
+              title={"End"}
+              foregroundColor="white"
+              onPress={() =>
+                confirmedNavigate(() =>
+                  navigation.navigate(routes.ROUTINES_SCREEN),
+                )
+              }
+              style={styles.backButton}
+            />
+          </View>
+        </View>
+        <Timer
+          state={state}
+          dispatch={dispatch}
+          nextExerciseTag={nextExerciseTag}
+          size={timerSize}
+          compact={compact}
+        />
+        <View style={styles.nextContainer}>
+          <Text style={styles.upNext}>UP NEXT:</Text>
+          <Text style={styles.nextExercise} numberOfLines={1}>
+            {nextExerciseTitle}
+          </Text>
+        </View>
+        <View style={styles.controlRow}>
+          <SkipButton
+            shouldSkipForward={false}
+            dispatch={dispatch}
+            active={state.currentIndex !== 0 && !state.routineComplete}
+          />
+          <PlayPause isPlaying={state.isPlaying} dispatch={dispatch} />
+          <SkipButton
+            shouldSkipForward={true}
+            dispatch={dispatch}
+            active={state.currentIndex !== state.intervals.length - 1}
           />
         </View>
-      </View>
-      <Timer
-        state={state}
-        dispatch={dispatch}
-        nextExerciseTag={nextExerciseTag}
-        size={timerSize}
-        compact={compact}
-      />
-      <View style={styles.nextContainer}>
-        <Text style={styles.upNext}>UP NEXT:</Text>
-        <Text style={styles.nextExercise} numberOfLines={1}>
-          {nextExerciseTitle}
-        </Text>
-      </View>
-      <View style={styles.controlRow}>
-        <SkipButton
-          shouldSkipForward={false}
-          dispatch={dispatch}
-          active={state.currentIndex !== 0 && !state.routineComplete}
-        />
-        <PlayPause isPlaying={state.isPlaying} dispatch={dispatch} />
-        <SkipButton
-          shouldSkipForward={true}
-          dispatch={dispatch}
-          active={state.currentIndex !== state.intervals.length - 1}
-        />
-      </View>
-      <View style={styles.progressRow}>
-        <InfoWidget title="Round" state={state} />
-        <InfoWidget title="Exercise" state={state} />
-        <InfoWidget title="Loop" state={state} />
-      </View>
-      <View style={styles.sliderContainer}>
-        <ProgressSlider
-          elapsed={state.totalElapsedTime}
-          total={state.totalDuration}
-        />
+        <View style={styles.progressRow}>
+          <InfoWidget title="Round" state={state} />
+          <InfoWidget title="Exercise" state={state} />
+          <InfoWidget title="Loop" state={state} />
+        </View>
+        <View style={styles.sliderContainer}>
+          <ProgressSlider
+            elapsed={state.totalElapsedTime}
+            total={state.totalDuration}
+          />
+        </View>
       </View>
       <SuccessModal
         routineID={state.id}
@@ -312,6 +317,12 @@ const getStyles = (theme, compact) =>
       alignSelf: "center",
       gap: compact ? 34 : 46,
       marginBottom: compact ? 12 : 48,
+    },
+    content: {
+      alignSelf: "center",
+      flex: 1,
+      maxWidth: 720,
+      width: "100%",
     },
     nextContainer: {
       marginTop: 5,
