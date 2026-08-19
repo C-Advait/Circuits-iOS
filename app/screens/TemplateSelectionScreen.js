@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Screen from "../components/Screen";
 import { useAppContext } from "../contexts/AppContext";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "../components/SafeIcons";
 import { useTemplateContext } from "../contexts/TemplateContext";
 import { useNavigation } from "@react-navigation/native";
 import NavHeader from "../components/NavHeader";

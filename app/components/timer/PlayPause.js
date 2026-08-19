@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../SafeIcons";
 import timerActions from "../../actions/timerActions";
 
 const BUTTON_SIZE = 50;

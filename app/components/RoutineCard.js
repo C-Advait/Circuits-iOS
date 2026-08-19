@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useAppContext } from "../contexts/AppContext";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialCommunityIcons } from "./SafeIcons";
 import {
   ROUTINE_PARAGRAPH_FONT_SIZE,
   ROUTINE_TITLE_FONT_SIZE,

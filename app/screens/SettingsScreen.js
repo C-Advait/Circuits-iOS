@@ -10,7 +10,7 @@ import {
   Linking,
   Platform,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather } from "../components/SafeIcons";
 import Rate from "react-native-rate";
 
 import Screen from "../components/Screen";

@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
-import { Feather } from "@expo/vector-icons";
+import { Feather } from "../components/SafeIcons";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import NavHeader from "../components/NavHeader";

@@ -12,7 +12,7 @@ import {
   DEFAULT_ROUTINE,
   TAB_BAR_HEIGHT,
 } from "../config/appConstants";
-import { Feather } from "@expo/vector-icons";
+import { Feather } from "../components/SafeIcons";
 import { IconButton } from "../components/buttons";
 import routes from "../navigation/routes";
 import { getAllRoutines } from "../db/DBActions";

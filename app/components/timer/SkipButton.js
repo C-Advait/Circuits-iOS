@@ -1,5 +1,5 @@
 import React from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "../SafeIcons";
 
 import { IconButton } from "../buttons";
 import timerActions from "../../actions/timerActions";

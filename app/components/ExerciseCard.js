@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { EvilIcons, MaterialIcons } from "@expo/vector-icons";
+import { EvilIcons, MaterialIcons } from "./SafeIcons";
 import { useNavigation } from "@react-navigation/native";
 
 import { useAppContext } from "../contexts/AppContext";

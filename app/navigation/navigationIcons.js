@@ -1,4 +1,4 @@
-import { Feather, Entypo } from "@expo/vector-icons";
+import { Feather, Entypo } from "../components/SafeIcons";
 import routes from "./routes";
 
 export default Object.freeze({
