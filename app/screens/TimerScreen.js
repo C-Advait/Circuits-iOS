@@ -68,7 +68,7 @@ function TimerScreen({ route }) {
             foregroundColor="white"
             onPress={() =>
               confirmedNavigate(() =>
-                navigation.navigate(routes.ROUTINES_SCREEN),
+                navigation.popTo(routes.ROUTINES_SCREEN),
               )
             }
             style={styles.backButton}
