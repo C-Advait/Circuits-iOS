@@ -19,8 +19,10 @@ import timerActions from "../actions/timerActions";
 import { Tag } from "../classes/Exercise";
 import CountdownModal from "../components/timer/CountdownModal";
 import { advanceTimerTo } from "../utilities/timerClock";
+import useCountdownDeadline from "../hooks/useCountdownDeadline";
 
 const CLOCK_INTERVAL_MS = 100;
+const INITIAL_COUNTDOWN_DURATION_MS = 3000;
 
 function TimerScreen({ route }) {
   const navigation = useNavigation();
@@ -31,9 +33,25 @@ function TimerScreen({ route }) {
   const [nextExerciseTitle, nextExerciseTag] = getNextExercise(state);
 
   useEffect(() => {
-    dispatch({ type: timerActions.INIT_FROM_PARAMS, params: route.params });
+    const now = Date.now();
+    dispatch({
+      type: timerActions.INIT_FROM_PARAMS,
+      params: route.params,
+    });
+    dispatch({
+      type: timerActions.START_COUNTDOWN,
+      deadline: now + INITIAL_COUNTDOWN_DURATION_MS,
+    });
     initTimerSequence(route.params, dispatch);
   }, []);
+
+  useCountdownDeadline({
+    deadline: state.countdownDeadline,
+    onComplete: () => {
+      dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
+      dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
+    },
+  });
 
   useEffect(() => {
     if (state.routineComplete) {
@@ -53,13 +71,7 @@ function TimerScreen({ route }) {
   // Check header for length, and potentially truncate!
   return (
     <Screen>
-      <CountdownModal
-        visible={state.showCountdown}
-        onClose={() => {
-          dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
-          dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
-        }}
-      />
+      <CountdownModal visible={state.showCountdown} />
       <View style={styles.topContainer}>
         <Text style={styles.routineTitle}>{state.title}</Text>
         <View style={styles.backButtonContainer}>
@@ -67,9 +79,7 @@ function TimerScreen({ route }) {
             title={"End"}
             foregroundColor="white"
             onPress={() =>
-              confirmedNavigate(() =>
-                navigation.popTo(routes.ROUTINES_SCREEN),
-              )
+              confirmedNavigate(() => navigation.popTo(routes.ROUTINES_SCREEN))
             }
             style={styles.backButton}
           />
@@ -126,6 +136,12 @@ function reducer(state, action) {
       return {
         ...state,
         ...action.params,
+      };
+    case timerActions.START_COUNTDOWN:
+      return {
+        ...state,
+        countdownDeadline: action.deadline,
+        showCountdown: true,
       };
     case timerActions.SET_EXERCISE_DATA:
       const finalInterval = action.intervals[action.intervals.length - 1];
@@ -226,6 +242,7 @@ function reducer(state, action) {
     case timerActions.MARK_COUNTDOWN_COMPLETE:
       return {
         ...state,
+        countdownDeadline: null,
         showCountdown: false,
       };
     case timerActions.CLOSE_SUCCESS_MODAL:
@@ -281,6 +298,7 @@ const initialState = {
   lastTickAt: null,
   clockRevision: 0,
 
+  countdownDeadline: null,
   showCountdown: true,
   showSuccess: false,
 };

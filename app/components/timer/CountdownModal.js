@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, StyleSheet, Modal } from "react-native";
 
 import LottieView from "lottie-react-native";
-import { SOUNDS } from "../../config/sounds";
 
-function CountdownModal({ visible, onClose }) {
+function CountdownModal({ visible }) {
   // Currently, countdown lottie is in dark mode only.
   return (
     <Modal animationType="fade" transparent={true} visible={visible}>
@@ -14,7 +13,6 @@ function CountdownModal({ visible, onClose }) {
           autoPlay
           loop={false}
           style={{ height: 322, width: 750 }}
-          onAnimationFinish={() => onClose()}
         />
       </View>
     </Modal>
