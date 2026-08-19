@@ -2,7 +2,6 @@ import SQLite from "react-native-sqlite-storage";
 import { SETTINGS_KEYS } from "../config/settingsKeys";
 import { defaultExercises, defaultRoutines } from "../config/defaultRoutines";
 
-
 let db;
 
 const createDefaultRoutine = (tx, routine) => {
@@ -186,51 +185,6 @@ export const createTables = async () => {
         console.error("Error creating `Routine` table.", error);
       },
     );
-
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS UserSubscription (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        requestDate TEXT,
-        entitlementId TEXT,
-        isActive INTEGER,
-        willRenew INTEGER,
-        productId TEXT,
-        periodType Text,
-        expirationDate TEXT,
-        purchaseDate TEXT,
-        originalPurchaseDate TEXT,
-        store TEXT,
-        isSandbox INTEGER,
-        unsubscribeDetectedAt TEXT,
-        billingIssueDetectedAt TEXT,
-        revenueCatID TEXT
-      );`,
-      [],
-      (_tx, _resultSet) => {
-        return;
-      },
-      (error) => {
-        console.error("Error creating `UserSubscription` table.", error);
-      },
-    );
-
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS UserSubscriptionAuxiliary (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        crossgrade INTEGER, 
-        expiryNotificationCount INTEGER 
-      );`,
-      [],
-      (_tx, _resultSet) => {
-        return;
-      },
-      (error) => {
-        console.error(
-          "Error creating `UserSubscriptionAuxiliary` table.",
-          error,
-        );
-      },
-    );
   });
 };
 
@@ -252,38 +206,6 @@ export const setDefaultValues = async () => {
     );
 
     tx.executeSql(
-      `INSERT OR IGNORE INTO UserSubscription
-      (id, isActive)
-      VALUES ( ?, ? );`,
-      [1, 0],
-      (_tx, _resultSet) => {
-        return;
-      },
-      (error) => {
-        console.error(
-          "Error setting defaults in `UserSubscription` table.",
-          error,
-        );
-      },
-    );
-
-    tx.executeSql(
-      `INSERT OR IGNORE INTO UserSubscriptionAuxiliary
-      (id, crossgrade, expiryNotificationCount)
-      VALUES ( ?, ?, ? );`,
-      [1, 0, 0],
-      (_tx, _resultSet) => {
-        return;
-      },
-      (error) => {
-        console.error(
-          "Error setting defaults in `UserSubscriptionAuxiliary` table.",
-          error,
-        );
-      },
-    );
-
-    tx.executeSql(
       `SELECT COUNT(*) AS count FROM Routine`,
       [],
       (_txObj, routineResult) => {
@@ -293,18 +215,21 @@ export const setDefaultValues = async () => {
           [],
           (_txObj, exerciseResult) => {
             // If no entries in both tables, call createDefaults
-            if (routineResult.rows.item(0).count === 0 && exerciseResult.rows.item(0).count === 0) {
+            if (
+              routineResult.rows.item(0).count === 0 &&
+              exerciseResult.rows.item(0).count === 0
+            ) {
               createDefaults(tx);
             }
           },
           (error) => {
             console.error("Error querying `Exercise` table.", error);
-          }
+          },
         );
       },
       (error) => {
         console.error("Error querying `Routine` table.", error);
-      }
+      },
     );
   });
 };

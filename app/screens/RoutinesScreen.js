@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { StyleSheet, FlatList, Alert, Text } from "react-native";
+import { StyleSheet, FlatList, Text } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import Header from "../components/Header";
@@ -35,7 +35,7 @@ function hashString(str) {
 
 function RoutinesScreen() {
   const navigation = useNavigation();
-  const { theme, isPremium } = useAppContext();
+  const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   const [routines, setRoutines] = useState([]);
@@ -118,33 +118,6 @@ function RoutinesScreen() {
     }
   };
 
-  const handleBlockedRoutineCreation = () => {
-    Alert.alert(
-      "You are on the Free Tier.", // Alert Title
-      "Create unlimited routines and more with Circuits Premium.", // Alert Message
-      [
-        {
-          text: "View Circuits Premium", // First button text
-          onPress: () =>
-            navigation.navigate(routes.SUBSCRIPTION_SCREEN, {
-              prevScreen: routes.ROUTINES_SCREEN,
-            }), // Handler for button press
-          isPreferred: true,
-        },
-        {
-          text: "Got it", // Second button text
-          onPress: () => null, // Handler for button press
-          // style: "cancel", // Style for the button, 'cancel' will make it the less prominent button
-        },
-      ],
-      {
-        cancelable: true, // Whether to close the dialog on tapping outside
-        onDismiss: () => null,
-        userInterfaceStyle: "dark",
-      },
-    );
-  };
-
   const combineData = () => {
     let ret = [];
 
@@ -182,7 +155,6 @@ function RoutinesScreen() {
               new Array(Math.max(prev.length - 1, 0)).fill(false),
             );
           }}
-          isEnabled={isPremium ? true : !routine.userCreated || index <= 3}
         />
       );
     else
@@ -202,13 +174,7 @@ function RoutinesScreen() {
           IconFamily={Feather}
           iconSize={55}
           foregroundColor={theme.blue}
-          onPress={() => {
-            isPremium
-              ? handleNewRoutineOnpress()
-              : userRoutines.length < 3
-              ? handleNewRoutineOnpress()
-              : handleBlockedRoutineCreation();
-          }}
+          onPress={handleNewRoutineOnpress}
         />
       </View>
       <FlatList

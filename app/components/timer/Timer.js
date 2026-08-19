@@ -119,13 +119,13 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
       timerIDsRef.current = newIDs;
     };
 
-    const subscription = AppState.addEventListener(
+    const appStateListener = AppState.addEventListener(
       "change",
       handleAppStateChange,
     );
 
     return () => {
-      subscription.remove();
+      appStateListener.remove();
       clearScheduledSounds();
     };
   }, []);
