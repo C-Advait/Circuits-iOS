@@ -13,7 +13,7 @@ import BackgroundTimer from "react-native-background-timer";
 import NumericalTimer from "./NumericalTimer";
 import ResetButton from "./ResetButton";
 
-import { CIRCLE_SIZE, CIRCUMFERENCE, STROKE_WIDTH } from "./timerConstants";
+import { STROKE_WIDTH } from "./timerConstants";
 import { getMovingEndColor, getFixedEndColor } from "../../config/gradients";
 import timerActions from "../../actions/timerActions";
 import { SOUNDS } from "../../config/sounds";
@@ -27,7 +27,7 @@ const MILLIS_IN_SECOND = 1000;
 // iOS expires ordinary background tasks after roughly 30 seconds.
 const MAX_BACKGROUND_SOUND_DELAY_SECONDS = 28;
 
-const Timer = ({ state, dispatch, nextExerciseTag }) => {
+const Timer = ({ state, dispatch, nextExerciseTag, size, compact = false }) => {
   const { playSound, stopSound } = useSoundContext();
   const progress = useSharedValue(1);
   const { title, tag } = state.intervals[state.currentIndex] || {};
@@ -38,6 +38,9 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
   const completionPlayedInBackgroundRef = useRef(false);
   const initialCountdownSoundPlayedRef = useRef(false);
   const previousIsPlayingRef = useRef(state.isPlaying);
+  const radius = size / 2 - STROKE_WIDTH;
+  const circumference = 2 * radius * Math.PI;
+  const styles = getStyles(size, compact);
 
   stateRef.current = state;
   playSoundRef.current = playSound;
@@ -191,7 +194,7 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
   }, [state.routineComplete]);
 
   const animatedProps = useAnimatedProps(() => {
-    const strokeDashoffset = (1 - progress.value) * CIRCUMFERENCE;
+    const strokeDashoffset = (1 - progress.value) * circumference;
     return {
       strokeDashoffset,
     };
@@ -199,30 +202,30 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
 
   return (
     <View style={styles.container}>
-      <Svg width={CIRCLE_SIZE} height={CIRCLE_SIZE} fill="transparent">
+      <Svg width={size} height={size} fill="transparent">
         <Defs>
           <LinearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <Stop offset="0%" stopColor={getMovingEndColor(tag)} />
             <Stop offset="100%" stopColor={getFixedEndColor(tag)} />
           </LinearGradient>
         </Defs>
-        <G rotation="-90" origin={`${CIRCLE_SIZE / 2}, ${CIRCLE_SIZE / 2}`}>
+        <G rotation="-90" origin={`${size / 2}, ${size / 2}`}>
           <Circle
-            cx={CIRCLE_SIZE / 2}
-            cy={CIRCLE_SIZE / 2}
-            r={CIRCLE_SIZE / 2 - STROKE_WIDTH}
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
             strokeWidth={STROKE_WIDTH}
             stroke="rgba(255, 255, 255, 0.11)"
           />
           <AnimatedCircle
-            cx={CIRCLE_SIZE / 2}
-            cy={CIRCLE_SIZE / 2}
-            r={CIRCLE_SIZE / 2 - STROKE_WIDTH}
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
             strokeWidth={STROKE_WIDTH}
             stroke="url(#gradient)"
             fill="transparent"
             strokeLinecap="round"
-            strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+            strokeDasharray={`${circumference} ${circumference}`}
             animatedProps={animatedProps}
           />
         </G>
@@ -277,33 +280,34 @@ const styleExerciseTitle = (title) => {
   return ret;
 };
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "flex-start",
-    alignItems: "center",
-    padding: 20,
-  },
-  overlay: {
-    alignSelf: "center",
-    width: 0.5 * CIRCLE_SIZE,
-    height: 0.65 * CIRCLE_SIZE,
-    position: "absolute",
-    gap: 10,
-    top: CIRCLE_SIZE / 3 - 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    color: "white",
-    fontSize: 27,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  timer: {
-    fontSize: 20,
-    color: "white",
-    marginBottom: 10,
-  },
-});
+const getStyles = (size, compact) =>
+  StyleSheet.create({
+    container: {
+      justifyContent: "flex-start",
+      alignItems: "center",
+      padding: compact ? 8 : 20,
+    },
+    overlay: {
+      alignSelf: "center",
+      width: 0.55 * size,
+      height: 0.65 * size,
+      position: "absolute",
+      gap: compact ? 4 : 10,
+      top: size / 3 - (compact ? 8 : 20),
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    title: {
+      color: "white",
+      fontSize: compact ? 24 : 27,
+      fontWeight: "500",
+      textAlign: "center",
+    },
+    timer: {
+      fontSize: 20,
+      color: "white",
+      marginBottom: 10,
+    },
+  });
 
 export default Timer;
