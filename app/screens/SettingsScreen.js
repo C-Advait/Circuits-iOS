@@ -12,8 +12,6 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Rate from "react-native-rate";
-import { useNavigation } from "@react-navigation/core";
-import routes from "../navigation/routes";
 
 import Screen from "../components/Screen";
 import Header from "../components/Header";
@@ -24,7 +22,6 @@ import { PRIVACY_STATEMENT_URL } from "../config/appConstants";
 function SettingsScreen() {
   const { theme } = useAppContext();
   const styles = getStyles(theme);
-  const navigation = useNavigation();
 
   const { soundOn, updateSound } = useAppContext();
 
@@ -91,17 +88,6 @@ function SettingsScreen() {
       ),
     },
   ];
-  const account = [
-    {
-      id: 1,
-      title: "Subscription Plan",
-      onTouchablePress: () =>
-        navigation.navigate(routes.SUBSCRIPTION_SCREEN, {
-          prevScreen: routes.SETTINGS_SCREEN,
-        }),
-    },
-  ];
-
   const support = [
     {
       id: 4,
@@ -163,7 +149,6 @@ function SettingsScreen() {
       </View>
       <ScrollView style={styles.scrollContainer}>
         {renderSection("Behaviour", behaviour)}
-        {renderSection("My Account", account)}
         {renderSection("Support", support)}
         {renderSection("Privacy", privacy)}
       </ScrollView>
