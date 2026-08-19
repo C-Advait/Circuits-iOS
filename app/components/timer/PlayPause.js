@@ -11,7 +11,7 @@ function PlayPause({ isPlaying, dispatch }) {
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => {
-        dispatch({ type: timerActions.TOGGLE_IS_PLAYING });
+        dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
       }}
       style={styles.background}
     >

@@ -20,9 +20,9 @@ function SkipButton({ shouldSkipForward, dispatch, active = true }) {
         if (!active) return;
 
         if (shouldSkipForward) {
-          dispatch({ type: timerActions.SKIP_FORWARD });
+          dispatch({ type: timerActions.SKIP_FORWARD, now: Date.now() });
         } else {
-          dispatch({ type: timerActions.SKIP_BACKWARD });
+          dispatch({ type: timerActions.SKIP_BACKWARD, now: Date.now() });
         }
       }}
     />
