@@ -27,11 +27,14 @@ function TimerScreen({ route }) {
   const { theme } = useAppContext();
   const { width, height } = useWindowDimensions();
   const isPhone = width < 600;
+  const isWide = width >= 1000;
   const compact = (isPhone && height < 750) || (!isPhone && height < 900);
-  const timerSize = isPhone
+  const timerSize = isWide
+    ? Math.min(height * 0.58, 460)
+    : isPhone
     ? Math.min(width - 60, compact ? height * 0.43 : width - 60)
     : Math.min(width - 80, height * (compact ? 0.45 : 0.52), 520);
-  const styles = getStyles(theme, compact);
+  const styles = getStyles(theme, compact, isWide);
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [nextExerciseTitle, nextExerciseTag] = getNextExercise(state);
@@ -82,42 +85,46 @@ function TimerScreen({ route }) {
             />
           </View>
         </View>
-        <Timer
-          state={state}
-          dispatch={dispatch}
-          nextExerciseTag={nextExerciseTag}
-          size={timerSize}
-          compact={compact}
-        />
-        <View style={styles.nextContainer}>
-          <Text style={styles.upNext}>UP NEXT:</Text>
-          <Text style={styles.nextExercise} numberOfLines={1}>
-            {nextExerciseTitle}
-          </Text>
-        </View>
-        <View style={styles.controlRow}>
-          <SkipButton
-            shouldSkipForward={false}
+        <View style={styles.body}>
+          <Timer
+            state={state}
             dispatch={dispatch}
-            active={state.currentIndex !== 0 && !state.routineComplete}
+            nextExerciseTag={nextExerciseTag}
+            size={timerSize}
+            compact={compact}
           />
-          <PlayPause isPlaying={state.isPlaying} dispatch={dispatch} />
-          <SkipButton
-            shouldSkipForward={true}
-            dispatch={dispatch}
-            active={state.currentIndex !== state.intervals.length - 1}
-          />
-        </View>
-        <View style={styles.progressRow}>
-          <InfoWidget title="Round" state={state} />
-          <InfoWidget title="Exercise" state={state} />
-          <InfoWidget title="Loop" state={state} />
-        </View>
-        <View style={styles.sliderContainer}>
-          <ProgressSlider
-            elapsed={state.totalElapsedTime}
-            total={state.totalDuration}
-          />
+          <View style={styles.detailsColumn}>
+            <View style={styles.nextContainer}>
+              <Text style={styles.upNext}>UP NEXT:</Text>
+              <Text style={styles.nextExercise} numberOfLines={1}>
+                {nextExerciseTitle}
+              </Text>
+            </View>
+            <View style={styles.controlRow}>
+              <SkipButton
+                shouldSkipForward={false}
+                dispatch={dispatch}
+                active={state.currentIndex !== 0 && !state.routineComplete}
+              />
+              <PlayPause isPlaying={state.isPlaying} dispatch={dispatch} />
+              <SkipButton
+                shouldSkipForward={true}
+                dispatch={dispatch}
+                active={state.currentIndex !== state.intervals.length - 1}
+              />
+            </View>
+            <View style={styles.progressRow}>
+              <InfoWidget title="Round" state={state} />
+              <InfoWidget title="Exercise" state={state} />
+              <InfoWidget title="Loop" state={state} />
+            </View>
+            <View style={styles.sliderContainer}>
+              <ProgressSlider
+                elapsed={state.totalElapsedTime}
+                total={state.totalDuration}
+              />
+            </View>
+          </View>
         </View>
       </View>
       <SuccessModal
@@ -295,7 +302,7 @@ const initialState = {
   showSuccess: false,
 };
 
-const getStyles = (theme, compact) =>
+const getStyles = (theme, compact, isWide) =>
   StyleSheet.create({
     backButton: {
       backgroundColor: "rgba(255, 255, 255, 0.14)",
@@ -310,6 +317,13 @@ const getStyles = (theme, compact) =>
       position: "absolute",
       right: 22,
     },
+    body: {
+      alignItems: "center",
+      flex: 1,
+      flexDirection: isWide ? "row" : "column",
+      gap: isWide ? 56 : 0,
+      justifyContent: isWide ? "center" : "flex-start",
+    },
     controlRow: {
       flexDirection: "row",
       justifyContent: "center",
@@ -321,8 +335,13 @@ const getStyles = (theme, compact) =>
     content: {
       alignSelf: "center",
       flex: 1,
-      maxWidth: 720,
+      maxWidth: isWide ? 1080 : 720,
+      paddingHorizontal: isWide ? 24 : 0,
       width: "100%",
+    },
+    detailsColumn: {
+      justifyContent: "center",
+      width: isWide ? 420 : "100%",
     },
     nextContainer: {
       marginTop: 5,
