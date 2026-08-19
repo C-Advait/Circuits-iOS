@@ -118,7 +118,7 @@ function ExerciseEditScreen({ route }) {
   );
 
   const goBack = () =>
-    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+    navigation.popTo(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
 
   const onSave = () => {
     const exercise = new Exercise({
@@ -148,7 +148,7 @@ function ExerciseEditScreen({ route }) {
       setContextExercises([...contextExercises, originalExercise]);
     }
 
-    navigation.navigate(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
+    navigation.popTo(routes.ROUTINE_EDIT_SCREEN, { edit: isRoutineEditing });
   };
 
   const confirmDiscard = () => confirmedNavigate(goBack);
