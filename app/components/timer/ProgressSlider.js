@@ -17,12 +17,12 @@ function ProgressSlider({ elapsed, total }) {
         thumbStyle={styles.thumbStyle}
         minimumTrackStyle={styles.leftTrack}
         maximumTrackStyle={styles.rightTrack}
-        value={elapsed / total}
+        value={total > 0 ? elapsed / total : 0}
       />
       <View style={styles.timeBox}>
-        <Text style={styles.time}>{parseTime(Math.round(elapsed))}</Text>
+        <Text style={styles.time}>{parseTime(Math.floor(elapsed))}</Text>
         <Text style={styles.time}>
-          -{parseTime(Math.round(total - elapsed))}
+          -{parseTime(Math.ceil(Math.max(0, total - elapsed)))}
         </Text>
       </View>
     </>

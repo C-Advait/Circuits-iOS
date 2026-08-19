@@ -7,22 +7,17 @@ import Header from "../Header";
 import { useNavigation } from "@react-navigation/native";
 import routes from "../../navigation/routes";
 import timerActions from "../../actions/timerActions";
-import { SOUNDS } from "../../config/sounds";
-import { useSoundContext } from "../../contexts/SoundContext";
 import { logRoutineCompletion } from "../../db/DBActions";
 
 function SuccessModal({ routineTitle, routineID, visible, dispatch }) {
   const navigation = useNavigation();
   const [animationCompleted, setAnimationCompleted] = useState(false);
   const animationRef = useRef(null);
-  const { playSound } = useSoundContext();
-
   const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   useEffect(() => {
     if (visible) {
-      playSound(SOUNDS.COMPLETION.key);
       logRoutineCompletion(routineID);
     }
   }, [visible]);
