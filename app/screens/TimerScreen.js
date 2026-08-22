@@ -67,9 +67,7 @@ function TimerScreen({ route }) {
             title={"End"}
             foregroundColor="white"
             onPress={() =>
-              confirmedNavigate(() =>
-                navigation.popTo(routes.ROUTINES_SCREEN),
-              )
+              confirmedNavigate(() => navigation.popTo(routes.ROUTINES_SCREEN))
             }
             style={styles.backButton}
           />
@@ -114,7 +112,6 @@ function TimerScreen({ route }) {
         routineID={state.id}
         routineTitle={state.title}
         visible={state.showSuccess}
-        dispatch={dispatch}
       />
     </Screen>
   );
