@@ -129,7 +129,7 @@ const TemplateSelectionScreen = ({ route }) => {
             IconFamily={Feather}
             foregroundColor={theme.blue}
             onPress={() =>
-              navigation.navigate(routes.ROUTINE_EDIT_SCREEN, {
+              navigation.popTo(routes.ROUTINE_EDIT_SCREEN, {
                 edit: isRoutineEditing,
               })
             }
