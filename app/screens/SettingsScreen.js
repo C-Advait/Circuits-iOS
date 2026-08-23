@@ -49,8 +49,7 @@ function SettingsScreen() {
 
   const rateUs = () => {
     const options = {
-      // Add AppleAppID after the new App Store Connect record is created.
-      // Ex. AppleAppID: "39402384290"
+      AppleAppID: "6804512436",
       // Add GooglePackageName after new google record created
       // Ex. GooglePackageName: "com.circuits.timer",
       preferInApp: true,
