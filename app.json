@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Circuits",
-    "slug": "Circuits",
+    "slug": "circuits-timer",
     "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./app/assets/icon.png",
@@ -9,7 +9,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.a99wang.Timer",
+      "bundleIdentifier": "com.circuits.timer",
       "infoPlist": {
         "UIBackgroundModes": ["audio"]
       }
@@ -19,16 +19,16 @@
         "foregroundImage": "./app/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.a99wang.circuits",
+      "package": "com.circuits.timer",
       "versionCode": 1
     },
     "web": {
       "favicon": "./app/assets/favicon.png"
     },
-    "owner": "a99wang",
+    "owner": "advaitc",
     "extra": {
       "eas": {
-        "projectId": "4d5d66e1-4dde-4610-8aa7-536816ab12a6"
+        "projectId": "9e75acbd-230e-47f3-80c4-13a926a6fb59"
       }
     },
     "plugins": [
