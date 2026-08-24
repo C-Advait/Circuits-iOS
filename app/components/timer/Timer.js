@@ -21,6 +21,10 @@ import { useSoundContext } from "../../contexts/SoundContext";
 import { Tag } from "../../classes/Exercise";
 import { getElapsedAtTime } from "../../utilities/timerClock";
 
+const {
+  getBackgroundPlaybackPlan,
+} = require("../../utilities/backgroundPlayback");
+
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const COUNTDOWN_DURATION = 3;
 const MILLIS_IN_SECOND = 1000;
@@ -75,13 +79,21 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
 
       if (nextAppState !== "background") return;
 
-      dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
-
       const snapshot = stateRef.current;
-      if (!snapshot.isPlaying || snapshot.routineComplete) return;
-
       const now = Date.now();
-      const elapsedAtBackground = getElapsedAtTime(snapshot, now);
+      const playbackPlan = getBackgroundPlaybackPlan(snapshot, now);
+      if (!playbackPlan || snapshot.routineComplete) return;
+
+      if (playbackPlan.startsAfterCountdown) {
+        dispatch({
+          type: timerActions.COMPLETE_COUNTDOWN,
+          startedAt: playbackPlan.startedAt,
+        });
+      }
+
+      const elapsedAtBackground = snapshot.isPlaying
+        ? getElapsedAtTime(snapshot, now)
+        : snapshot.totalElapsedTime;
       const newIDs = [];
 
       snapshot.intervals.forEach((interval, index) => {
@@ -90,7 +102,8 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
         const cueTime = interval.startTime - COUNTDOWN_DURATION;
         if (cueTime <= elapsedAtBackground) return;
 
-        const cueDelay = cueTime - elapsedAtBackground;
+        const cueDelay =
+          playbackPlan.delayUntilStartSeconds + cueTime - elapsedAtBackground;
         if (cueDelay > MAX_BACKGROUND_SOUND_DELAY_SECONDS) return;
 
         const soundKey = getSoundToPlay(interval.tag);
@@ -104,7 +117,10 @@ const Timer = ({ state, dispatch, nextExerciseTag }) => {
         newIDs.push(id);
       });
 
-      const completionDelay = snapshot.totalDuration - elapsedAtBackground;
+      const completionDelay =
+        playbackPlan.delayUntilStartSeconds +
+        snapshot.totalDuration -
+        elapsedAtBackground;
       if (
         completionDelay > 0 &&
         completionDelay <= MAX_BACKGROUND_SOUND_DELAY_SECONDS

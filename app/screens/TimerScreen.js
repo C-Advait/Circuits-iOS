@@ -48,8 +48,10 @@ function TimerScreen({ route }) {
   useCountdownDeadline({
     deadline: state.countdownDeadline,
     onComplete: () => {
-      dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
-      dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
+      dispatch({
+        type: timerActions.COMPLETE_COUNTDOWN,
+        startedAt: state.countdownDeadline ?? Date.now(),
+      });
     },
   });
 
@@ -238,11 +240,16 @@ function reducer(state, action) {
           : null,
         clockRevision: state.clockRevision + 1,
       };
-    case timerActions.MARK_COUNTDOWN_COMPLETE:
+    case timerActions.COMPLETE_COUNTDOWN:
+      if (!state.showCountdown) return state;
+
       return {
         ...state,
         countdownDeadline: null,
         showCountdown: false,
+        isPlaying: true,
+        lastTickAt: action.startedAt,
+        clockRevision: state.clockRevision + 1,
       };
     case timerActions.CLOSE_SUCCESS_MODAL:
       return {
