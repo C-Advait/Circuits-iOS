@@ -1,5 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Text, View, StyleSheet, Modal, TouchableOpacity } from "react-native";
+import React, { useEffect, useRef } from "react";
+import {
+  Animated,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import LottieView from "lottie-react-native";
 import { useAppContext } from "../../contexts/AppContext";
@@ -10,51 +16,74 @@ import { logRoutineCompletion } from "../../db/DBActions";
 
 function SuccessModal({ routineTitle, routineID, visible }) {
   const navigation = useNavigation();
-  const [animationCompleted, setAnimationCompleted] = useState(false);
   const animationRef = useRef(null);
+  const completionHandledRef = useRef(false);
+  const animationOpacity = useRef(new Animated.Value(0)).current;
   const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   useEffect(() => {
-    if (visible) {
-      logRoutineCompletion(routineID);
-    }
-  }, [visible]);
+    if (!visible || completionHandledRef.current) return;
+
+    completionHandledRef.current = true;
+    logRoutineCompletion(routineID);
+    animationRef.current?.play();
+
+    const fade = Animated.timing(animationOpacity, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    });
+    fade.start();
+
+    return () => fade.stop();
+  }, [animationOpacity, routineID, visible]);
 
   return (
-    <Modal animationType="fade" transparent={true} visible={visible}>
-      <View style={styles.overlay}>
-        <View style={styles.topContainer}>
-          <Text style={styles.routineTitle}>{routineTitle}</Text>
-        </View>
+    <View
+      accessibilityElementsHidden={!visible}
+      accessibilityViewIsModal={visible}
+      importantForAccessibility={visible ? "yes" : "no-hide-descendants"}
+      pointerEvents={visible ? "auto" : "none"}
+      style={[
+        StyleSheet.absoluteFill,
+        styles.overlay,
+        !visible && styles.hiddenOverlay,
+      ]}
+    >
+      <View style={styles.topContainer}>
+        <Text style={styles.routineTitle}>{routineTitle}</Text>
+      </View>
+      <Animated.View
+        style={[styles.animationContainer, { opacity: animationOpacity }]}
+      >
         <LottieView
           ref={animationRef}
           source={require("../../assets/lotties/success.json")}
-          autoPlay
           loop={false}
-          style={{ height: 400, width: 400 }}
-          onAnimationFinish={() => {
-            setAnimationCompleted(true);
-          }}
-          progress={animationCompleted ? 1 : 0}
+          style={StyleSheet.absoluteFill}
         />
-        <View style={styles.completeContainer}>
-          <Header>Complete!</Header>
-        </View>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.touchable}
-          onPress={() => navigation.popTo(routes.ROUTINES_SCREEN)}
-        >
-          <Text style={styles.done}>Done</Text>
-        </TouchableOpacity>
+      </Animated.View>
+      <View style={styles.completeContainer}>
+        <Header>Complete!</Header>
       </View>
-    </Modal>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.touchable}
+        onPress={() => navigation.popTo(routes.ROUTINES_SCREEN)}
+      >
+        <Text style={styles.done}>Done</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const getStyles = (theme) =>
   StyleSheet.create({
+    animationContainer: {
+      height: 400,
+      width: 400,
+    },
     completeContainer: {
       alignItems: "center",
       marginBottom: 50,
@@ -65,10 +94,14 @@ const getStyles = (theme) =>
       fontWeight: "500",
     },
     overlay: {
-      flex: 1,
       backgroundColor: theme.background,
       justifyContent: "center",
       alignItems: "center",
+      zIndex: 1,
+    },
+    hiddenOverlay: {
+      opacity: 0,
+      zIndex: -1,
     },
     routineTitle: {
       color: theme.foreground,

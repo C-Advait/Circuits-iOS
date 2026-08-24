@@ -48,16 +48,12 @@ function TimerScreen({ route }) {
   useCountdownDeadline({
     deadline: state.countdownDeadline,
     onComplete: () => {
-      dispatch({ type: timerActions.MARK_COUNTDOWN_COMPLETE });
-      dispatch({ type: timerActions.TOGGLE_IS_PLAYING, now: Date.now() });
+      dispatch({
+        type: timerActions.COMPLETE_COUNTDOWN,
+        startedAt: state.countdownDeadline ?? Date.now(),
+      });
     },
   });
-
-  useEffect(() => {
-    if (state.routineComplete) {
-      dispatch({ type: timerActions.CLOSE_SUCCESS_MODAL });
-    }
-  }, [state.routineComplete]);
 
   useEffect(() => {
     if (!state.isPlaying || state.routineComplete) return;
@@ -123,7 +119,7 @@ function TimerScreen({ route }) {
       <SuccessModal
         routineID={state.id}
         routineTitle={state.title}
-        visible={state.showSuccess}
+        visible={state.routineComplete}
       />
     </Screen>
   );
@@ -238,16 +234,16 @@ function reducer(state, action) {
           : null,
         clockRevision: state.clockRevision + 1,
       };
-    case timerActions.MARK_COUNTDOWN_COMPLETE:
+    case timerActions.COMPLETE_COUNTDOWN:
+      if (!state.showCountdown) return state;
+
       return {
         ...state,
         countdownDeadline: null,
         showCountdown: false,
-      };
-    case timerActions.CLOSE_SUCCESS_MODAL:
-      return {
-        ...state,
-        showSuccess: true,
+        isPlaying: true,
+        lastTickAt: action.startedAt,
+        clockRevision: state.clockRevision + 1,
       };
   }
 }
@@ -299,7 +295,6 @@ const initialState = {
 
   countdownDeadline: null,
   showCountdown: true,
-  showSuccess: false,
 };
 
 const getStyles = (theme) =>
