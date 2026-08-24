@@ -56,12 +56,6 @@ function TimerScreen({ route }) {
   });
 
   useEffect(() => {
-    if (state.routineComplete) {
-      dispatch({ type: timerActions.CLOSE_SUCCESS_MODAL });
-    }
-  }, [state.routineComplete]);
-
-  useEffect(() => {
     if (!state.isPlaying || state.routineComplete) return;
 
     const tick = () => dispatch({ type: timerActions.TICK, now: Date.now() });
@@ -122,11 +116,9 @@ function TimerScreen({ route }) {
           total={state.totalDuration}
         />
       </View>
-      <SuccessModal
-        routineID={state.id}
-        routineTitle={state.title}
-        visible={state.showSuccess}
-      />
+      {state.routineComplete ? (
+        <SuccessModal routineID={state.id} routineTitle={state.title} />
+      ) : null}
     </Screen>
   );
 }
@@ -251,11 +243,6 @@ function reducer(state, action) {
         lastTickAt: action.startedAt,
         clockRevision: state.clockRevision + 1,
       };
-    case timerActions.CLOSE_SUCCESS_MODAL:
-      return {
-        ...state,
-        showSuccess: true,
-      };
   }
 }
 
@@ -306,7 +293,6 @@ const initialState = {
 
   countdownDeadline: null,
   showCountdown: true,
-  showSuccess: false,
 };
 
 const getStyles = (theme) =>

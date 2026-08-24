@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Text, View, StyleSheet, Modal, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 
 import LottieView from "lottie-react-native";
 import { useAppContext } from "../../contexts/AppContext";
@@ -8,48 +8,40 @@ import { useNavigation } from "@react-navigation/native";
 import routes from "../../navigation/routes";
 import { logRoutineCompletion } from "../../db/DBActions";
 
-function SuccessModal({ routineTitle, routineID, visible }) {
+function SuccessModal({ routineTitle, routineID }) {
   const navigation = useNavigation();
-  const [animationCompleted, setAnimationCompleted] = useState(false);
-  const animationRef = useRef(null);
   const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   useEffect(() => {
-    if (visible) {
-      logRoutineCompletion(routineID);
-    }
-  }, [visible]);
+    logRoutineCompletion(routineID);
+  }, [routineID]);
 
   return (
-    <Modal animationType="fade" transparent={true} visible={visible}>
-      <View style={styles.overlay}>
-        <View style={styles.topContainer}>
-          <Text style={styles.routineTitle}>{routineTitle}</Text>
-        </View>
-        <LottieView
-          ref={animationRef}
-          source={require("../../assets/lotties/success.json")}
-          autoPlay
-          loop={false}
-          style={{ height: 400, width: 400 }}
-          onAnimationFinish={() => {
-            setAnimationCompleted(true);
-          }}
-          progress={animationCompleted ? 1 : 0}
-        />
-        <View style={styles.completeContainer}>
-          <Header>Complete!</Header>
-        </View>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={styles.touchable}
-          onPress={() => navigation.popTo(routes.ROUTINES_SCREEN)}
-        >
-          <Text style={styles.done}>Done</Text>
-        </TouchableOpacity>
+    <View
+      accessibilityViewIsModal
+      style={[StyleSheet.absoluteFill, styles.overlay]}
+    >
+      <View style={styles.topContainer}>
+        <Text style={styles.routineTitle}>{routineTitle}</Text>
       </View>
-    </Modal>
+      <LottieView
+        source={require("../../assets/lotties/success.json")}
+        autoPlay
+        loop={false}
+        style={{ height: 400, width: 400 }}
+      />
+      <View style={styles.completeContainer}>
+        <Header>Complete!</Header>
+      </View>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.touchable}
+        onPress={() => navigation.popTo(routes.ROUTINES_SCREEN)}
+      >
+        <Text style={styles.done}>Done</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -65,10 +57,10 @@ const getStyles = (theme) =>
       fontWeight: "500",
     },
     overlay: {
-      flex: 1,
       backgroundColor: theme.background,
       justifyContent: "center",
       alignItems: "center",
+      zIndex: 1,
     },
     routineTitle: {
       color: theme.foreground,
