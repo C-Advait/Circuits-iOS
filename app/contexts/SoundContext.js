@@ -9,6 +9,8 @@ import { createAudioPlayer } from "expo-audio";
 import { SOUNDS } from "../config/sounds";
 import { useAppContext } from "./AppContext";
 
+const { SoundPlaybackController } = require("../utilities/soundPlayback");
+
 const SoundContext = createContext();
 
 export const useSoundContext = () => {
@@ -18,10 +20,25 @@ export const useSoundContext = () => {
 export const SoundProvider = ({ children }) => {
   const [sounds, setSounds] = useState({});
   const soundsRef = useRef({});
-  const activeSoundRef = useRef(null);
   const pendingSoundRef = useRef(null);
+  const soundOnRef = useRef(false);
+  const playbackControllerRef = useRef(null);
 
   const { soundOn } = useAppContext();
+  soundOnRef.current = soundOn;
+
+  if (!playbackControllerRef.current) {
+    playbackControllerRef.current = new SoundPlaybackController({
+      getPlayer: (key) => soundsRef.current[key],
+      isEnabled: () => soundOnRef.current,
+      onPlaybackStart: (key) => {
+        console.log(`About to play sound for key ${key}`);
+      },
+      onError: (action, key, error) => {
+        console.error(`Couldn't ${action} the sound for key ${key}`, error);
+      },
+    });
+  }
 
   const soundFiles = SOUNDS;
 
@@ -39,10 +56,7 @@ export const SoundProvider = ({ children }) => {
           (status) => {
             if (!status.didJustFinish) return;
 
-            activeSoundRef.current = null;
-            player.seekTo(0).catch((error) => {
-              console.error(`Couldn't rewind the sound for key ${key}`, error);
-            });
+            playbackControllerRef.current.handlePlaybackFinished(player);
           },
         );
 
@@ -83,39 +97,14 @@ export const SoundProvider = ({ children }) => {
   }, [sounds]);
 
   const playSound = async (key) => {
-    if (!key || activeSoundRef.current) return;
-
-    const sound = soundsRef.current[key];
-    if (!sound) {
+    const result = await playbackControllerRef.current.play(key);
+    if (result === "missing") {
       pendingSoundRef.current = key;
-      return;
-    }
-
-    if (soundOn) {
-      console.log(`About to play sound for key ${key}`);
-      try {
-        activeSoundRef.current = key;
-        await sound.seekTo(0);
-        sound.play();
-      } catch (error) {
-        activeSoundRef.current = null;
-        console.error(`Couldn't play the sound for key ${key}`, error);
-      }
     }
   };
 
   const stopSound = async () => {
-    const activeKey = activeSoundRef.current;
-    const sound = soundsRef.current[activeKey];
-    if (!activeKey || !sound) return;
-
-    activeSoundRef.current = null;
-    try {
-      sound.pause();
-      await sound.seekTo(0);
-    } catch (error) {
-      console.error(`Couldn't stop the sound for key ${activeKey}`, error);
-    }
+    await playbackControllerRef.current.stop();
   };
 
   return (
