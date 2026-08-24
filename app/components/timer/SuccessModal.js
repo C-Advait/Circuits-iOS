@@ -1,5 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Animated,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import LottieView from "lottie-react-native";
 import { useAppContext } from "../../contexts/AppContext";
@@ -8,38 +14,56 @@ import { useNavigation } from "@react-navigation/native";
 import routes from "../../navigation/routes";
 import { logRoutineCompletion } from "../../db/DBActions";
 
-function SuccessModal({ routineTitle, routineID }) {
+function SuccessModal({ routineTitle, routineID, visible }) {
   const navigation = useNavigation();
   const animationRef = useRef(null);
-  const animationPlayedRef = useRef(false);
+  const completionHandledRef = useRef(false);
+  const animationOpacity = useRef(new Animated.Value(0)).current;
   const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   useEffect(() => {
+    if (!visible || completionHandledRef.current) return;
+
+    completionHandledRef.current = true;
     logRoutineCompletion(routineID);
-  }, [routineID]);
-
-  useEffect(() => {
-    if (animationPlayedRef.current) return;
-
-    animationPlayedRef.current = true;
     animationRef.current?.play();
-  }, []);
+
+    const fade = Animated.timing(animationOpacity, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    });
+    fade.start();
+
+    return () => fade.stop();
+  }, [animationOpacity, routineID, visible]);
 
   return (
     <View
-      accessibilityViewIsModal
-      style={[StyleSheet.absoluteFill, styles.overlay]}
+      accessibilityElementsHidden={!visible}
+      accessibilityViewIsModal={visible}
+      importantForAccessibility={visible ? "yes" : "no-hide-descendants"}
+      pointerEvents={visible ? "auto" : "none"}
+      style={[
+        StyleSheet.absoluteFill,
+        styles.overlay,
+        !visible && styles.hiddenOverlay,
+      ]}
     >
       <View style={styles.topContainer}>
         <Text style={styles.routineTitle}>{routineTitle}</Text>
       </View>
-      <LottieView
-        ref={animationRef}
-        source={require("../../assets/lotties/success.json")}
-        loop={false}
-        style={{ height: 400, width: 400 }}
-      />
+      <Animated.View
+        style={[styles.animationContainer, { opacity: animationOpacity }]}
+      >
+        <LottieView
+          ref={animationRef}
+          source={require("../../assets/lotties/success.json")}
+          loop={false}
+          style={StyleSheet.absoluteFill}
+        />
+      </Animated.View>
       <View style={styles.completeContainer}>
         <Header>Complete!</Header>
       </View>
@@ -56,6 +80,10 @@ function SuccessModal({ routineTitle, routineID }) {
 
 const getStyles = (theme) =>
   StyleSheet.create({
+    animationContainer: {
+      height: 400,
+      width: 400,
+    },
     completeContainer: {
       alignItems: "center",
       marginBottom: 50,
@@ -70,6 +98,10 @@ const getStyles = (theme) =>
       justifyContent: "center",
       alignItems: "center",
       zIndex: 1,
+    },
+    hiddenOverlay: {
+      opacity: 0,
+      zIndex: -1,
     },
     routineTitle: {
       color: theme.foreground,

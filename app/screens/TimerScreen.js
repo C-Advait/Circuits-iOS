@@ -116,9 +116,11 @@ function TimerScreen({ route }) {
           total={state.totalDuration}
         />
       </View>
-      {state.routineComplete ? (
-        <SuccessModal routineID={state.id} routineTitle={state.title} />
-      ) : null}
+      <SuccessModal
+        routineID={state.id}
+        routineTitle={state.title}
+        visible={state.routineComplete}
+      />
     </Screen>
   );
 }
