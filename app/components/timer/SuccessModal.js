@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 
 import LottieView from "lottie-react-native";
@@ -10,12 +10,21 @@ import { logRoutineCompletion } from "../../db/DBActions";
 
 function SuccessModal({ routineTitle, routineID }) {
   const navigation = useNavigation();
+  const animationRef = useRef(null);
+  const animationPlayedRef = useRef(false);
   const { theme } = useAppContext();
   const styles = getStyles(theme);
 
   useEffect(() => {
     logRoutineCompletion(routineID);
   }, [routineID]);
+
+  useEffect(() => {
+    if (animationPlayedRef.current) return;
+
+    animationPlayedRef.current = true;
+    animationRef.current?.play();
+  }, []);
 
   return (
     <View
@@ -26,8 +35,8 @@ function SuccessModal({ routineTitle, routineID }) {
         <Text style={styles.routineTitle}>{routineTitle}</Text>
       </View>
       <LottieView
+        ref={animationRef}
         source={require("../../assets/lotties/success.json")}
-        autoPlay
         loop={false}
         style={{ height: 400, width: 400 }}
       />
