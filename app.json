@@ -10,6 +10,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.circuits.timer",
+      "appleTeamId": "C4M59G2AT3",
       "infoPlist": {
         "UIBackgroundModes": ["audio"],
         "ITSAppUsesNonExemptEncryption": false
